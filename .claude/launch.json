@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Static Site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["/tmp/ballpark_cafe/serve.py"],
+      "port": 8080
+    }
+  ]
+}
