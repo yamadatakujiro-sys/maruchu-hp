@@ -3,9 +3,8 @@
    Claude API 連携
    =============================== */
 
-// ★ サイトオーナー設定 ★
-// 下記にAnthropicのAPIキーを設定してください（sk-ant-api03-... の形式）
-const ANTHROPIC_API_KEY = '';
+// APIキーは config.js で設定してください（.gitignore 対象）
+// ANTHROPIC_API_KEY は config.js で定義されています
 
 // 店舗情報をシステムプロンプトに設定
 const SYSTEM_PROMPT = `あなたは野球コンセプト居酒屋「バッチコイ酒場まるちゅう」のAIアシスタントです。
@@ -47,12 +46,8 @@ class BallparkChat {
     this.fab.addEventListener('click', () => this.toggle());
     this.closeBtn.addEventListener('click', () => this.close());
     this.sendBtn.addEventListener('click', () => this.send());
-    this.inputEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        this.send();
-      }
-    });
+    // 送信はボタンクリックのみ（キーボードのEnterは使わない）
+    // ※日本語IME変換のEnterと競合するため
   }
 
   toggle() {
@@ -116,7 +111,9 @@ class BallparkChat {
       return;
     }
 
+    // 入力欄をクリア（ブラウザに強制反映）
     this.inputEl.value = '';
+    this.inputEl.dispatchEvent(new Event('input'));
     this.addUserMessage(text);
     this.isTyping = true;
     this.sendBtn.disabled = true;
@@ -162,6 +159,8 @@ class BallparkChat {
     } finally {
       this.isTyping = false;
       this.sendBtn.disabled = false;
+      // 入力欄が残っていた場合の保険
+      this.inputEl.value = '';
       this.inputEl.focus();
     }
   }
