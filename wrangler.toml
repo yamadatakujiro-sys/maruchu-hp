@@ -1,5 +1,8 @@
 name = "maruchu-kumagaya"
+main = "worker.js"
 compatibility_date = "2024-12-01"
+account_id = "6fc06e4682d7108850f5c8e62d700a2c"
 
 [assets]
-directory = "./"
+directory = "./public"
+binding = "ASSETS"

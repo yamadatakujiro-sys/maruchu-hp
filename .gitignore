@@ -11,3 +11,7 @@ config.js
 node_modules/
 package-lock.json
 package.json
+
+# wrangler
+.wrangler/
+.dev.vars

@@ -1,10 +1,11 @@
 /* ===============================
    バッチコイ酒場 まるちゅう
-   AI案内（Claude API 連携）
+   AI案内（Cloudflare Worker 経由で Claude API 連携）
    =============================== */
 
-// APIキーは config.js で設定してください（.gitignore 対象）
-// ANTHROPIC_API_KEY は config.js で定義されています
+// APIキーは Cloudflare Worker のシークレット (ANTHROPIC_API_KEY) で保持。
+// このスクリプトは同一オリジンの /api/chat へリクエストするのみで、
+// ブラウザにAPIキーは露出しない。
 
 // 店舗情報をシステムプロンプトに設定
 const SYSTEM_PROMPT = `あなたは熊谷の大衆酒場「バッチコイ酒場 まるちゅう」のオンライン案内係です。
@@ -120,19 +121,6 @@ class BallparkChat {
     const text = this.inputEl.value.trim();
     if (!text || this.isTyping) return;
 
-    // APIキー未設定（空 or プレースホルダー）の場合はAPI呼び出しを行わずに案内
-    const keyConfigured =
-      typeof ANTHROPIC_API_KEY === 'string' &&
-      ANTHROPIC_API_KEY.startsWith('sk-ant-') &&
-      ANTHROPIC_API_KEY.length > 60 &&
-      /^[\x00-\x7F]+$/.test(ANTHROPIC_API_KEY); // 非ASCII（プレースホルダー和文）を除外
-    if (!keyConfigured) {
-      this.addUserMessage(text);
-      this.inputEl.value = '';
-      this.addBotMessage('ただいま案内サービスをご利用いただけません。お電話（048-577-7677）にてお気軽にお問い合わせください。');
-      return;
-    }
-
     // 入力欄をクリア（ブラウザに強制反映）
     this.inputEl.value = '';
     this.inputEl.dispatchEvent(new Event('input'));
@@ -149,13 +137,10 @@ class BallparkChat {
     });
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
           model: 'claude-opus-4-7',
