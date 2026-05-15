@@ -6,3 +6,8 @@ config.js
 
 # Claude Code ローカル設定
 .claude/settings.local.json
+
+# npm
+node_modules/
+package-lock.json
+package.json
