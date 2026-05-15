@@ -3,329 +3,363 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>バッチコイ酒場まるちゅう — 野球コンセプト居酒屋｜埼玉県熊谷市</title>
-  <meta name="description" content="野球をテーマにした居酒屋「バッチコイ酒場まるちゅう」。埼玉県熊谷市筑波。こだわりの料理と豊富なドリンクでお待ちしております。">
+  <title>バッチコイ酒場 まるちゅう｜熊谷の大衆酒場</title>
+  <meta name="description" content="埼玉県熊谷駅徒歩5分の大衆酒場「バッチコイ酒場 まるちゅう」。まるちゅう餃子・塩ホルモン煮込み・自家製唐揚げを、温かい店内で。月～土 18:00～24:00／日曜定休。">
+  <meta property="og:title" content="バッチコイ酒場 まるちゅう｜熊谷の大衆酒場">
+  <meta property="og:description" content="熊谷駅徒歩5分の大衆酒場。まるちゅう餃子・塩ホルモン煮込み・自家製唐揚げを温かい店内で。">
+  <meta property="og:type" content="restaurant.restaurant">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <!-- Restaurant 構造化データ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    "name": "バッチコイ酒場 まるちゅう",
+    "image": "images/interior1.jpg",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "筑波3-46 ダイコービル 1F",
+      "addressLocality": "熊谷市",
+      "addressRegion": "埼玉県",
+      "postalCode": "360-0037",
+      "addressCountry": "JP"
+    },
+    "telephone": "+81-48-577-7677",
+    "servesCuisine": "Izakaya",
+    "priceRange": "¥¥",
+    "openingHoursSpecification": [{
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+      "opens": "18:00",
+      "closes": "24:00"
+    }],
+    "sameAs": ["https://www.instagram.com/maruchu88/"]
+  }
+  </script>
 </head>
 <body>
 
-  <!-- ===============================
-       ナビゲーション
-       =============================== -->
-  <nav class="nav">
-    <a class="nav-logo" href="#top">
-      <img src="images/logo.png" alt="バッチコイ酒場まるちゅう" class="nav-logo-img">
+  <!-- ナビゲーション -->
+  <nav class="nav" id="nav">
+    <a class="nav-brand" href="#top">
+      <span class="nav-brand-jp">バッチコイ酒場</span>
+      <span class="nav-brand-name">まるちゅう</span>
     </a>
     <ul class="nav-links" id="navLinks">
-      <li><a href="#about">About</a></li>
-      <li><a href="#menu">Menu</a></li>
-      <li><a href="#gallery">Gallery</a></li>
-      <li><a href="#access">Access</a></li>
-      <li><a href="#contact" class="nav-cta">予約・お問い合わせ</a></li>
+      <li><a href="#concept">こだわり</a></li>
+      <li><a href="#signature">名物</a></li>
+      <li><a href="#menu">お品書き</a></li>
+      <li><a href="#info">店舗情報</a></li>
+      <li><a href="#access">アクセス</a></li>
+      <li><a href="tel:0485777677" class="nav-cta">📞 048-577-7677</a></li>
     </ul>
     <button class="nav-toggle" id="navToggle" aria-label="メニューを開く">
       <span></span><span></span><span></span>
     </button>
   </nav>
 
-  <!-- ===============================
-       Hero
-       =============================== -->
+  <!-- Hero -->
   <section class="hero" id="top">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-glow hero-glow-1"></div>
+      <div class="hero-glow hero-glow-2"></div>
+      <div class="hero-glow hero-glow-3"></div>
+      <div class="hero-lantern hero-lantern-l"><span class="hero-lantern-band"></span><span class="hero-lantern-band"></span></div>
+      <div class="hero-lantern hero-lantern-r"><span class="hero-lantern-band"></span><span class="hero-lantern-band"></span></div>
+    </div>
+    <div class="hero-noren" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
     <div class="hero-content">
-      <p class="hero-subtitle">
-        埼玉県熊谷市にあります。╭( ･ㅂ･)و ̑̑ﾔｶﾞﾏｸｿﾞｲﾂｱ<br>
-        オススメはニンニクの入って無いまるちゅう餃子🥟<br>
-        子供から大人まで大人気の鶏の唐揚げ🐔<br>
-        その他定番メニューから季節の旬のオススメもいろいろそろってます👍
+      <p class="hero-eyebrow">熊谷・筑波 ／ 大衆酒場</p>
+      <h1 class="hero-title" lang="ja">
+        <span class="hero-title-vert">バッチコイ酒場</span>
+        <span class="hero-title-mark">まるちゅう</span>
+      </h1>
+      <p class="hero-tagline">
+        その日の魚と、煮込みと、笑い声。<br>
+        熊谷の夜を、ちょっと温める一軒。
       </p>
       <div class="hero-actions">
-        <a href="#menu" class="btn btn-primary">メニューを見る</a>
-        <a href="#contact" class="btn btn-outline">予約する</a>
+        <a href="#signature" class="btn btn-primary">名物を見る</a>
+        <a href="tel:0485777677" class="btn btn-ghost">電話で予約</a>
       </div>
+      <p class="hero-meta">月〜土 18:00 - 24:00 ／ 日曜定休</p>
+      <!-- 朱色印章 -->
+      <svg class="hero-stamp" aria-hidden="true" viewBox="0 0 100 100">
+        <rect x="6" y="6" width="88" height="88" rx="6" fill="none" stroke="currentColor" stroke-width="4"></rect>
+        <text x="50" y="40" text-anchor="middle" font-family="serif" font-weight="900" font-size="32" fill="currentColor">熊谷</text>
+        <text x="50" y="78" text-anchor="middle" font-family="serif" font-weight="900" font-size="32" fill="currentColor">乃店</text>
+      </svg>
     </div>
-    <div class="hero-image">
-      <img src="images/interior1.jpg" alt="店内" loading="eager">
-    </div>
+    <a href="#concept" class="hero-scroll" aria-label="ページを下にスクロール">
+      <span class="hero-scroll-label">SCROLL</span>
+      <span class="hero-scroll-line"></span>
+    </a>
   </section>
 
-  <!-- ===============================
-       About
-       =============================== -->
-  <section class="about" id="about">
-    <div class="about-image">
-      <div class="about-img-wrapper">
-        <img src="images/interior4.jpg" alt="店内カウンター">
-      </div>
+  <!-- Concept -->
+  <section class="concept" id="concept">
+    <div class="concept-image">
+      <img src="images/interior1.jpg" alt="まるちゅうの店内" loading="lazy">
+      <span class="concept-image-tag">since 開店</span>
     </div>
-    <div class="about-text">
-      <span class="section-label">About Us</span>
-      <h2 class="section-title">野球の魂が宿る、<br>熊谷の居酒屋。</h2>
+    <div class="concept-text">
+      <span class="section-label">— Concept</span>
+      <h2 class="section-title">
+        <span class="vert">気どらない、</span>
+        <span class="vert">うまい、あったかい。</span>
+      </h2>
       <p class="section-desc">
-        「バッチコイ」——その掛け声には、来い、かかってこいという強い意志が込められています。どんな一球も全力で受け止める野球精神を、お酒と料理でお届けします。
-        <br><br>
-        地元・熊谷を愛するお客様と、野球好きが集まるアットホームな空間。試合帰りも、普段の一杯も、まるちゅうがホームベースです。
+        カウンターと座敷あわせて 20 席。
+        ひとりでもふらりと、仲間とわいわいと。
+        熊谷駅から歩いて5分、筑波の路地に灯る暖簾をくぐれば、
+        その日の魚、丁寧に炊いた塩ホルモン、香ばしく焼いた餃子が待っています。
       </p>
-      <div class="about-stats">
-        <div class="stat">
-          <div class="stat-num">9+</div>
-          <div class="stat-label">こだわりのメニュー</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">豊富</div>
-          <div class="stat-label">ドリンク種類</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">18-</div>
-          <div class="stat-label">営業時間</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">日</div>
-          <div class="stat-label">定休日</div>
-        </div>
-      </div>
+      <ul class="concept-list">
+        <li><span>一</span>その日仕入れの旬ネタ</li>
+        <li><span>二</span>名物・まるちゅう餃子</li>
+        <li><span>三</span>カウンターで一人呑み歓迎</li>
+      </ul>
     </div>
   </section>
 
-  <!-- ===============================
-       Menu / Price
-       =============================== -->
+  <!-- Signature -->
+  <section class="signature" id="signature">
+    <header class="signature-header">
+      <span class="section-label">— Signature</span>
+      <h2 class="section-title">名物五品</h2>
+      <p class="section-desc">
+        まずは、これを。<br>
+        まるちゅうらしさが詰まった、看板の五品をどうぞ。
+      </p>
+    </header>
+    <div class="signature-grid">
+      <article class="sig-card" style="--reveal-delay: 0ms;">
+        <img class="sig-card-image" src="images/gyoza.jpg" alt="まるちゅう餃子" loading="lazy">
+        <div class="sig-card-num">壱</div>
+        <h3 class="sig-card-name">まるちゅう餃子</h3>
+        <p class="sig-card-desc">ニンニク不使用。皮はパリッと、餡はやさしい味わい。お子さまから大人まで人気。</p>
+        <span class="sig-card-tag">看板</span>
+      </article>
+      <article class="sig-card" style="--reveal-delay: 90ms;">
+        <img class="sig-card-image" src="images/food1.jpg" alt="塩ホルモン煮込み" loading="lazy">
+        <div class="sig-card-num">弐</div>
+        <h3 class="sig-card-name">塩ホルモン煮込み</h3>
+        <p class="sig-card-desc">じっくり下処理したホルモンを、澄んだ塩のスープで丁寧に。〆まで温まる一杯。</p>
+      </article>
+      <article class="sig-card" style="--reveal-delay: 180ms;">
+        <img class="sig-card-image" src="images/kushiage.jpg" alt="鳥の唐揚げ" loading="lazy">
+        <div class="sig-card-num">参</div>
+        <h3 class="sig-card-name">鳥の唐揚げ</h3>
+        <p class="sig-card-desc">衣はサクッ、肉汁ジュッ。気取らないけれど、ついおかわりしたくなる定番の一皿。</p>
+      </article>
+      <article class="sig-card" style="--reveal-delay: 270ms;">
+        <img class="sig-card-image" src="images/food3.jpg" alt="ふわトロチーズオムレツ" loading="lazy">
+        <div class="sig-card-num">四</div>
+        <h3 class="sig-card-name">ふわトロチーズオムレツ</h3>
+        <p class="sig-card-desc">ふんわり卵にとろけるチーズを忍ばせて。やさしい口どけで、お酒の合間にもう一品。</p>
+      </article>
+      <article class="sig-card" style="--reveal-delay: 360ms;">
+        <img class="sig-card-image" src="images/food4.jpg" alt="ガーリックシュリンプ" loading="lazy">
+        <div class="sig-card-num">五</div>
+        <h3 class="sig-card-name">ガーリックシュリンプ</h3>
+        <p class="sig-card-desc">香ばしいガーリックバターでぷりっと仕上げた海老。ビールにもハイボールにも。</p>
+      </article>
+    </div>
+    <p class="signature-note">※季節・仕入れにより内容が変わる場合があります。価格は店頭にてご確認ください。</p>
+  </section>
+
+  <!-- Menu -->
   <section class="menu" id="menu">
-    <div class="menu-inner">
-      <span class="section-label">Menu & Price</span>
-      <h2 class="section-title">メニュー</h2>
-      <div class="menu-grid">
-
-        <div class="menu-item">
-          <div class="menu-item-num">01</div>
-          <div class="menu-item-name">まるちゅう唐揚げ</div>
-          <p class="menu-item-desc">秘伝のタレに漬け込んだ、ジューシーな自家製唐揚げ。ビールとの相性は抜群。</p>
-          <div class="menu-item-price">
-            <span class="price-num">¥580</span>
-            <span class="price-unit">（税込）</span>
-          </div>
-          <div class="menu-item-tag">人気No.1</div>
-        </div>
-
-        <div class="menu-item">
-          <div class="menu-item-num">02</div>
-          <div class="menu-item-name">焼き鳥盛り合わせ</div>
-          <p class="menu-item-desc">炭火でじっくり焼いた串焼き盛り合わせ。塩・タレお好みで。</p>
-          <div class="menu-item-price">
-            <span class="price-num">¥780</span>
-            <span class="price-unit">（税込）</span>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <div class="menu-item-num">03</div>
-          <div class="menu-item-name">刺身三点盛り</div>
-          <p class="menu-item-desc">その日仕入れた新鮮な魚介を、丁寧に盛り合わせました。</p>
-          <div class="menu-item-price">
-            <span class="price-num">¥980</span>
-            <span class="price-unit">（税込）</span>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <div class="menu-item-num">04</div>
-          <div class="menu-item-name">生ビール</div>
-          <p class="menu-item-desc">キンキンに冷えた黄金の一杯。試合後の乾杯にも、最初の一杯にも。</p>
-          <div class="menu-item-price">
-            <span class="price-num">¥550</span>
-            <span class="price-unit">（税込）</span>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <div class="menu-item-num">05</div>
-          <div class="menu-item-name">ハイボール</div>
-          <p class="menu-item-desc">スッキリ爽快なウィスキーハイボール。何杯でも飲めてしまう軽やかな口当たり。</p>
-          <div class="menu-item-price">
-            <span class="price-num">¥480</span>
-            <span class="price-unit">（税込）</span>
-          </div>
-        </div>
-
-        <div class="menu-item">
-          <div class="menu-item-num">06</div>
-          <div class="menu-item-name">宴会コース</div>
-          <p class="menu-item-desc">飲み放題付きの宴会コース。チームの打ち上げ・歓送迎会にぜひ。</p>
-          <div class="menu-item-price">
-            <span class="price-num">¥3,500</span>
-            <span class="price-unit">〜 / 人（税込）</span>
-          </div>
-          <div class="menu-item-tag">要予約</div>
-        </div>
-
-      </div>
+    <header class="menu-header">
+      <span class="section-label">— Menu</span>
+      <h2 class="section-title">お品書き</h2>
+    </header>
+    <div class="menu-tabs" role="tablist">
+      <button class="menu-tab is-active" data-tab="signature" role="tab">餃子・名物</button>
+      <button class="menu-tab" data-tab="fried" role="tab">揚げ物・炒め</button>
+      <button class="menu-tab" data-tab="cold" role="tab">冷菜・サラダ</button>
+      <button class="menu-tab" data-tab="drink1" role="tab">ビール・サワー</button>
+      <button class="menu-tab" data-tab="drink2" role="tab">ウイスキー・焼酎</button>
     </div>
+
+    <div class="menu-pane is-active" data-pane="signature">
+      <ul class="menu-list">
+        <li><span>焼まるちゅう餃子（5個）</span><span class="dots"></span><span>¥429</span></li>
+        <li><span>和風水餃子（6個）</span><span class="dots"></span><span>¥660</span></li>
+        <li><span>塩ホルモン煮込み</span><span class="dots"></span><span>¥660</span></li>
+        <li><span>鶏のから揚げ（5個）</span><span class="dots"></span><span>¥858</span></li>
+        <li><span>ふわトロチーズオムレツ <small>※明太子+¥110</small></span><span class="dots"></span><span>¥858</span></li>
+        <li><span>ガーリックシュリンプ</span><span class="dots"></span><span>¥990</span></li>
+      </ul>
+    </div>
+    <div class="menu-pane" data-pane="fried">
+      <ul class="menu-list">
+        <li><span>パリッパリッ春巻き（2本）</span><span class="dots"></span><span>¥605</span></li>
+        <li><span>ハムカツ＋うずら串（2本）</span><span class="dots"></span><span>¥550</span></li>
+        <li><span>ちくわの磯辺揚げ</span><span class="dots"></span><span>¥660</span></li>
+        <li><span>なんこchuのから揚げ</span><span class="dots"></span><span>¥825</span></li>
+        <li><span>フライドポテト</span><span class="dots"></span><span>¥660</span></li>
+        <li><span>枝豆ガーリック炒め</span><span class="dots"></span><span>¥638</span></li>
+        <li><span>豚のカシラ焼き</span><span class="dots"></span><span>¥770</span></li>
+      </ul>
+    </div>
+    <div class="menu-pane" data-pane="cold">
+      <ul class="menu-list">
+        <li><span>自家製浅漬け</span><span class="dots"></span><span>¥550</span></li>
+        <li><span>チャンジャやっこ</span><span class="dots"></span><span>¥550</span></li>
+        <li><span>長芋のワサビ漬け</span><span class="dots"></span><span>¥550</span></li>
+        <li><span>ガツネギ</span><span class="dots"></span><span>¥550</span></li>
+        <li><span>タコネギポン酢</span><span class="dots"></span><span>¥770</span></li>
+        <li><span>もずく酢</span><span class="dots"></span><span>¥110</span></li>
+        <li><span>まるちゅうサラダ <small>（ゴマ／わさび／フレンチ）</small></span><span class="dots"></span><span>¥858</span></li>
+      </ul>
+    </div>
+    <div class="menu-pane" data-pane="drink1">
+      <ul class="menu-list">
+        <li><span>ザ・プレミアムモルツ グラス</span><span class="dots"></span><span>¥400</span></li>
+        <li><span>ザ・プレミアムモルツ Chuジョッキ</span><span class="dots"></span><span>¥700 / メガ¥1,200</span></li>
+        <li><span>サッポロラガー Chu瓶</span><span class="dots"></span><span>¥850</span></li>
+        <li><span>シャンディガフ</span><span class="dots"></span><span>¥710</span></li>
+        <li><span>レッドアイ</span><span class="dots"></span><span>¥710</span></li>
+        <li><span>オールフリー <small>（ノンアルコール）</small></span><span class="dots"></span><span>¥550</span></li>
+        <li><span>こだわり酒場のレモンサワー</span><span class="dots"></span><span>¥550 / メガ¥990</span></li>
+        <li><span>Chuハイ各種 <small>（レモン／グレフル／ピーチ／巨峰／ウメ／カルピス／青りんご／トマト／ウーロン／緑茶／紅茶）</small></span><span class="dots"></span><span>各¥550 / メガ¥990</span></li>
+        <li><span>ウメボシ（サワー・ハイ）</span><span class="dots"></span><span>¥610</span></li>
+        <li><span>カクテル各種 <small>（カシス4種／ピーチフィズ／ファジーネーブル／レゲエパンチ／ピーチアイスティー）</small></span><span class="dots"></span><span>各¥670</span></li>
+      </ul>
+    </div>
+    <div class="menu-pane" data-pane="drink2">
+      <ul class="menu-list">
+        <li><span>ジムビームハイボール</span><span class="dots"></span><span>¥550 / メガ¥990</span></li>
+        <li><span>ジムコーラ／ジムジンジャー</span><span class="dots"></span><span>各¥660</span></li>
+        <li><span>角ハイボール</span><span class="dots"></span><span>¥650 / メガ¥1,100</span></li>
+        <li><span>翠ジンソーダ</span><span class="dots"></span><span>¥610 / メガ¥1,050</span></li>
+        <li><span>鏡月Green（甲類）ボトル</span><span class="dots"></span><span>¥2,420</span></li>
+        <li><span>キンミヤ（甲類）ボトル</span><span class="dots"></span><span>¥2,420</span></li>
+        <li><span>壱乃國（麦）ボトル</span><span class="dots"></span><span>¥4,620</span></li>
+        <li><span>黒丸（焼芋）ボトル</span><span class="dots"></span><span>¥4,290</span></li>
+        <li><span>ホッピー（白／黒）</span><span class="dots"></span><span>¥600</span></li>
+        <li><span>ホッピー なか<small>（焼酎）</small> ／ そと<small>（白／黒）</small></span><span class="dots"></span><span>¥300 / ¥400</span></li>
+        <li><span>白扇 一合（燗・冷）</span><span class="dots"></span><span>¥638</span></li>
+        <li><span>サントリーカップワイン（赤／白）</span><span class="dots"></span><span>各¥800</span></li>
+        <li><span>梅酒（ロック・水割・ソーダ）</span><span class="dots"></span><span>¥605</span></li>
+        <li><span>ソフトドリンク各種 <small>（ウーロン茶／緑茶／コーラ／ジンジャー／オレンジ／カルピス／グレフル／紅茶／トマト）</small></span><span class="dots"></span><span>各¥380</span></li>
+      </ul>
+    </div>
+    <p class="menu-note">※価格は税込み表記です。仕入れ・季節により内容が変わる場合があります。黒板にも本日のおすすめがございます。</p>
   </section>
 
-  <!-- ===============================
-       Gallery
-       =============================== -->
+  <!-- Gallery -->
   <section class="gallery" id="gallery">
-    <div class="gallery-header">
-      <div>
-        <span class="section-label">Gallery</span>
-        <h2 class="section-title">店内・料理ギャラリー</h2>
-      </div>
-      <a href="#contact" class="gallery-link">ご予約はこちら →</a>
-    </div>
+    <header class="gallery-header">
+      <span class="section-label">— Gallery</span>
+      <h2 class="section-title">店内の様子</h2>
+    </header>
     <div class="gallery-grid">
-      <div class="gallery-item">
-        <img src="images/interior2.jpg" alt="店内" loading="lazy">
-      </div>
-      <div class="gallery-item">
-        <img src="images/gyoza.jpg" alt="まるちゅう餃子" loading="lazy">
-      </div>
-      <div class="gallery-item">
-        <img src="images/sashimi.jpg" alt="刺身盛り合わせ" loading="lazy">
-      </div>
-      <div class="gallery-item">
-        <img src="images/food2.jpg" alt="餃子とハイボール" loading="lazy">
-      </div>
-      <div class="gallery-item">
-        <img src="images/kushiage.jpg" alt="串揚げ" loading="lazy">
-      </div>
-      <div class="gallery-item">
-        <img src="images/food1.jpg" alt="ワンタンスープ" loading="lazy">
-      </div>
+      <figure class="g g-1" style="--reveal-delay: 0ms;"><img src="images/interior2.jpg" alt="店内" loading="lazy"></figure>
+      <figure class="g g-2" style="--reveal-delay: 70ms;"><img src="images/gyoza.jpg" alt="まるちゅう餃子" loading="lazy"></figure>
+      <figure class="g g-3" style="--reveal-delay: 140ms;"><img src="images/sashimi.jpg" alt="刺身" loading="lazy"></figure>
+      <figure class="g g-4" style="--reveal-delay: 210ms;"><img src="images/interior3.jpg" alt="カウンター" loading="lazy"></figure>
+      <figure class="g g-5" style="--reveal-delay: 280ms;"><img src="images/kushiage.jpg" alt="串揚げ" loading="lazy"></figure>
+      <figure class="g g-6" style="--reveal-delay: 350ms;"><img src="images/food1.jpg" alt="本日の一品" loading="lazy"></figure>
+      <figure class="g g-7" style="--reveal-delay: 420ms;"><img src="images/interior4.jpg" alt="座敷" loading="lazy"></figure>
+      <figure class="g g-8" style="--reveal-delay: 490ms;"><img src="images/food2.jpg" alt="お酒と料理" loading="lazy"></figure>
+    </div>
+    <p class="gallery-note">最新の様子は <a href="https://www.instagram.com/maruchu88/" target="_blank" rel="noopener noreferrer">Instagram @maruchu88</a> にて。</p>
+  </section>
+
+  <!-- Store Info -->
+  <section class="info" id="info">
+    <div class="info-inner">
+      <header class="info-header">
+        <span class="section-label">— Information</span>
+        <h2 class="section-title">店舗情報</h2>
+      </header>
+      <table class="info-table">
+        <tbody>
+          <tr style="--reveal-delay: 0ms;"><th>店名</th><td>バッチコイ酒場 まるちゅう</td></tr>
+          <tr style="--reveal-delay: 60ms;"><th>住所</th><td>〒360-0037 埼玉県熊谷市筑波3-46 ダイコービル 1F</td></tr>
+          <tr style="--reveal-delay: 120ms;"><th>電話</th><td><a href="tel:0485777677">048-577-7677</a></td></tr>
+          <tr style="--reveal-delay: 180ms;"><th>営業時間</th><td>18:00 - 24:00<br><small>料理ラストオーダー 23:00</small></td></tr>
+          <tr style="--reveal-delay: 240ms;"><th>定休日</th><td>毎週日曜日</td></tr>
+          <tr style="--reveal-delay: 300ms;"><th>席数</th><td>20席（カウンター・座敷）</td></tr>
+          <tr style="--reveal-delay: 360ms;"><th>お支払</th><td>現金のみ</td></tr>
+          <tr style="--reveal-delay: 420ms;"><th>駐車場</th><td>なし（近隣にコインパーキングあり）</td></tr>
+          <tr style="--reveal-delay: 480ms;"><th>SNS</th><td><a href="https://www.instagram.com/maruchu88/" target="_blank" rel="noopener noreferrer">Instagram @maruchu88</a></td></tr>
+        </tbody>
+      </table>
+      <a href="tel:0485777677" class="info-cta">📞 ご予約はお電話で（048-577-7677）</a>
     </div>
   </section>
 
-  <!-- ===============================
-       Access
-       =============================== -->
+  <!-- Access -->
   <section class="access" id="access">
-    <div class="access-inner">
-      <div class="access-info">
-        <span class="section-label">Access</span>
-        <h2 class="section-title">アクセス</h2>
-        <div class="access-detail">
-          <div class="access-row">
-            <div class="access-key">住所</div>
-            <div class="access-val">〒360-0037<br>埼玉県熊谷市筑波3-46<br>ダイコービル 1F</div>
-          </div>
-          <div class="access-row">
-            <div class="access-key">営業時間</div>
-            <div class="access-val">18:00 〜 00:00<br><small style="color:#888">フードLO 23:00 / ドリンクLO 23:30</small></div>
-          </div>
-          <div class="access-row">
-            <div class="access-key">定休日</div>
-            <div class="access-val">毎週日曜日</div>
-          </div>
-          <div class="access-row">
-            <div class="access-key">TEL</div>
-            <div class="access-val">
-              <a href="tel:0485777677" class="access-tel">048-577-7677</a>
-            </div>
-          </div>
-          <div class="access-row">
-            <div class="access-key">SNS</div>
-            <div class="access-val">
-              <a href="https://www.instagram.com/maruchu88/" target="_blank" rel="noopener" style="color:var(--red); font-weight:600;">📷 @maruchu88</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="access-map">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3222.0670076888287!2d139.38966197534256!3d36.14058170460507!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x601f29bc4b8fb0e9%3A0x3fed89f5c7ce848d!2z44OQ44OD44OB44Kz44Kk6YWS5aC0IOOBvuOCi-OBoeOCheOBhg!5e0!3m2!1sja!2sjp!4v1776401520046!5m2!1sja!2sjp" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      </div>
+    <header class="access-header">
+      <span class="section-label">— Access</span>
+      <h2 class="section-title">アクセス</h2>
+      <p class="section-desc">JR熊谷駅 北口より 徒歩5分</p>
+    </header>
+    <div class="access-map">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3222.0670076888287!2d139.38966197534256!3d36.14058170460507!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x601f29bc4b8fb0e9%3A0x3fed89f5c7ce848d!2z44OQ44OD44OB44Kz44Kk6YWS5aC0IOOBvuOCi-OBoeOCheOBhg!5e0!3m2!1sja!2sjp!4v1776401520046!5m2!1sja!2sjp" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="バッチコイ酒場 まるちゅうの地図"></iframe>
     </div>
   </section>
 
-  <!-- ===============================
-       Contact
-       =============================== -->
-  <section class="contact" id="contact">
-    <span class="section-label">Contact</span>
-    <h2 class="section-title">ご予約・お問い合わせ</h2>
-    <p class="section-desc">
-      ご予約・団体ご利用・宴会のご相談など、お気軽にご連絡ください。
-      お電話でも受け付けております：<strong>048-577-7677</strong>
-    </p>
-
-    <form class="contact-form" action="mailto:info@maruchu.example.com" method="POST" enctype="text/plain">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="name">お名前<span class="required">*</span></label>
-          <input class="form-input" type="text" id="name" name="name" placeholder="山田 太郎" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="email">メールアドレス<span class="required">*</span></label>
-          <input class="form-input" type="email" id="email" name="email" placeholder="taro@example.com" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="subject">件名</label>
-        <input class="form-input" type="text" id="subject" name="subject" placeholder="ご予約について">
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="message">メッセージ<span class="required">*</span></label>
-        <textarea class="form-textarea" id="message" name="message" placeholder="ご用件をご記入ください。&#10;（例：〇月〇日　〇名で予約希望）" required></textarea>
-      </div>
-      <button type="submit" class="form-submit">送信する</button>
-    </form>
-  </section>
-
-  <!-- ===============================
-       Footer
-       =============================== -->
+  <!-- Footer -->
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <div class="footer-logo">バッチコイ酒場<span>まるちゅう</span></div>
+        <div class="footer-logo">
+          <span class="footer-logo-jp">バッチコイ酒場</span>
+          <span class="footer-logo-name">まるちゅう</span>
+        </div>
         <p class="footer-tagline">
-          野球の情熱を胸に、仲間と囲む一杯を。<br>
-          熊谷のホームベースで、お待ちしています。
+          熊谷・筑波の路地から、<br>
+          今日も暖簾を上げています。
         </p>
         <div class="footer-sns">
-          <a class="sns-link" href="https://www.instagram.com/maruchu88/" target="_blank" rel="noopener" aria-label="Instagram">📷</a>
-          <a class="sns-link" href="#" aria-label="X (Twitter)">𝕏</a>
-          <a class="sns-link" href="#" aria-label="Facebook">f</a>
+          <a class="sns-link" href="https://www.instagram.com/maruchu88/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">Instagram</a>
         </div>
       </div>
       <nav class="footer-nav">
-        <h4>Navigation</h4>
+        <h4>店舗</h4>
         <ul>
-          <li><a href="#about">About</a></li>
-          <li><a href="#menu">Menu</a></li>
-          <li><a href="#gallery">Gallery</a></li>
-          <li><a href="#access">Access</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li><a href="#concept">こだわり</a></li>
+          <li><a href="#signature">名物</a></li>
+          <li><a href="#menu">お品書き</a></li>
         </ul>
       </nav>
       <nav class="footer-nav">
-        <h4>Info</h4>
+        <h4>ご来店</h4>
         <ul>
-          <li><a href="#access">営業時間</a></li>
+          <li><a href="#info">営業時間</a></li>
           <li><a href="#access">アクセス</a></li>
-          <li><a href="#">プライバシーポリシー</a></li>
+          <li><a href="tel:0485777677">電話で予約</a></li>
         </ul>
       </nav>
     </div>
     <div class="footer-bottom">
-      <p class="footer-copy">© 2026 バッチコイ酒場まるちゅう. All rights reserved.</p>
+      <p class="footer-copy">© 2026 バッチコイ酒場 まるちゅう</p>
     </div>
   </footer>
 
-  <!-- ===============================
-       AIチャットボット
-       =============================== -->
-  <button class="chat-fab" id="chatFab" aria-label="チャットを開く">⚾</button>
+  <!-- AIチャットボット -->
+  <button class="chat-fab" id="chatFab" aria-label="チャットを開く">
+    <img class="chat-fab-logo" src="images/logo-maruchu.jpg" alt="まるちゅう">
+  </button>
 
   <div class="chat-window" id="chatWindow" role="dialog" aria-label="AIチャット">
     <div class="chat-header">
       <div class="chat-header-info">
-        <div class="chat-avatar">⚾</div>
+        <div class="chat-avatar"><img src="images/logo-maruchu.jpg" alt="まるちゅう"></div>
         <div>
-          <h3>まるちゅう AI</h3>
-          <p>予約・お問い合わせをサポート</p>
+          <h3>まるちゅう案内</h3>
+          <p>営業時間・予約のご相談</p>
         </div>
       </div>
       <button class="chat-close" id="chatClose" aria-label="閉じる">×</button>
@@ -334,12 +368,12 @@
     <div class="chat-messages" id="chatMessages"></div>
 
     <div class="chat-footer">
-      <textarea class="chat-input" id="chatInput" placeholder="メッセージを入力して ↑ ボタンで送信" rows="1"></textarea>
+      <textarea class="chat-input" id="chatInput" placeholder="お気軽にどうぞ" rows="1"></textarea>
       <button class="chat-send" id="chatSend" aria-label="送信">↑</button>
     </div>
   </div>
 
   <script src="config.js"></script>
-  <script src="chatbot.js?v=4"></script>
+  <script src="chatbot.js"></script>
 </body>
 </html>
