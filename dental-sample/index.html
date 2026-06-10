@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>まる歯科クリニック｜埼玉県熊谷市の歯医者・小児歯科・予防歯科</title>
+  <meta name="description" content="熊谷駅徒歩5分の「まる歯科クリニック」。痛くなる前に通える、地域のかかりつけ歯科医院です。一般歯科・小児歯科・予防歯科・矯正・インプラント・ホワイトニングに対応。土曜も診療。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===============================
+       ヘッダー / ナビゲーション
+       =============================== -->
+  <header class="header">
+    <div class="header-inner">
+      <a class="logo" href="#top">
+        <!-- ロゴ（歯のアイコン + 医院名） -->
+        <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 3C11 3 7 6.5 7 11.5c0 3.4 1.2 5.2 2 8 .8 2.7 1 8.5 3.2 8.5 2 0 1.4-5.5 3.8-5.5s1.8 5.5 3.8 5.5c2.2 0 2.4-5.8 3.2-8.5.8-2.8 2-4.6 2-8C25 6.5 21 3 16 3z" fill="currentColor"/>
+        </svg>
+        <span class="logo-text">まる歯科クリニック</span>
+      </a>
+
+      <nav class="nav" id="nav">
+        <ul class="nav-links">
+          <li><a href="#features">当院の特徴</a></li>
+          <li><a href="#services">診療案内</a></li>
+          <li><a href="#doctor">医院紹介</a></li>
+          <li><a href="#flow">初めての方へ</a></li>
+          <li><a href="#access">診療時間・アクセス</a></li>
+        </ul>
+        <div class="nav-cta-group">
+          <a href="tel:0480000000" class="nav-tel">
+            <span class="nav-tel-label">お電話でのご予約</span>
+            <span class="nav-tel-number">048-000-0000</span>
+          </a>
+          <a href="#access" class="btn btn-primary nav-reserve">Web予約</a>
+        </div>
+      </nav>
+
+      <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- ===============================
+         ヒーロー
+         =============================== -->
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <p class="hero-lead">熊谷駅 徒歩5分・土曜も診療</p>
+          <h1 class="hero-title">
+            痛くなる前に、<br>
+            通いたくなる歯医者へ。
+          </h1>
+          <p class="hero-desc">
+            まる歯科クリニックは、「治療が終わったら行かない場所」ではなく、
+            「健康な歯を守るために通う場所」を目指す、地域のかかりつけ歯科です。
+          </p>
+          <div class="hero-actions">
+            <a href="#access" class="btn btn-primary btn-large">Web予約はこちら</a>
+            <a href="#services" class="btn btn-outline btn-large">診療案内を見る</a>
+          </div>
+          <!-- 診療時間の要約：来院判断に必要な情報をファーストビューに置く -->
+          <dl class="hero-hours">
+            <div class="hero-hours-row">
+              <dt>平日</dt>
+              <dd>9:30〜13:00 / 14:30〜19:00</dd>
+            </div>
+            <div class="hero-hours-row">
+              <dt>土曜</dt>
+              <dd>9:30〜13:00 / 14:30〜17:00</dd>
+            </div>
+            <div class="hero-hours-row">
+              <dt>休診</dt>
+              <dd>木曜・日曜・祝日</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <!-- 写真の代わりの装飾ビジュアル（実案件では院内写真が入る想定） -->
+          <div class="hero-circle hero-circle-1"></div>
+          <div class="hero-circle hero-circle-2"></div>
+          <svg class="hero-tooth" viewBox="0 0 32 32">
+            <path d="M16 3C11 3 7 6.5 7 11.5c0 3.4 1.2 5.2 2 8 .8 2.7 1 8.5 3.2 8.5 2 0 1.4-5.5 3.8-5.5s1.8 5.5 3.8 5.5c2.2 0 2.4-5.8 3.2-8.5.8-2.8 2-4.6 2-8C25 6.5 21 3 16 3z" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===============================
+         お知らせ
+         =============================== -->
+    <section class="news" aria-label="お知らせ">
+      <div class="news-inner">
+        <h2 class="news-title">お知らせ</h2>
+        <ul class="news-list">
+          <li class="news-item">
+            <time datetime="2026-06-01">2026.06.01</time>
+            <span class="news-tag">重要</span>
+            <a href="#">6月の休診日のお知らせ（6/18は院内研修のため休診いたします）</a>
+          </li>
+          <li class="news-item">
+            <time datetime="2026-05-15">2026.05.15</time>
+            <span class="news-tag news-tag-info">案内</span>
+            <a href="#">小児歯科の土曜午後枠を増設しました</a>
+          </li>
+          <li class="news-item">
+            <time datetime="2026-04-28">2026.04.28</time>
+            <span class="news-tag news-tag-info">案内</span>
+            <a href="#">ホワイトニングの新メニューを開始しました</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===============================
+         当院の特徴
+         =============================== -->
+    <section class="features" id="features">
+      <div class="section-inner">
+        <span class="section-label">Features</span>
+        <h2 class="section-title">まる歯科クリニックの特徴</h2>
+        <p class="section-desc">
+          「歯医者は怖い・痛い・面倒」というイメージを変えるために、<br class="pc-only">
+          当院が大切にしている4つのことをご紹介します。
+        </p>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 12l2.5 2.5 4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 class="feature-title">痛みに配慮した治療</h3>
+            <p class="feature-text">
+              表面麻酔・電動麻酔器の活用や声かけのタイミングまで、「痛くない・怖くない」を徹底。歯科恐怖症の方もご相談ください。
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <h3 class="feature-title">通いやすい診療体制</h3>
+            <p class="feature-text">
+              熊谷駅徒歩5分・土曜診療・Web予約対応。お仕事や学校帰りでも通い続けられる体制を整えています。
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.2-9A5.2 5.2 0 0 1 12 6.6 5.2 5.2 0 0 1 21.2 12C19 16.4 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 class="feature-title">お子さま連れ歓迎</h3>
+            <p class="feature-text">
+              キッズスペースとベビーカー入室可の診療室をご用意。お子さまの「歯医者デビュー」も楽しく迎えられます。
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 17l5-5 4 4 7-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 9h5v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 class="feature-title">予防中心の歯科医療</h3>
+            <p class="feature-text">
+              削る治療を減らすため、定期検診とクリーニングを軸にした予防プログラムをご提案。生涯の医療費も抑えられます。
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===============================
+         診療案内
+         =============================== -->
+    <section class="services" id="services">
+      <div class="section-inner">
+        <span class="section-label">Services</span>
+        <h2 class="section-title">診療案内</h2>
+        <p class="section-desc">
+          むし歯治療から予防・審美まで、お口の悩みにワンストップで対応します。
+        </p>
+
+        <div class="services-grid">
+          <a class="service-card" href="#">
+            <div class="service-head">
+              <span class="service-num">01</span>
+              <h3 class="service-title">一般歯科</h3>
+            </div>
+            <p class="service-text">むし歯・歯周病の治療、詰め物・被せ物。できる限り「削らない・抜かない」治療を心がけています。</p>
+            <span class="service-more">詳しく見る</span>
+          </a>
+
+          <a class="service-card" href="#">
+            <div class="service-head">
+              <span class="service-num">02</span>
+              <h3 class="service-title">小児歯科</h3>
+            </div>
+            <p class="service-text">フッ素塗布・シーラント・仕上げ磨き指導。怖がらせない工夫で、歯医者好きなお子さまを育てます。</p>
+            <span class="service-more">詳しく見る</span>
+          </a>
+
+          <a class="service-card" href="#">
+            <div class="service-head">
+              <span class="service-num">03</span>
+              <h3 class="service-title">予防歯科</h3>
+            </div>
+            <p class="service-text">担当歯科衛生士による定期クリーニング（PMTC）と検診で、むし歯・歯周病を未然に防ぎます。</p>
+            <span class="service-more">詳しく見る</span>
+          </a>
+
+          <a class="service-card" href="#">
+            <div class="service-head">
+              <span class="service-num">04</span>
+              <h3 class="service-title">矯正歯科</h3>
+            </div>
+            <p class="service-text">マウスピース矯正・小児矯正に対応。歯並びの無料相談を毎月実施しています。</p>
+            <span class="service-more">詳しく見る</span>
+          </a>
+
+          <a class="service-card" href="#">
+            <div class="service-head">
+              <span class="service-num">05</span>
+              <h3 class="service-title">インプラント</h3>
+            </div>
+            <p class="service-text">失った歯の機能と見た目を回復します。CT撮影による精密診断のうえ、治療計画をご説明します。</p>
+            <span class="service-more">詳しく見る</span>
+          </a>
+
+          <a class="service-card" href="#">
+            <div class="service-head">
+              <span class="service-num">06</span>
+              <h3 class="service-title">ホワイトニング</h3>
+            </div>
+            <p class="service-text">ご自宅で行うホームホワイトニングと院内施術のオフィスホワイトニングをご用意しています。</p>
+            <span class="service-more">詳しく見る</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===============================
+         院長挨拶・医院紹介
+         =============================== -->
+    <section class="doctor" id="doctor">
+      <div class="section-inner doctor-inner">
+        <div class="doctor-visual" aria-hidden="true">
+          <!-- 実案件では院長写真が入る想定のプレースホルダ -->
+          <div class="doctor-photo">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <span>院長写真</span>
+          </div>
+        </div>
+        <div class="doctor-content">
+          <span class="section-label">Greeting</span>
+          <h2 class="section-title">院長挨拶</h2>
+          <p class="doctor-message">
+            「歯医者に行くのが憂うつだった」——私自身、子どもの頃はそうでした。
+            だからこそ当院では、痛みや不安への配慮を何よりも大切にしています。
+            <br><br>
+            治療の選択肢は、メリットだけでなくデメリットや費用も含めて丁寧にご説明し、
+            患者さまご自身が納得して選べることを大切にしています。
+            お口のことで気になることがあれば、どんな小さなことでもご相談ください。
+          </p>
+          <p class="doctor-name">
+            <span class="doctor-name-label">まる歯科クリニック 院長</span>
+            丸山 太郎<span class="doctor-name-en">／ Taro Maruyama</span>
+          </p>
+          <ul class="doctor-career">
+            <li>日本歯科大学 卒業</li>
+            <li>都内歯科医院にて勤務医として10年間従事</li>
+            <li>2020年 まる歯科クリニック 開院</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===============================
+         初めての方へ（初診の流れ）
+         =============================== -->
+    <section class="flow" id="flow">
+      <div class="section-inner">
+        <span class="section-label">First Visit</span>
+        <h2 class="section-title">初めての方へ — 初診の流れ</h2>
+        <p class="section-desc">
+          初診は約60分。痛みがある場合は、まず痛みを取り除く処置を優先します。
+        </p>
+
+        <ol class="flow-list">
+          <li class="flow-step">
+            <span class="flow-num">1</span>
+            <div class="flow-body">
+              <h3 class="flow-title">ご予約・受付</h3>
+              <p class="flow-text">Web・お電話でご予約のうえ、保険証（マイナンバーカード）とお薬手帳をお持ちください。</p>
+            </div>
+          </li>
+          <li class="flow-step">
+            <span class="flow-num">2</span>
+            <div class="flow-body">
+              <h3 class="flow-title">カウンセリング</h3>
+              <p class="flow-text">問診票をもとに、症状やお悩み、治療のご希望をゆっくりお伺いします。</p>
+            </div>
+          </li>
+          <li class="flow-step">
+            <span class="flow-num">3</span>
+            <div class="flow-body">
+              <h3 class="flow-title">検査・診断</h3>
+              <p class="flow-text">レントゲン撮影・歯ぐきの検査などを行い、お口全体の状態を把握します。</p>
+            </div>
+          </li>
+          <li class="flow-step">
+            <span class="flow-num">4</span>
+            <div class="flow-body">
+              <h3 class="flow-title">治療計画のご説明</h3>
+              <p class="flow-text">検査結果を画像でご覧いただきながら、治療の選択肢・期間・費用をご説明します。</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===============================
+         診療時間・アクセス
+         =============================== -->
+    <section class="access" id="access">
+      <div class="section-inner">
+        <span class="section-label">Hours & Access</span>
+        <h2 class="section-title">診療時間・アクセス</h2>
+
+        <div class="access-grid">
+          <!-- 診療時間テーブル -->
+          <div class="access-hours">
+            <table class="hours-table">
+              <caption class="sr-only">診療時間</caption>
+              <thead>
+                <tr>
+                  <th scope="col">診療時間</th>
+                  <th scope="col">月</th>
+                  <th scope="col">火</th>
+                  <th scope="col">水</th>
+                  <th scope="col">木</th>
+                  <th scope="col">金</th>
+                  <th scope="col">土</th>
+                  <th scope="col">日祝</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">9:30〜13:00</th>
+                  <td>○</td><td>○</td><td>○</td><td class="closed">／</td><td>○</td><td>○</td><td class="closed">／</td>
+                </tr>
+                <tr>
+                  <th scope="row">14:30〜19:00</th>
+                  <td>○</td><td>○</td><td>○</td><td class="closed">／</td><td>○</td><td class="note-mark">▲</td><td class="closed">／</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="hours-note">▲ 土曜午後は 14:30〜17:00　／ 休診日：木曜・日曜・祝日</p>
+
+            <div class="access-cta">
+              <a href="#" class="btn btn-primary btn-large">24時間 Web予約</a>
+              <a href="tel:0480000000" class="btn btn-outline btn-large">048-000-0000</a>
+            </div>
+          </div>
+
+          <!-- アクセス情報 -->
+          <div class="access-info">
+            <!-- 実案件ではGoogleマップ埋め込みが入る想定のプレースホルダ -->
+            <div class="access-map" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.7-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.3 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="10.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+              <span>Googleマップ</span>
+            </div>
+            <dl class="access-details">
+              <div class="access-row">
+                <dt>住所</dt>
+                <dd>〒360-0000 埼玉県熊谷市〇〇町1-2-3 まるビル1F</dd>
+              </div>
+              <div class="access-row">
+                <dt>アクセス</dt>
+                <dd>JR高崎線「熊谷駅」北口より徒歩5分</dd>
+              </div>
+              <div class="access-row">
+                <dt>駐車場</dt>
+                <dd>専用駐車場3台（提携コインパーキングあり）</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===============================
+       フッター
+       =============================== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="logo logo-footer" href="#top">
+          <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M16 3C11 3 7 6.5 7 11.5c0 3.4 1.2 5.2 2 8 .8 2.7 1 8.5 3.2 8.5 2 0 1.4-5.5 3.8-5.5s1.8 5.5 3.8 5.5c2.2 0 2.4-5.8 3.2-8.5.8-2.8 2-4.6 2-8C25 6.5 21 3 16 3z" fill="currentColor"/>
+          </svg>
+          <span class="logo-text">まる歯科クリニック</span>
+        </a>
+        <p class="footer-address">
+          〒360-0000 埼玉県熊谷市〇〇町1-2-3 まるビル1F<br>
+          TEL：048-000-0000
+        </p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="#features">当院の特徴</a></li>
+        <li><a href="#services">診療案内</a></li>
+        <li><a href="#doctor">医院紹介</a></li>
+        <li><a href="#flow">初めての方へ</a></li>
+        <li><a href="#access">診療時間・アクセス</a></li>
+      </ul>
+    </div>
+    <p class="footer-copy">
+      ※ このページはデザインサンプルです。医院名・住所・電話番号はすべて架空のものです。<br>
+      &copy; 2026 Maru Dental Clinic (Sample)
+    </p>
+  </footer>
+
+  <!-- ===============================
+       モバイル用固定CTAバー
+       =============================== -->
+  <div class="mobile-cta" aria-label="予約">
+    <a href="tel:0480000000" class="mobile-cta-tel">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h3l2 5-2.5 1.5a12 12 0 0 0 6 6L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      電話する
+    </a>
+    <a href="#access" class="mobile-cta-reserve">Web予約</a>
+  </div>
+
+  <script>
+    // ハンバーガーメニューの開閉
+    const navToggle = document.getElementById('navToggle');
+    const nav = document.getElementById('nav');
+
+    navToggle.addEventListener('click', () => {
+      const isOpen = nav.classList.toggle('is-open');
+      navToggle.classList.toggle('is-open', isOpen);
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+      navToggle.setAttribute('aria-label', isOpen ? 'メニューを閉じる' : 'メニューを開く');
+    });
+
+    // メニュー内リンクをタップしたら閉じる
+    nav.addEventListener('click', (e) => {
+      if (e.target.closest('a')) {
+        nav.classList.remove('is-open');
+        navToggle.classList.remove('is-open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  </script>
+</body>
+</html>
