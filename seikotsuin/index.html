@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ルクス鍼灸接骨院 日本橋 | 国家資格者による施術（デモサイト）</title>
+  <meta name="description" content="日本橋駅徒歩3分。国家資格保有率100%のスタッフが、肩こり・腰痛・骨盤矯正に根本からアプローチ。平日20:30まで受付。※Web制作デモ用の架空サイトです">
+  <meta name="robots" content="noindex">
+  <!-- フォント：見出し=ゴシック太字 / 英字=Jost -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="header" id="header">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <!-- ロゴ（SVG自作） -->
+        <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M13 27 V13 h4 v10.5 h9" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">
+          <span class="logo-main">ルクス鍼灸接骨院</span>
+          <span class="logo-sub">日本橋</span>
+        </span>
+      </a>
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#symptom">症状別メニュー</a></li>
+          <li><a href="#reason">選ばれる理由</a></li>
+          <li><a href="#price">料金</a></li>
+          <li><a href="#staff">スタッフ</a></li>
+          <li><a href="#voice">お客様の声</a></li>
+          <li><a href="#access">アクセス</a></li>
+          <li><a href="#reserve" class="nav-cta">ご予約</a></li>
+        </ul>
+        <button class="nav-toggle" id="navToggle" aria-label="メニューを開く">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ヒーロー -->
+  <section class="hero">
+    <div class="hero-bg">
+      <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1800&q=80" alt="施術の様子" onerror="this.classList.add('img-error')">
+    </div>
+    <div class="hero-content">
+      <p class="hero-badge">東京メトロ「日本橋駅」徒歩3分</p>
+      <h1 class="hero-title">その痛みに、<br>根本から向き合う。</h1>
+      <p class="hero-lead">国家資格保有率100%。仕事帰りに通える、<br class="pc-only">ホテルライクな鍼灸接骨院です。</p>
+      <div class="hero-btns">
+        <a href="#reserve" class="btn btn-primary">WEB予約はこちら</a>
+        <a href="tel:0300000000" class="btn btn-ghost">📞 03-0000-0000</a>
+      </div>
+      <ul class="hero-points">
+        <li>平日20:30まで受付</li>
+        <li>保険診療対応</li>
+        <li>完全予約制</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 症状別メニュー -->
+  <section class="section symptom" id="symptom">
+    <div class="container">
+      <p class="section-en center">Symptom</p>
+      <h2 class="section-title center">こんなお悩み、ありませんか？</h2>
+      <p class="section-lead">症状の原因を見極め、お一人おひとりに合わせた施術プランをご提案します。</p>
+      <div class="symptom-grid">
+        <a href="#reserve" class="symptom-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="12" r="6"/><path d="M12 30 q12 -10 24 0" fill="none"/><path d="M10 24 l4 4 M38 24 l-4 4" fill="none"/></svg>
+          <h3>肩こり・首の痛み</h3>
+          <p>デスクワーク・スマホ首による慢性的なこり</p>
+        </a>
+        <a href="#reserve" class="symptom-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 v36" fill="none"/><path d="M16 14 h16 M14 24 h20 M16 34 h16" fill="none"/><circle cx="24" cy="24" r="4"/></svg>
+          <h3>腰痛・ぎっくり腰</h3>
+          <p>長時間の同じ姿勢、急な動作による痛み</p>
+        </a>
+        <a href="#reserve" class="symptom-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="20" rx="12" ry="8" fill="none"/><path d="M14 28 q10 8 20 0 M18 34 v6 M30 34 v6" fill="none"/></svg>
+          <h3>骨盤矯正</h3>
+          <p>産後の歪み・姿勢の崩れ・ぽっこりお腹</p>
+        </a>
+        <a href="#reserve" class="symptom-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="30" cy="10" r="5"/><path d="M14 42 l8 -14 6 4 8 -12" fill="none"/><path d="M10 26 l8 -2" fill="none"/></svg>
+          <h3>スポーツ外傷</h3>
+          <p>捻挫・肉離れ・テーピング・コンディショニング</p>
+        </a>
+        <a href="#reserve" class="symptom-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 v24" fill="none"/><path d="M24 30 l-2 12 M24 30 l2 12" fill="none"/><circle cx="24" cy="6" r="2.4"/><path d="M16 14 l16 8 M32 14 l-16 8" fill="none"/></svg>
+          <h3>鍼灸治療</h3>
+          <p>自律神経の乱れ・眼精疲労・冷え・美容鍼</p>
+        </a>
+        <a href="#reserve" class="symptom-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="20" width="32" height="14" rx="4" fill="none"/><circle cx="16" cy="36" r="4" fill="none"/><circle cx="32" cy="36" r="4" fill="none"/><path d="M14 20 l4 -8 h12 l4 8" fill="none"/></svg>
+          <h3>交通事故施術</h3>
+          <p>むちうち・自賠責保険対応・手続きサポート</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 選ばれる理由 -->
+  <section class="section reason" id="reason">
+    <div class="container">
+      <p class="section-en center light">Reason</p>
+      <h2 class="section-title center light">ルクスが選ばれる理由</h2>
+      <div class="reason-grid">
+        <div class="reason-card fade-up">
+          <p class="reason-num"><span class="count" data-count="100">0</span><small>%</small></p>
+          <h3>国家資格保有率</h3>
+          <p>施術を行うのは柔道整復師・はり師・きゅう師の国家資格者のみ。安心してお任せください。</p>
+        </div>
+        <div class="reason-card fade-up">
+          <p class="reason-num"><span class="count" data-count="20.5" data-decimal="1">0</span><small>時まで</small></p>
+          <h3>仕事帰りに通える</h3>
+          <p>平日は20:30まで受付。完全予約制で待ち時間なく、スーツのままお立ち寄りいただけます。</p>
+        </div>
+        <div class="reason-card fade-up">
+          <p class="reason-num"><span class="count" data-count="32000">0</span><small>件</small></p>
+          <h3>累計施術実績</h3>
+          <p>開院以来の施術実績。丁寧なカウンセリングと検査で、痛みの根本原因にアプローチします。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 料金 -->
+  <section class="section price" id="price">
+    <div class="container">
+      <p class="section-en center">Price</p>
+      <h2 class="section-title center">料金のご案内</h2>
+      <p class="section-lead">表示はすべて税込です。症状により最適なプランをご提案します。</p>
+
+      <div class="price-tabs" id="priceTabs">
+        <button class="price-tab is-active" data-tab="hoken">保険診療</button>
+        <button class="price-tab" data-tab="jihi">自費メニュー</button>
+      </div>
+      <div class="price-panels">
+        <div class="price-panel is-active" data-panel="hoken">
+          <dl class="price-item"><dt>初診 <small>1〜3割負担</small></dt><dd>¥800〜2,400<small>程度</small></dd></dl>
+          <dl class="price-item"><dt>2回目以降</dt><dd>¥400〜1,200<small>程度</small></dd></dl>
+          <p class="price-note">急性のケガ（捻挫・打撲・挫傷など）が保険適用の対象です。交通事故（自賠責保険）・労災もご相談ください。</p>
+        </div>
+        <div class="price-panel" data-panel="jihi">
+          <dl class="price-item"><dt>全身整体 <small>40分</small></dt><dd>¥6,600</dd></dl>
+          <dl class="price-item"><dt>骨盤矯正 <small>初回体験</small></dt><dd>¥4,950</dd></dl>
+          <dl class="price-item"><dt>鍼灸治療 <small>40分</small></dt><dd>¥5,500</dd></dl>
+          <dl class="price-item"><dt>美容鍼 <small>50分・人気</small></dt><dd>¥7,700</dd></dl>
+          <dl class="price-item"><dt>回数券 <small>全身整体5回</small></dt><dd>¥29,700</dd></dl>
+          <p class="price-note">初回はカウンセリング・検査の時間を含め、施術時間＋20分ほどお取りしています。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- スタッフ -->
+  <section class="section staff" id="staff">
+    <div class="container">
+      <p class="section-en center">Staff</p>
+      <h2 class="section-title center">スタッフ紹介</h2>
+      <div class="staff-grid">
+        <div class="staff-card fade-up">
+          <div class="staff-photo"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" alt="院長 三浦 健吾" onerror="this.classList.add('img-error')"></div>
+          <h3>三浦 健吾<span>院長 / 柔道整復師・はり師・きゅう師</span></h3>
+          <p>整形外科勤務を経て開院。「痛みを取るだけでなく、再発しない身体づくりまで」がモットーです。</p>
+        </div>
+        <div class="staff-card fade-up">
+          <div class="staff-photo"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80" alt="副院長 沢村 あかね" onerror="this.classList.add('img-error')"></div>
+          <h3>沢村 あかね<span>副院長 / 柔道整復師</span></h3>
+          <p>産後骨盤矯正・女性の骨格ケアを担当。お子さま連れでも安心してご来院ください。</p>
+        </div>
+        <div class="staff-card fade-up">
+          <div class="staff-photo"><img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80" alt="鍼灸師 葉山 つむぎ" onerror="this.classList.add('img-error')"></div>
+          <h3>葉山 つむぎ<span>はり師・きゅう師</span></h3>
+          <p>美容鍼と自律神経ケアの専門。「鍼が初めて」という方への丁寧な施術に定評があります。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 院内紹介 -->
+  <section class="section facility">
+    <div class="container">
+      <p class="section-en center">Facility</p>
+      <h2 class="section-title center">院内のご紹介</h2>
+      <div class="facility-grid">
+        <figure class="facility-item fade-up"><img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=80" alt="施術ルーム" onerror="this.classList.add('img-error')"><figcaption>半個室の施術ルーム</figcaption></figure>
+        <figure class="facility-item fade-up"><img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=900&q=80" alt="手技施術" onerror="this.classList.add('img-error')"><figcaption>国家資格者による手技</figcaption></figure>
+        <figure class="facility-item fade-up"><img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80" alt="ストレッチ指導" onerror="this.classList.add('img-error')"><figcaption>セルフケア・運動指導</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- お客様の声（カルーセル） -->
+  <section class="section voice" id="voice">
+    <div class="container">
+      <p class="section-en center">Voice</p>
+      <h2 class="section-title center">お客様の声</h2>
+      <div class="voice-carousel fade-up">
+        <div class="voice-track" id="voiceTrack">
+          <blockquote class="voice-card">
+            <p class="voice-stars">★★★★★</p>
+            <p>長年の肩こりが3回の施術でかなり楽になりました。原因の説明が分かりやすく、自宅でのストレッチまで教えてもらえます。</p>
+            <footer>40代女性 / 事務職</footer>
+          </blockquote>
+          <blockquote class="voice-card">
+            <p class="voice-stars">★★★★★</p>
+            <p>仕事帰りの20時でも通えるのが本当に助かる。院内がきれいで接骨院のイメージが変わりました。</p>
+            <footer>30代男性 / 営業職</footer>
+          </blockquote>
+          <blockquote class="voice-card">
+            <p class="voice-stars">★★★★☆</p>
+            <p>産後の骨盤矯正でお世話になりました。子連れOKで、スタッフさんが子どもをあやしてくれたのが嬉しかったです。</p>
+            <footer>30代女性 / 育休中</footer>
+          </blockquote>
+          <blockquote class="voice-card">
+            <p class="voice-stars">★★★★★</p>
+            <p>マラソンの故障で通院。テーピングとフォーム指導のおかげで大会に間に合いました。アスリート目線の説明が信頼できます。</p>
+            <footer>50代男性 / ランナー</footer>
+          </blockquote>
+        </div>
+        <div class="voice-nav">
+          <button id="voicePrev" aria-label="前の声">←</button>
+          <div class="voice-dots" id="voiceDots"></div>
+          <button id="voiceNext" aria-label="次の声">→</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- アクセス -->
+  <section class="section access" id="access">
+    <div class="container">
+      <p class="section-en center">Access</p>
+      <h2 class="section-title center">アクセス・受付時間</h2>
+      <div class="access-grid fade-up">
+        <table class="access-table">
+          <tr><th>院名</th><td>ルクス鍼灸接骨院 日本橋</td></tr>
+          <tr><th>住所</th><td>〒103-0027 東京都中央区日本橋2-1-1 ルクスビル B1F</td></tr>
+          <tr><th>アクセス</th><td>東京メトロ「日本橋駅」B3出口 徒歩3分 / JR「東京駅」八重洲北口 徒歩8分</td></tr>
+          <tr><th>電話</th><td><a href="tel:0300000000">03-0000-0000</a></td></tr>
+          <tr><th>受付時間</th><td>平日 11:00〜20:30 / 土曜 10:00〜18:00</td></tr>
+          <tr><th>定休日</th><td>日曜・祝日</td></tr>
+          <tr><th>支払い</th><td>現金 / クレジットカード / QRコード決済</td></tr>
+        </table>
+        <div class="access-map">
+          <!-- デモ用ダミーマップ（実案件ではGoogleマップ埋め込みに差し替え） -->
+          <div class="map-placeholder">
+            <p>MAP</p>
+            <span>実際の制作時はここに<br>Googleマップが入ります</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 予約CTA -->
+  <section class="reserve" id="reserve">
+    <div class="container">
+      <p class="section-en center light">Reservation</p>
+      <h2 class="reserve-title">ご予約・ご相談</h2>
+      <p class="reserve-lead">「この症状、診てもらえる？」という段階でも大丈夫です。<br>AIチャットでもお気軽にご相談ください。</p>
+      <div class="reserve-actions">
+        <a href="tel:0300000000" class="btn btn-light">📞 03-0000-0000</a>
+        <button class="btn btn-outline-light" id="openChatBtn">💬 AIチャットで相談する</button>
+      </div>
+      <p class="reserve-note">受付時間 平日11:00〜20:30 / 土曜10:00〜18:00（日祝休）</p>
+    </div>
+  </section>
+
+  <!-- フッター -->
+  <footer class="footer">
+    <p class="footer-logo">ルクス鍼灸接骨院<span>日本橋</span></p>
+    <p class="footer-copy">&copy; 2026 Luxe Acupuncture &amp; Judo Therapy Clinic</p>
+    <p class="footer-demo">※本サイトはWeb制作サービスのデモンストレーション用に作成した架空の鍼灸接骨院サイトです。実在の院・人物とは関係ありません。</p>
+  </footer>
+
+  <!-- チャットボット -->
+  <button class="chat-fab" id="chatFab" aria-label="チャットを開く">💬</button>
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <div>
+        <p class="chat-title">ルクス AI受付</p>
+        <p class="chat-status">症状・料金のご相談はこちら</p>
+      </div>
+      <button class="chat-close" id="chatClose" aria-label="チャットを閉じる">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chatInput" placeholder="症状・料金・ご予約のご相談など">
+      <button class="chat-send" id="chatSend">送信</button>
+    </div>
+  </div>
+
+  <!-- 設定ファイル（config.example.js をコピーして config.js を作成） -->
+  <script src="config.js" onerror=""></script>
+  <script>
+    // config.js が無い環境（デモ公開時など）でもエラーにしない保険
+    if (typeof ANTHROPIC_API_KEY === 'undefined') { var ANTHROPIC_API_KEY = ''; }
+  </script>
+  <script src="chatbot.js"></script>
+</body>
+</html>
