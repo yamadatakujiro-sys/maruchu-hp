@@ -1,0 +1,48 @@
+# ネイルサロン「Lino」デモサイトを GitHub Pages に公開するワークフロー
+# 公開対象は nail-sample/ のみ（公開URL直下 = Lino のTOPページ）
+name: Deploy nail-sample to GitHub Pages
+
+on:
+  # mainブランチの nail-sample 配下が更新されたら自動デプロイ
+  push:
+    branches: [main]
+    paths:
+      - 'nail-sample/**'
+      - '.github/workflows/deploy-pages.yml'
+  # 手動実行も可能
+  workflow_dispatch:
+
+# GitHub Pages へのデプロイに必要な権限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時デプロイは1つに制限（実行中のデプロイは中断しない）
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+
+      - name: Pages を設定（未有効なら自動で有効化）
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: nail-sample をアーティファクトとしてアップロード
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: nail-sample
+
+      - name: GitHub Pages へデプロイ
+        id: deployment
+        uses: actions/deploy-pages@v4
