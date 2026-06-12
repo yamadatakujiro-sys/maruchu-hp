@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>hair atelier SOIE | 表参道の美容室（デモサイト）</title>
-  <meta name="description" content="表参道の美容室 hair atelier SOIE（ソワ）。髪質改善とパーソナルなスタイル提案を得意とするプライベートサロン。※Web制作デモ用の架空サイトです">
+  <title>Lino hair（リノヘア）| 千葉の髪質改善美容室（デモサイト）</title>
+  <meta name="description" content="千葉県内3店舗の髪質改善特化サロン Lino hair。通うほど髪がきれいになる、独自の髪質改善トリートメント。※Web制作デモ用の架空サイトです">
   <meta name="robots" content="noindex">
-  <!-- フォント：見出し=明朝系セリフ / 本文=ゴシック -->
+  <!-- フォント：見出し=丸ゴシック系 / 英字=Jost / 本文=ゴシック -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Zen+Old+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Zen+Maru+Gothic:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,17 +18,18 @@
   <header class="header" id="header">
     <div class="header-inner">
       <a href="#" class="logo">
-        <span class="logo-main">SOIE</span>
-        <span class="logo-sub">hair atelier</span>
+        <span class="logo-main">Lino hair</span>
+        <span class="logo-sub">髪質改善サロン</span>
       </a>
       <nav>
         <ul class="nav-links" id="navLinks">
-          <li><a href="#concept">Concept</a></li>
-          <li><a href="#menu">Menu</a></li>
-          <li><a href="#style">Style</a></li>
-          <li><a href="#stylist">Stylist</a></li>
-          <li><a href="#info">Access</a></li>
-          <li><a href="#reserve" class="nav-cta">ご予約</a></li>
+          <li><a href="#treatment">髪質改善</a></li>
+          <li><a href="#menu">メニュー</a></li>
+          <li><a href="#shop">店舗一覧</a></li>
+          <li><a href="#stylist">スタイリスト</a></li>
+          <li><a href="#product">プロダクト</a></li>
+          <li><a href="#faq">Q&amp;A</a></li>
+          <li><a href="#reserve" class="nav-cta">WEB予約</a></li>
         </ul>
         <button class="nav-toggle" id="navToggle" aria-label="メニューを開く">
           <span></span><span></span><span></span>
@@ -37,87 +38,176 @@
     </div>
   </header>
 
-  <!-- ヒーロー -->
+  <!-- ヒーロー（クロスフェードスライドショー） -->
   <section class="hero">
-    <div class="hero-bg">
-      <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1800&q=80" alt="hair atelier SOIE 店内" onerror="this.classList.add('img-error')">
+    <div class="hero-slides" id="heroSlides">
+      <div class="hero-slide is-active" style="background-image:url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1800&q=80')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1800&q=80')"></div>
+      <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=1800&q=80')"></div>
     </div>
     <div class="hero-content">
-      <p class="hero-en">Hair Atelier in Omotesando</p>
-      <h1 class="hero-title">絹のように、<br>しなやかに。</h1>
-      <p class="hero-lead">あなたの髪が持つ、本来の美しさを引き出す。<br class="pc-only">表参道のプライベートヘアアトリエ。</p>
-      <a href="#reserve" class="btn btn-primary">ご予約はこちら</a>
+      <p class="hero-badge">髪質改善 専門サロン</p>
+      <h1 class="hero-title">通うほど、<br>髪はきれいに<span class="dot">。</span></h1>
+      <p class="hero-lead">くり返すたびに艶を重ねる、Lino式髪質改善。<br class="pc-only">千葉県内3店舗で、あなたの髪を美しく育てます。</p>
+      <div class="hero-btns">
+        <a href="#reserve" class="btn btn-primary">WEB予約はこちら</a>
+        <a href="#treatment" class="btn btn-ghost">髪質改善について</a>
+      </div>
     </div>
-    <div class="hero-scroll"><span></span>Scroll</div>
+    <div class="hero-dots" id="heroDots"></div>
   </section>
 
-  <!-- コンセプト -->
-  <section class="section concept" id="concept">
+  <!-- 流れるテキスト（マーキー） -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Lino hair — Hair Quality Improvement Salon — Chiba / Funabashi / Tsudanuma / Kashiwa — </span>
+      <span>Lino hair — Hair Quality Improvement Salon — Chiba / Funabashi / Tsudanuma / Kashiwa — </span>
+    </div>
+  </div>
+
+  <!-- 数字で見るLino hair -->
+  <section class="stats">
+    <div class="container stats-grid">
+      <div class="stat fade-up">
+        <p class="stat-num"><span class="count" data-count="3">0</span><small>店舗</small></p>
+        <p class="stat-label">千葉県内で展開</p>
+      </div>
+      <div class="stat fade-up">
+        <p class="stat-num"><span class="count" data-count="38000">0</span><small>人</small></p>
+        <p class="stat-label">年間ご来店数</p>
+      </div>
+      <div class="stat fade-up">
+        <p class="stat-num"><span class="count" data-count="92">0</span><small>%</small></p>
+        <p class="stat-label">髪質改善リピート率</p>
+      </div>
+      <div class="stat fade-up">
+        <p class="stat-num"><span class="count" data-count="4.8" data-decimal="1">0</span><small>点</small></p>
+        <p class="stat-label">口コミ平均評価</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 髪質改善特集 -->
+  <section class="section treatment" id="treatment">
     <div class="container">
-      <div class="concept-grid">
-        <div class="concept-img fade-up">
-          <img src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=1000&q=80" alt="施術の様子" onerror="this.classList.add('img-error')">
+      <p class="section-en center">Treatment</p>
+      <h2 class="section-title center">Lino式 髪質改善</h2>
+      <p class="section-lead">「ストレートにする」のではなく「素材から整える」。<br>髪の内部補修と表面コーティングを重ねる、Lino hair独自のプログラムです。</p>
+
+      <div class="ba-grid fade-up">
+        <figure class="ba-item">
+          <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80" alt="髪質改善 施術前のイメージ" onerror="this.classList.add('img-error')">
+          <figcaption><span class="ba-tag before">Before</span>広がり・うねり・パサつき</figcaption>
+        </figure>
+        <div class="ba-arrow" aria-hidden="true">→</div>
+        <figure class="ba-item">
+          <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&q=80" alt="髪質改善 施術後のイメージ" onerror="this.classList.add('img-error')">
+          <figcaption><span class="ba-tag after">After</span>まとまる・艶が続く・手触り◎</figcaption>
+        </figure>
+      </div>
+
+      <div class="steps">
+        <div class="step fade-up">
+          <p class="step-num">01</p>
+          <h3>毛髪診断</h3>
+          <p>マイクロスコープと問診で、ダメージレベル・癖の質を見極めます。</p>
         </div>
-        <div class="concept-text fade-up">
-          <p class="section-en">Concept</p>
-          <h2 class="section-title">髪と向き合う、<br>静かな時間。</h2>
-          <p>SOIE（ソワ）とは、フランス語で「絹」。<br>
-          一人ひとり異なる髪質・骨格・ライフスタイルに寄り添い、絹のような手触りと、あなたらしいシルエットをお仕立てします。</p>
-          <p>完全予約制・マンツーマン施術。<br>
-          雑誌をめくる時間も、何も考えない時間も。ここでは、すべてがあなたのための時間です。</p>
+        <div class="step fade-up">
+          <p class="step-num">02</p>
+          <h3>内部補修</h3>
+          <p>髪の状態に合わせて調合したケラチン・酸熱成分を芯まで補充します。</p>
+        </div>
+        <div class="step fade-up">
+          <p class="step-num">03</p>
+          <h3>艶コーティング</h3>
+          <p>キューティクルを整え、熱処理で艶の膜を定着。持ちは約1〜2ヶ月。</p>
+        </div>
+        <div class="step fade-up">
+          <p class="step-num">04</p>
+          <h3>ホームケア提案</h3>
+          <p>オリジナルプロダクトで、サロン帰りの状態を自宅でもキープ。</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- メニュー -->
+  <!-- メニューガイド -->
   <section class="section menu" id="menu">
     <div class="container">
       <p class="section-en center">Menu</p>
-      <h2 class="section-title center">メニュー・料金</h2>
-      <p class="section-lead">表示はすべて税込価格です。髪の長さ・状態により変動する場合があります。</p>
-      <div class="menu-list fade-up">
-        <dl class="menu-item">
-          <dt>カット <small>シャンプー・ブロー込</small></dt>
-          <dd>¥6,600</dd>
-        </dl>
-        <dl class="menu-item">
-          <dt>カット＋カラー</dt>
-          <dd>¥13,200〜</dd>
-        </dl>
-        <dl class="menu-item">
-          <dt>カット＋パーマ</dt>
-          <dd>¥14,300〜</dd>
-        </dl>
-        <dl class="menu-item">
-          <dt>髪質改善トリートメント <small>人気No.1</small></dt>
-          <dd>¥8,800〜</dd>
-        </dl>
-        <dl class="menu-item">
-          <dt>縮毛矯正 <small>カット込</small></dt>
-          <dd>¥18,700〜</dd>
-        </dl>
-        <dl class="menu-item">
-          <dt>ヘッドスパ <small>30分</small></dt>
-          <dd>¥5,500</dd>
-        </dl>
+      <h2 class="section-title center">メニューガイド</h2>
+      <p class="section-lead">表示はすべて税込です。スタイリストランクにより変動する場合があります。</p>
+
+      <!-- カテゴリタブ -->
+      <div class="menu-tabs" id="menuTabs">
+        <button class="menu-tab is-active" data-tab="cut">カット</button>
+        <button class="menu-tab" data-tab="color">カラー</button>
+        <button class="menu-tab" data-tab="treatment">髪質改善</button>
+        <button class="menu-tab" data-tab="other">パーマ・その他</button>
       </div>
-      <p class="menu-note">初めてのお客様は、カウンセリングのお時間を含め余裕を持ってご来店ください。</p>
+
+      <div class="menu-panels" id="menuPanels">
+        <div class="menu-panel is-active" data-panel="cut">
+          <dl class="menu-item"><dt>カット <small>シャンプー・ブロー込</small></dt><dd>¥4,950</dd></dl>
+          <dl class="menu-item"><dt>カット＋炭酸スパ</dt><dd>¥6,600</dd></dl>
+          <dl class="menu-item"><dt>学生カット <small>中高生</small></dt><dd>¥3,850</dd></dl>
+          <dl class="menu-item"><dt>キッズカット <small>小学生以下</small></dt><dd>¥2,750</dd></dl>
+        </div>
+        <div class="menu-panel" data-panel="color">
+          <dl class="menu-item"><dt>カット＋カラー</dt><dd>¥9,900〜</dd></dl>
+          <dl class="menu-item"><dt>カット＋ケアブリーチWカラー</dt><dd>¥16,500〜</dd></dl>
+          <dl class="menu-item"><dt>白髪ぼかしハイライト</dt><dd>¥13,200〜</dd></dl>
+          <dl class="menu-item"><dt>リタッチカラー</dt><dd>¥6,050</dd></dl>
+        </div>
+        <div class="menu-panel" data-panel="treatment">
+          <dl class="menu-item"><dt>Lino式髪質改善トリートメント <small>人気No.1</small></dt><dd>¥9,900〜</dd></dl>
+          <dl class="menu-item"><dt>髪質改善＋カット</dt><dd>¥13,750〜</dd></dl>
+          <dl class="menu-item"><dt>髪質改善カラー <small>艶カラー</small></dt><dd>¥15,400〜</dd></dl>
+          <dl class="menu-item"><dt>酸性ストレート <small>カット込</small></dt><dd>¥19,800〜</dd></dl>
+        </div>
+        <div class="menu-panel" data-panel="other">
+          <dl class="menu-item"><dt>カット＋パーマ</dt><dd>¥11,000〜</dd></dl>
+          <dl class="menu-item"><dt>デジタルパーマ <small>カット込</small></dt><dd>¥15,400〜</dd></dl>
+          <dl class="menu-item"><dt>プレミアムヘッドスパ <small>40分</small></dt><dd>¥6,050</dd></dl>
+          <dl class="menu-item"><dt>眉カット <small>セットメニュー限定</small></dt><dd>¥1,100</dd></dl>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- スタイルギャラリー -->
-  <section class="section style-gallery" id="style">
+  <!-- 店舗一覧 -->
+  <section class="section shop" id="shop">
     <div class="container">
-      <p class="section-en center">Style</p>
-      <h2 class="section-title center">スタイルギャラリー</h2>
-      <div class="gallery-grid">
-        <figure class="gallery-item fade-up"><img src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?auto=format&fit=crop&w=800&q=80" alt="ナチュラルカール" onerror="this.classList.add('img-error')"><figcaption>Natural Curl</figcaption></figure>
-        <figure class="gallery-item fade-up"><img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=800&q=80" alt="ロングストレート" onerror="this.classList.add('img-error')"><figcaption>Long Straight</figcaption></figure>
-        <figure class="gallery-item fade-up"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" alt="ミディアムレイヤー" onerror="this.classList.add('img-error')"><figcaption>Medium Layer</figcaption></figure>
-        <figure class="gallery-item fade-up"><img src="https://images.unsplash.com/photo-1500840216050-6ffa99d75160?auto=format&fit=crop&w=800&q=80" alt="アレンジスタイル" onerror="this.classList.add('img-error')"><figcaption>Arrange</figcaption></figure>
-        <figure class="gallery-item fade-up"><img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=800&q=80" alt="ショートボブ" onerror="this.classList.add('img-error')"><figcaption>Short Bob</figcaption></figure>
-        <figure class="gallery-item fade-up"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80" alt="ニュアンスウェーブ" onerror="this.classList.add('img-error')"><figcaption>Nuance Wave</figcaption></figure>
+      <p class="section-en center">Shop List</p>
+      <h2 class="section-title center">店舗一覧</h2>
+      <div class="shop-grid">
+        <article class="shop-card fade-up">
+          <div class="shop-img"><img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=900&q=80" alt="Lino hair 船橋本店" onerror="this.classList.add('img-error')"></div>
+          <div class="shop-body">
+            <h3>船橋本店</h3>
+            <p class="shop-access">JR船橋駅 南口 徒歩4分</p>
+            <p class="shop-info">千葉県船橋市本町1-2-3 リノビル2F<br>TEL 047-000-0000 / 9:30〜19:30</p>
+            <a href="#reserve" class="shop-link">この店舗を予約する →</a>
+          </div>
+        </article>
+        <article class="shop-card fade-up">
+          <div class="shop-img"><img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=900&q=80" alt="Lino hair 津田沼店" onerror="this.classList.add('img-error')"></div>
+          <div class="shop-body">
+            <h3>津田沼店</h3>
+            <p class="shop-access">JR津田沼駅 北口 徒歩3分</p>
+            <p class="shop-info">千葉県習志野市津田沼2-3-4 グランビル3F<br>TEL 047-000-0001 / 9:30〜19:30</p>
+            <a href="#reserve" class="shop-link">この店舗を予約する →</a>
+          </div>
+        </article>
+        <article class="shop-card fade-up">
+          <div class="shop-img"><img src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=900&q=80" alt="Lino hair 柏店" onerror="this.classList.add('img-error')"></div>
+          <div class="shop-body">
+            <h3>柏店</h3>
+            <p class="shop-access">JR柏駅 東口 徒歩5分</p>
+            <p class="shop-info">千葉県柏市柏3-4-5 サニープレイス1F<br>TEL 04-0000-0002 / 9:30〜19:30</p>
+            <a href="#reserve" class="shop-link">この店舗を予約する →</a>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -129,51 +219,79 @@
       <h2 class="section-title center">スタイリスト</h2>
       <div class="stylist-grid">
         <div class="stylist-card fade-up">
-          <div class="stylist-photo"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80" alt="高瀬 美織" onerror="this.classList.add('img-error')"></div>
-          <h3>高瀬 美織<span>Takase Miori</span></h3>
-          <p class="stylist-role">代表 / トップスタイリスト</p>
-          <p class="stylist-bio">髪質改善・大人世代のスタイル提案が得意。「10年後も似合う髪」をテーマに、骨格と生活に寄り添うデザインをお届けします。</p>
+          <div class="stylist-photo"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80" alt="若菜 ひより" onerror="this.classList.add('img-error')"></div>
+          <h3>若菜 ひより<span>船橋本店 / 店長</span></h3>
+          <p>髪質改善歴8年。広がる髪・エイジング毛のお悩みはお任せください。</p>
         </div>
         <div class="stylist-card fade-up">
-          <div class="stylist-photo"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=600&q=80" alt="桐山 蒼" onerror="this.classList.add('img-error')"></div>
-          <h3>桐山 蒼<span>Kiriyama Aoi</span></h3>
-          <p class="stylist-role">スタイリスト</p>
-          <p class="stylist-bio">ショート・ボブのカットに定評。乾かすだけで決まる再現性の高いカットで、毎朝のスタイリングを軽やかにします。</p>
+          <div class="stylist-photo"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=600&q=80" alt="瀬名 拓海" onerror="this.classList.add('img-error')"></div>
+          <h3>瀬名 拓海<span>津田沼店 / トップスタイリスト</span></h3>
+          <p>骨格補正カットが得意。乾かすだけでまとまるショート・ボブを提案します。</p>
         </div>
         <div class="stylist-card fade-up">
-          <div class="stylist-photo"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=600&q=80" alt="小野寺 凛" onerror="this.classList.add('img-error')"></div>
-          <h3>小野寺 凛<span>Onodera Rin</span></h3>
-          <p class="stylist-role">カラーリスト</p>
-          <p class="stylist-bio">透明感カラーのスペシャリスト。肌色診断をもとに、あなたにいちばん似合う「似合わせカラー」をご提案します。</p>
+          <div class="stylist-photo"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=600&q=80" alt="美馬 さくら" onerror="this.classList.add('img-error')"></div>
+          <h3>美馬 さくら<span>柏店 / カラーリスト</span></h3>
+          <p>ブリーチワークと白髪ぼかしのスペシャリスト。透明感カラーが人気です。</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- サロン情報・アクセス -->
-  <section class="section info" id="info">
-    <div class="container">
-      <p class="section-en center">Salon Info</p>
-      <h2 class="section-title center">サロン情報・アクセス</h2>
-      <div class="info-grid fade-up">
-        <table class="info-table">
-          <tr><th>店名</th><td>hair atelier SOIE（ソワ）</td></tr>
-          <tr><th>住所</th><td>〒107-0062 東京都港区南青山5-1-1 ソワビル 2F</td></tr>
-          <tr><th>アクセス</th><td>東京メトロ「表参道駅」B1出口より徒歩3分</td></tr>
-          <tr><th>電話</th><td><a href="tel:0300000000">03-0000-0000</a></td></tr>
-          <tr><th>営業時間</th><td>10:00〜19:00（最終受付 18:00）</td></tr>
-          <tr><th>定休日</th><td>毎週火曜日・第2水曜日</td></tr>
-          <tr><th>席数</th><td>セット面4席（完全予約制）</td></tr>
-          <tr><th>支払い</th><td>現金 / 各種クレジットカード / QRコード決済</td></tr>
-        </table>
-        <div class="info-map">
-          <!-- デモ用ダミーマップ（実案件ではGoogleマップ埋め込みに差し替え） -->
-          <div class="map-placeholder">
-            <p>MAP</p>
-            <span>実際の制作時はここに<br>Googleマップが入ります</span>
-          </div>
-        </div>
+  <!-- オリジナルプロダクト -->
+  <section class="section product" id="product">
+    <div class="container product-grid">
+      <div class="product-img fade-up">
+        <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=900&q=80" alt="オリジナルヘアケアブランド LINOTE" onerror="this.classList.add('img-error')">
       </div>
+      <div class="product-text fade-up">
+        <p class="section-en">Original Product</p>
+        <h2 class="section-title">おうちでも、サロン品質を。<br><span class="brand">LINOTE</span></h2>
+        <p>Lino hairの髪質改善メソッドから生まれたホームケアブランド「LINOTE（リノート）」。シャンプー・トリートメント・ヘアオイルの3ステップで、サロン帰りの艶を毎日再現します。</p>
+        <ul class="product-list">
+          <li>モイストシャンプー 300mL — ¥3,080</li>
+          <li>リペアトリートメント 240g — ¥3,520</li>
+          <li>シルクヘアオイル 100mL — ¥2,860</li>
+        </ul>
+        <p class="product-note">各店舗にてお取り扱い中。スタイリストが髪質に合わせてご提案します。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Q&A -->
+  <section class="section faq" id="faq">
+    <div class="container">
+      <p class="section-en center">Q&amp;A</p>
+      <h2 class="section-title center">よくあるご質問</h2>
+      <div class="faq-list fade-up">
+        <details class="faq-item">
+          <summary>髪質改善と縮毛矯正はどう違いますか？</summary>
+          <p>縮毛矯正は強い癖を薬剤と熱でまっすぐに伸ばす施術、髪質改善は髪の内部を補修して艶とまとまりを高める施術です。癖の強さやなりたい仕上がりに合わせてご提案しますので、カウンセリングでお気軽にご相談ください。</p>
+        </details>
+        <details class="faq-item">
+          <summary>髪質改善はどのくらいの頻度で通えばいいですか？</summary>
+          <p>1〜2ヶ月に1回が目安です。回数を重ねるごとに髪の状態が底上げされ、3回目以降は持ちがさらに良くなる方が多いです。</p>
+        </details>
+        <details class="faq-item">
+          <summary>当日予約はできますか？</summary>
+          <p>空きがあれば当日でもご案内可能です。WEB予約は2時間前まで、それ以降はお電話にてご確認ください。</p>
+        </details>
+        <details class="faq-item">
+          <summary>子ども連れでも大丈夫ですか？</summary>
+          <p>はい、全店舗ベビーカーのままご案内できるお席をご用意しています。キッズスペースは船橋本店・柏店にございます。</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- リクルートバナー -->
+  <section class="recruit">
+    <div class="container recruit-inner fade-up">
+      <div>
+        <p class="section-en light">Recruit</p>
+        <h2>一緒に働く仲間を募集しています</h2>
+        <p>スタイリスト・アシスタント・パート歓迎。社保完備 / 完全週休2日 / 講習費全額負担</p>
+      </div>
+      <a href="#reserve" class="btn btn-light">採用情報を見る</a>
     </div>
   </section>
 
@@ -181,21 +299,21 @@
   <section class="reserve" id="reserve">
     <div class="container">
       <p class="section-en center light">Reservation</p>
-      <h2 class="reserve-title">ご予約・ご相談</h2>
-      <p class="reserve-lead">ご予約はお電話、またはAIチャットにてメニューのご相談も承ります。<br>初めての方も、どうぞお気軽にご連絡ください。</p>
+      <h2 class="reserve-title">ご予約・お問い合わせ</h2>
+      <p class="reserve-lead">ご予約はお電話または各店舗のWEB予約から。<br>メニュー選びに迷ったら、AIチャットにお気軽にご相談ください。</p>
       <div class="reserve-actions">
-        <a href="tel:0300000000" class="btn btn-light">📞 03-0000-0000</a>
+        <a href="tel:0470000000" class="btn btn-light">📞 047-000-0000（船橋本店）</a>
         <button class="btn btn-outline-light" id="openChatBtn">💬 AIチャットで相談する</button>
       </div>
-      <p class="reserve-note">受付時間 10:00〜18:00（火曜・第2水曜定休）</p>
+      <p class="reserve-note">受付時間 9:30〜19:00 / 定休日：毎週月曜・第3火曜</p>
     </div>
   </section>
 
   <!-- フッター -->
   <footer class="footer">
-    <p class="footer-logo">SOIE<span>hair atelier</span></p>
-    <p class="footer-copy">&copy; 2026 hair atelier SOIE</p>
-    <p class="footer-demo">※本サイトはWeb制作サービスのデモンストレーション用に作成した架空の美容室サイトです。実在の店舗・人物とは関係ありません。</p>
+    <p class="footer-logo">Lino hair<span>髪質改善サロン</span></p>
+    <p class="footer-copy">&copy; 2026 Lino hair</p>
+    <p class="footer-demo">※本サイトはWeb制作サービスのデモンストレーション用に作成した架空の美容室サイトです。実在の店舗・人物・ブランドとは関係ありません。</p>
   </footer>
 
   <!-- チャットボット -->
@@ -203,14 +321,14 @@
   <div class="chat-window" id="chatWindow">
     <div class="chat-header">
       <div>
-        <p class="chat-title">SOIE コンシェルジュ</p>
+        <p class="chat-title">Lino hair サポート</p>
         <p class="chat-status">AIがご質問にお答えします</p>
       </div>
       <button class="chat-close" id="chatClose" aria-label="チャットを閉じる">✕</button>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area">
-      <input type="text" class="chat-input" id="chatInput" placeholder="メニュー・ご予約のご相談など">
+      <input type="text" class="chat-input" id="chatInput" placeholder="メニュー・店舗・ご予約のご相談など">
       <button class="chat-send" id="chatSend">送信</button>
     </div>
   </div>

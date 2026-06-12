@@ -1,41 +1,40 @@
 /* ===============================
-   hair atelier SOIE
+   Lino hair
    AIチャットボット + ページUI制御
    =============================== */
 
 // APIキーは config.js で設定（.gitignore 対象 / 未設定でも動作する）
 
 // サロン情報をシステムプロンプトに設定
-const SYSTEM_PROMPT = `あなたは表参道の美容室「hair atelier SOIE（ソワ）」のAIコンシェルジュです。
+const SYSTEM_PROMPT = `あなたは千葉県の髪質改善特化美容室「Lino hair（リノヘア）」のAIサポートです。
 
 【サロン情報】
-- 店名: hair atelier SOIE（ソワ）
-- 住所: 東京都港区南青山5-1-1 ソワビル 2F（表参道駅 B1出口 徒歩3分）
-- 電話: 03-0000-0000
-- 営業時間: 10:00〜19:00（最終受付 18:00）
-- 定休日: 毎週火曜日・第2水曜日
-- 完全予約制 / セット面4席のプライベートサロン
-- コンセプト: 「絹のように、しなやかに。」髪質改善とパーソナルなスタイル提案が得意。
+- 店名: Lino hair（リノヘア）/ 髪質改善専門サロン
+- コンセプト: 「通うほど、髪はきれいに。」くり返すたびに艶を重ねるLino式髪質改善。
+- 営業時間: 9:30〜19:30（最終受付 19:00）
+- 定休日: 毎週月曜・第3火曜
 
-【メニュー（税込）】
-- カット（シャンプー・ブロー込）: ¥6,600
-- カット＋カラー: ¥13,200〜
-- カット＋パーマ: ¥14,300〜
-- 髪質改善トリートメント（人気No.1）: ¥8,800〜
-- 縮毛矯正（カット込）: ¥18,700〜
-- ヘッドスパ（30分）: ¥5,500
+【店舗】
+- 船橋本店: 千葉県船橋市本町1-2-3 リノビル2F / JR船橋駅 南口 徒歩4分 / TEL 047-000-0000
+- 津田沼店: 千葉県習志野市津田沼2-3-4 グランビル3F / JR津田沼駅 北口 徒歩3分 / TEL 047-000-0001
+- 柏店: 千葉県柏市柏3-4-5 サニープレイス1F / JR柏駅 東口 徒歩5分 / TEL 04-0000-0002
 
-【スタイリスト】
-- 高瀬 美織（代表/トップスタイリスト）: 髪質改善・大人世代のスタイル提案が得意
-- 桐山 蒼（スタイリスト）: ショート・ボブのカットに定評
-- 小野寺 凛（カラーリスト）: 透明感カラー・似合わせカラーのスペシャリスト
+【主なメニュー（税込）】
+- カット（シャンプー・ブロー込）: ¥4,950
+- カット＋カラー: ¥9,900〜
+- Lino式髪質改善トリートメント（人気No.1）: ¥9,900〜
+- 髪質改善＋カット: ¥13,750〜
+- 酸性ストレート（カット込）: ¥19,800〜
+- プレミアムヘッドスパ（40分）: ¥6,050
+
+【オリジナルプロダクト LINOTE】
+- モイストシャンプー 300mL ¥3,080 / リペアトリートメント 240g ¥3,520 / シルクヘアオイル 100mL ¥2,860
 
 【対応方針】
-- ご予約はお電話（03-0000-0000）へ誘導してください。
-- メニュー・料金・営業時間・アクセスの質問には丁寧に回答してください。
-- 髪の悩み相談には共感しつつ、来店カウンセリングをおすすめしてください。
+- ご予約は各店舗のお電話へ誘導してください。
+- 髪質改善と縮毛矯正の違いなど、髪の悩み相談には分かりやすく回答し、来店カウンセリングをおすすめしてください。
 - 回答は簡潔に、2〜3文程度でまとめてください。
-- 日本語で、上品で柔らかい接客トーンで回答してください。`;
+- 日本語で、明るく親しみやすい接客トーンで回答してください。絵文字を適度に使ってください。`;
 
 class SalonChat {
   constructor() {
@@ -69,7 +68,7 @@ class SalonChat {
     this.window.classList.add('open');
     this.fab.textContent = '✕';
     if (this.messages.length === 0) {
-      this.addBotMessage('こんにちは。hair atelier SOIE のAIコンシェルジュです🌿\nメニュー・料金・髪のお悩みなど、お気軽にご相談ください。');
+      this.addBotMessage('こんにちは！Lino hair のAIサポートです🌸\nメニュー・料金・店舗のこと、髪のお悩みなど、お気軽にご相談ください！');
     }
     setTimeout(() => this.inputEl.focus(), 300);
   }
@@ -120,7 +119,7 @@ class SalonChat {
     if (!ANTHROPIC_API_KEY) {
       this.inputEl.value = '';
       this.addUserMessage(text);
-      this.addBotMessage('デモサイトのためAI応答は停止中です🙇\n実際の導入時には、サロン情報を学習したAIが24時間ご質問にお答えします。\nご予約はお電話（03-0000-0000）にて承ります。');
+      this.addBotMessage('デモサイトのためAI応答は停止中です🙇\n実際の導入時には、サロン情報を学習したAIが24時間ご質問にお答えします。\nご予約は各店舗のお電話にて承ります📞');
       return;
     }
 
@@ -167,7 +166,7 @@ class SalonChat {
     } catch (e) {
       this.hideTyping();
       console.error('Chat error:', e);
-      this.addBotMessage('通信エラーが発生しました。お手数ですが、お電話（03-0000-0000）にてお問い合わせください🙇');
+      this.addBotMessage('通信エラーが発生しました。お手数ですが、各店舗のお電話にてお問い合わせください🙇');
     } finally {
       this.isTyping = false;
       this.sendBtn.disabled = false;
@@ -177,7 +176,7 @@ class SalonChat {
   }
 }
 
-// DOM準備完了後に初期化
+/* ---------- ページUI制御 ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   const chat = new SalonChat();
 
@@ -210,6 +209,75 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+
+  // ヒーロー：クロスフェードスライドショー
+  const slides = document.querySelectorAll('.hero-slide');
+  const dotsWrap = document.getElementById('heroDots');
+  let current = 0;
+  let slideTimer = null;
+
+  const goTo = (index) => {
+    slides[current].classList.remove('is-active');
+    dotsWrap.children[current].classList.remove('is-active');
+    current = (index + slides.length) % slides.length;
+    slides[current].classList.add('is-active');
+    dotsWrap.children[current].classList.add('is-active');
+  };
+  const startAuto = () => {
+    clearInterval(slideTimer);
+    slideTimer = setInterval(() => goTo(current + 1), 5000);
+  };
+
+  if (slides.length > 0 && dotsWrap) {
+    // ドットを生成
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.setAttribute('aria-label', `スライド${i + 1}を表示`);
+      if (i === 0) dot.classList.add('is-active');
+      dot.addEventListener('click', () => { goTo(i); startAuto(); });
+      dotsWrap.appendChild(dot);
+    });
+    startAuto();
+  }
+
+  // メニューガイド：カテゴリタブ切り替え
+  const tabs = document.querySelectorAll('.menu-tab');
+  const panels = document.querySelectorAll('.menu-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('is-active'));
+      panels.forEach(p => p.classList.remove('is-active'));
+      tab.classList.add('is-active');
+      const panel = document.querySelector(`.menu-panel[data-panel="${tab.dataset.tab}"]`);
+      if (panel) panel.classList.add('is-active');
+    });
+  });
+
+  // 数字カウントアップ（画面に入ったら開始）
+  const counters = document.querySelectorAll('.count');
+  const countObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      countObserver.unobserve(el);
+      const target = parseFloat(el.dataset.count);
+      const decimals = parseInt(el.dataset.decimal || '0', 10);
+      const duration = 1600;
+      const start = performance.now();
+      const tick = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        // イージング（最後ゆっくり）
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const value = target * eased;
+        el.textContent = decimals > 0
+          ? value.toFixed(decimals)
+          : Math.round(value).toLocaleString();
+        if (progress < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  }, { threshold: 0.4 });
+  counters.forEach(el => countObserver.observe(el));
 
   // スクロールで現れるアニメーション
   const observer = new IntersectionObserver((entries) => {
