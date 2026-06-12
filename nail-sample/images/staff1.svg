@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
+  <!-- スタッフ1：上品なポートレートイラスト（シニヨンヘア） -->
+  <defs>
+    <linearGradient id="s1Bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F3EDE3"/>
+      <stop offset="1" stop-color="#E5D5B8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#s1Bg)"/>
+  <circle cx="320" cy="80" r="110" fill="#FFFFFF" opacity="0.35"/>
+  <circle cx="60" cy="340" r="80" fill="#FFFFFF" opacity="0.28"/>
+
+  <!-- 髪（シニヨン） -->
+  <circle cx="245" cy="105" r="34" fill="#6B5B49"/>
+  <path d="M120 210 q0 -95 80 -95 q80 0 80 95 l0 30 q-22 -12 -28 -52 q-3 30 -52 32 q-50 2 -56 -28 q-10 36 -24 48 z" fill="#7A6852"/>
+
+  <!-- 首と顔 -->
+  <path d="M178 235 l44 0 l0 36 q-22 10 -44 0 z" fill="#EFD9C4"/>
+  <path d="M200 130 q52 0 52 58 q0 60 -52 62 q-52 -2 -52 -62 q0 -58 52 -58 z" fill="#F6E5D2"/>
+  <!-- 前髪 -->
+  <path d="M148 185 q-4 -62 52 -64 q56 2 52 64 q-8 -38 -36 -42 q10 12 6 22 q-26 -22 -52 -8 q-18 10 -22 28 z" fill="#7A6852"/>
+
+  <!-- 表情 -->
+  <g stroke="#5B4B3A" stroke-width="2.4" fill="none" stroke-linecap="round">
+    <path d="M172 196 q8 7 16 0"/>
+    <path d="M212 196 q8 7 16 0"/>
+    <path d="M188 238 q12 9 24 0"/>
+  </g>
+  <g stroke="#6B5B49" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M170 182 q9 -6 19 -2"/>
+    <path d="M211 180 q10 -4 19 2"/>
+  </g>
+  <circle cx="166" cy="222" r="7" fill="#E8B9A4" opacity="0.5"/>
+  <circle cx="234" cy="222" r="7" fill="#E8B9A4" opacity="0.5"/>
+
+  <!-- ピアス -->
+  <circle cx="149" cy="212" r="3.4" fill="#B89B5E"/>
+  <circle cx="251" cy="212" r="3.4" fill="#B89B5E"/>
+
+  <!-- 服（白のサロンウェア） -->
+  <path d="M110 400 q0 -86 90 -88 q90 2 90 88 z" fill="#FFFFFF"/>
+  <path d="M110 400 q0 -86 90 -88 q90 2 90 88" fill="none" stroke="#D4BC8B" stroke-width="1.6"/>
+  <path d="M200 312 l-18 22 18 30 18 -30 z" fill="#F3EDE3"/>
+  <!-- 胸元のゴールドネックレス -->
+  <path d="M178 318 q22 18 44 0" fill="none" stroke="#B89B5E" stroke-width="1.8"/>
+  <circle cx="200" cy="334" r="4" fill="#B89B5E"/>
+</svg>

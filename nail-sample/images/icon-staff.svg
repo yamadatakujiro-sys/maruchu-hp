@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <!-- スタッフアイコン：人物 -->
+  <g stroke="#B89B5E" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="40" cy="28" r="12"/>
+    <path d="M18 68 q0 -20 22 -20 q22 0 22 20"/>
+  </g>
+  <path d="M62 16 l1.8 5.4 5.4 1.8 -5.4 1.8 -1.8 5.4 -1.8 -5.4 -5.4 -1.8 5.4 -1.8 z" fill="#B89B5E" opacity="0.8"/>
+</svg>

@@ -1,0 +1,1142 @@
+/* ===============================
+   リセット & 基本設定
+   =============================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* カラーパレット：清潔感のあるティール × 温かみのあるアイボリー */
+  --teal: #1B8A85;
+  --teal-dark: #136B67;
+  --teal-pale: #E6F3F2;
+  --ivory: #FAF8F3;
+  --white: #FFFFFF;
+  --ink: #233636;          /* 本文の濃色（真っ黒を避けて柔らかく） */
+  --ink-soft: #5C6E6E;     /* 補足テキスト */
+  --line: #E3E8E8;         /* 罫線 */
+  --accent: #E8A03C;       /* 注意・注釈に使う暖色 */
+
+  --font-heading: 'Zen Kaku Gothic New', 'Noto Sans JP', sans-serif;
+  --font-body: 'Noto Sans JP', 'Helvetica Neue', sans-serif;
+
+  --radius: 14px;
+  --transition: 0.25s ease;
+  --header-h: 64px;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* 固定ヘッダー分だけアンカー位置をずらす */
+  scroll-padding-top: calc(var(--header-h) + 12px);
+}
+
+body {
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  overflow-x: hidden;
+  /* モバイル固定CTAバーに本文が隠れないよう下に余白を確保 */
+  padding-bottom: 64px;
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* スクリーンリーダー専用テキスト */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* PCのみ表示する改行 */
+.pc-only {
+  display: none;
+}
+
+/* ===============================
+   共通：セクション見出し・ボタン
+   =============================== */
+.section-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 72px 20px;
+}
+
+.section-label {
+  display: block;
+  color: var(--teal);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  margin-bottom: 18px;
+}
+
+.section-desc {
+  color: var(--ink-soft);
+  margin-bottom: 40px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  padding: 12px 24px;
+  border-radius: 999px;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.btn-large {
+  padding: 15px 30px;
+  font-size: 15px;
+}
+
+.btn-primary {
+  background: var(--teal);
+  color: var(--white);
+  box-shadow: 0 4px 14px rgba(27, 138, 133, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--teal-dark);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  border: 2px solid var(--teal);
+  color: var(--teal);
+  background: var(--white);
+}
+
+.btn-outline:hover {
+  background: var(--teal-pale);
+  transform: translateY(-2px);
+}
+
+/* ===============================
+   ヘッダー / ナビゲーション
+   =============================== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-h);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-mark {
+  width: 30px;
+  height: 30px;
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* モバイル：ナビはドロワー（上から展開） */
+.nav {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  padding: 24px 20px 28px;
+  transform: translateY(-110%);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s;
+}
+
+.nav.is-open {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.nav-links a {
+  display: block;
+  padding: 10px 4px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  border-bottom: 1px solid var(--line);
+  transition: var(--transition);
+}
+
+.nav-links a:hover {
+  color: var(--teal);
+}
+
+.nav-cta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nav-tel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.4;
+}
+
+.nav-tel-label {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.nav-tel-number {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.04em;
+}
+
+/* ハンバーガーボタン */
+.nav-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: var(--transition);
+}
+
+.nav-toggle.is-open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-toggle.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle.is-open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ===============================
+   ヒーロー
+   =============================== */
+.hero {
+  margin-top: var(--header-h);
+  background: linear-gradient(160deg, var(--ivory) 0%, var(--teal-pale) 100%);
+  overflow: hidden;
+}
+
+.hero-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 56px 20px 64px;
+  position: relative;
+}
+
+.hero-lead {
+  display: inline-block;
+  background: var(--white);
+  color: var(--teal-dark);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 6px 16px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(27, 138, 133, 0.12);
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: 0.05em;
+  margin-bottom: 18px;
+}
+
+.hero-desc {
+  color: var(--ink-soft);
+  margin-bottom: 28px;
+  max-width: 34em;
+}
+
+.hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+/* ファーストビュー内の診療時間サマリー */
+.hero-hours {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: 0 4px 20px rgba(27, 138, 133, 0.1);
+  max-width: 420px;
+}
+
+.hero-hours-row {
+  display: flex;
+  gap: 14px;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.hero-hours-row + .hero-hours-row {
+  border-top: 1px dashed var(--line);
+}
+
+.hero-hours dt {
+  flex-shrink: 0;
+  width: 3em;
+  font-weight: 700;
+  color: var(--teal-dark);
+}
+
+/* 装飾ビジュアル（モバイルでは非表示） */
+.hero-visual {
+  display: none;
+}
+
+/* ===============================
+   お知らせ
+   =============================== */
+.news {
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+}
+
+.news-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 20px;
+}
+
+.news-title {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--teal-dark);
+  margin-bottom: 12px;
+}
+
+.news-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 10px 0;
+  font-size: 14px;
+}
+
+.news-item + .news-item {
+  border-top: 1px solid var(--line);
+}
+
+.news-item time {
+  color: var(--ink-soft);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.news-tag {
+  flex-shrink: 0;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.news-tag-info {
+  background: var(--teal);
+}
+
+.news-item a {
+  width: 100%;
+  transition: var(--transition);
+}
+
+.news-item a:hover {
+  color: var(--teal);
+}
+
+/* ===============================
+   当院の特徴
+   =============================== */
+.features {
+  background: var(--ivory);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.feature-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  box-shadow: 0 2px 12px rgba(35, 54, 54, 0.05);
+}
+
+.feature-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--teal-pale);
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.feature-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.feature-title {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.feature-text {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+/* ===============================
+   診療案内
+   =============================== */
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: var(--transition);
+}
+
+.service-card:hover {
+  border-color: var(--teal);
+  box-shadow: 0 6px 20px rgba(27, 138, 133, 0.12);
+  transform: translateY(-3px);
+}
+
+.service-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.service-num {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.1em;
+}
+
+.service-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.service-text {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin-bottom: 14px;
+  flex-grow: 1;
+}
+
+.service-more {
+  align-self: flex-end;
+  color: var(--teal);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.service-more::after {
+  content: ' →';
+}
+
+/* ===============================
+   院長挨拶
+   =============================== */
+.doctor {
+  background: var(--teal-pale);
+}
+
+.doctor-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* 院長写真プレースホルダ */
+.doctor-photo {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 4 / 5;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  box-shadow: 0 6px 24px rgba(27, 138, 133, 0.15);
+}
+
+.doctor-photo svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.4;
+}
+
+.doctor-message {
+  color: var(--ink);
+  margin-bottom: 24px;
+}
+
+.doctor-name {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.doctor-name-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+
+.doctor-name-en {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-left: 6px;
+}
+
+.doctor-career li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.doctor-career li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.85em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+/* ===============================
+   初診の流れ
+   =============================== */
+.flow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.flow-step {
+  display: flex;
+  gap: 18px;
+  position: relative;
+  padding-bottom: 28px;
+}
+
+/* ステップ間をつなぐ縦ライン */
+.flow-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 21px;
+  top: 44px;
+  bottom: 0;
+  width: 2px;
+  background: var(--teal-pale);
+}
+
+.flow-num {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.flow-title {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  padding-top: 8px;
+}
+
+.flow-text {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+/* ===============================
+   診療時間・アクセス
+   =============================== */
+.access {
+  background: var(--ivory);
+}
+
+.access-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.hours-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(35, 54, 54, 0.05);
+  font-size: 13px;
+}
+
+.hours-table th,
+.hours-table td {
+  padding: 12px 6px;
+  text-align: center;
+  border: 1px solid var(--line);
+}
+
+.hours-table thead th {
+  background: var(--teal);
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.hours-table tbody th {
+  background: var(--teal-pale);
+  font-weight: 700;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.hours-table td {
+  color: var(--teal-dark);
+  font-weight: 700;
+}
+
+.hours-table td.closed {
+  color: var(--line);
+  background: #FAFBFB;
+}
+
+.hours-table td.note-mark {
+  color: var(--accent);
+}
+
+.hours-note {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 10px;
+}
+
+.access-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* 地図プレースホルダ */
+.access-map {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--white);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.access-map svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.4;
+}
+
+.access-row {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.access-row dt {
+  flex-shrink: 0;
+  width: 5.5em;
+  font-weight: 700;
+  color: var(--teal-dark);
+}
+
+/* ===============================
+   フッター
+   =============================== */
+.footer {
+  background: var(--ink);
+  color: var(--white);
+  padding: 48px 20px 24px;
+}
+
+.footer-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.logo-footer .logo-mark {
+  color: var(--white);
+}
+
+.logo-footer .logo-text {
+  color: var(--white);
+}
+
+.footer-address {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 12px;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.footer-links a {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  transition: var(--transition);
+}
+
+.footer-links a:hover {
+  color: var(--white);
+}
+
+.footer-copy {
+  max-width: 1080px;
+  margin: 32px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.8;
+}
+
+/* ===============================
+   モバイル用固定CTAバー
+   =============================== */
+.mobile-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  z-index: 100;
+  box-shadow: 0 -4px 16px rgba(35, 54, 54, 0.12);
+}
+
+.mobile-cta a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 8px;
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.mobile-cta svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mobile-cta-tel {
+  background: var(--white);
+  color: var(--teal-dark);
+}
+
+.mobile-cta-reserve {
+  background: var(--teal);
+  color: var(--white);
+}
+
+/* ===============================
+   タブレット（768px〜）
+   =============================== */
+@media (min-width: 768px) {
+  body {
+    font-size: 16px;
+    /* タブレット以上は固定CTAバーを出さない */
+    padding-bottom: 0;
+  }
+
+  .pc-only {
+    display: inline;
+  }
+
+  .section-inner {
+    padding: 96px 32px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .hero-inner {
+    padding: 80px 32px 88px;
+  }
+
+  .hero-title {
+    font-size: 42px;
+  }
+
+  .hero-actions {
+    flex-direction: row;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .flow-list {
+    max-width: 720px;
+  }
+
+  .hours-table {
+    font-size: 15px;
+  }
+
+  .hours-table th,
+  .hours-table td {
+    padding: 14px 10px;
+  }
+
+  .access-cta {
+    flex-direction: row;
+  }
+
+  .footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mobile-cta {
+    display: none;
+  }
+}
+
+/* ===============================
+   PC（1024px〜）
+   =============================== */
+@media (min-width: 1024px) {
+  /* ナビを常時表示のヘッダー内レイアウトに切り替え */
+  .nav-toggle {
+    display: none;
+  }
+
+  .nav {
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    background: none;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .nav-links {
+    flex-direction: row;
+    gap: 26px;
+    margin-bottom: 0;
+  }
+
+  .nav-links a {
+    border: none;
+    padding: 4px 0;
+    font-size: 14px;
+  }
+
+  .nav-cta-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .nav-tel {
+    align-items: flex-end;
+  }
+
+  .nav-tel-number {
+    font-size: 18px;
+  }
+
+  .nav-reserve {
+    padding: 10px 22px;
+  }
+
+  /* ヒーローを2カラム＋装飾ビジュアル表示に */
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 40px;
+    padding: 96px 32px 104px;
+  }
+
+  .hero-visual {
+    display: block;
+    position: relative;
+    height: 420px;
+  }
+
+  .hero-circle {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .hero-circle-1 {
+    width: 320px;
+    height: 320px;
+    background: rgba(255, 255, 255, 0.8);
+    top: 30px;
+    right: 10px;
+  }
+
+  .hero-circle-2 {
+    width: 140px;
+    height: 140px;
+    background: rgba(27, 138, 133, 0.15);
+    bottom: 20px;
+    left: 10px;
+  }
+
+  .hero-tooth {
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    top: 105px;
+    right: 85px;
+    color: var(--teal);
+    opacity: 0.85;
+  }
+
+  /* お知らせを1行レイアウトに */
+  .news-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 32px;
+  }
+
+  .news-title {
+    flex-shrink: 0;
+    padding-top: 10px;
+  }
+
+  .news-list {
+    flex-grow: 1;
+  }
+
+  .news-item a {
+    width: auto;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* 院長挨拶を2カラムに */
+  .doctor-inner {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 64px;
+  }
+
+  .doctor-visual {
+    flex-shrink: 0;
+    width: 300px;
+  }
+
+  .doctor-content {
+    flex-grow: 1;
+  }
+
+  /* アクセスを2カラムに */
+  .access-grid {
+    flex-direction: row;
+    gap: 48px;
+  }
+
+  .access-hours {
+    flex: 1.1;
+  }
+
+  .access-info {
+    flex: 0.9;
+  }
+}

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 620" preserveAspectRatio="xMidYMid slice">
+  <!-- ヒーロービジュアル：ベージュ×ゴールドの抽象ボタニカル -->
+  <defs>
+    <linearGradient id="heroBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FAF7F2"/>
+      <stop offset="0.55" stop-color="#F3EDE3"/>
+      <stop offset="1" stop-color="#E8DCC3"/>
+    </linearGradient>
+    <linearGradient id="goldLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C9AD72"/>
+      <stop offset="0.5" stop-color="#B89B5E"/>
+      <stop offset="1" stop-color="#D4BC8B"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1440" height="620" fill="url(#heroBg)"/>
+
+  <!-- 柔らかな光 -->
+  <circle cx="1180" cy="120" r="340" fill="url(#glow)" opacity="0.75"/>
+  <circle cx="240" cy="520" r="260" fill="url(#glow)" opacity="0.5"/>
+
+  <!-- 大きな装飾円 -->
+  <circle cx="1210" cy="140" r="270" fill="#FFFFFF" opacity="0.32"/>
+  <circle cx="150" cy="560" r="180" fill="none" stroke="#B89B5E" stroke-width="1" opacity="0.45"/>
+  <circle cx="320" cy="130" r="70" fill="#D4BC8B" opacity="0.30"/>
+  <circle cx="1330" cy="470" r="8" fill="#B89B5E" opacity="0.5"/>
+
+  <!-- ボタニカル線画（右） -->
+  <g stroke="url(#goldLine)" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.85">
+    <path d="M1150 600 C1170 480 1210 380 1290 300"/>
+    <path d="M1188 470 C1148 448 1124 452 1096 478"/>
+    <path d="M1188 470 C1216 432 1218 404 1206 372"/>
+    <path d="M1222 392 C1184 374 1158 378 1132 400"/>
+    <path d="M1222 392 C1248 358 1252 330 1240 300"/>
+    <path d="M1258 340 C1224 326 1198 330 1176 348"/>
+    <path d="M1258 340 C1282 310 1288 286 1278 258"/>
+  </g>
+  <!-- 葉 -->
+  <g fill="#C9AD72" opacity="0.5">
+    <ellipse cx="1106" cy="472" rx="26" ry="10" transform="rotate(-18 1106 472)"/>
+    <ellipse cx="1208" cy="380" rx="24" ry="9" transform="rotate(-65 1208 380)"/>
+    <ellipse cx="1142" cy="396" rx="24" ry="9" transform="rotate(-20 1142 396)"/>
+    <ellipse cx="1240" cy="306" rx="22" ry="8" transform="rotate(-68 1240 306)"/>
+    <ellipse cx="1184" cy="346" rx="22" ry="8" transform="rotate(-22 1184 346)"/>
+    <ellipse cx="1276" cy="264" rx="20" ry="8" transform="rotate(-70 1276 264)"/>
+  </g>
+
+  <!-- ボタニカル線画（左・小） -->
+  <g stroke="#B89B5E" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="0.55">
+    <path d="M120 620 C150 540 170 470 230 410"/>
+    <path d="M168 510 C140 494 120 496 100 514"/>
+    <path d="M168 510 C190 480 192 458 184 434"/>
+    <path d="M204 446 C178 432 158 436 140 452"/>
+  </g>
+
+  <!-- きらめき -->
+  <g fill="#B89B5E">
+    <path d="M380 220 l3.2 9.8 9.8 3.2 -9.8 3.2 -3.2 9.8 -3.2 -9.8 -9.8 -3.2 9.8 -3.2 z" opacity="0.8"/>
+    <path d="M1060 170 l2.6 8 8 2.6 -8 2.6 -2.6 8 -2.6 -8 -8 -2.6 8 -2.6 z" opacity="0.65"/>
+    <path d="M940 480 l2.2 6.6 6.6 2.2 -6.6 2.2 -2.2 6.6 -2.2 -6.6 -6.6 -2.2 6.6 -2.2 z" opacity="0.55"/>
+    <path d="M520 90 l1.8 5.6 5.6 1.8 -5.6 1.8 -1.8 5.6 -1.8 -5.6 -5.6 -1.8 5.6 -1.8 z" opacity="0.5"/>
+  </g>
+
+  <!-- 細い弧 -->
+  <path d="M-50 640 Q 720 460 1490 640" fill="none" stroke="#B89B5E" stroke-width="1" opacity="0.35"/>
+</svg>

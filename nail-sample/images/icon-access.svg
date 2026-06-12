@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <!-- アクセスアイコン：マップピン -->
+  <g stroke="#B89B5E" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 68 C28 52 22 42 22 32 a18 18 0 0 1 36 0 c0 10 -6 20 -18 36 z"/>
+    <circle cx="40" cy="31" r="7"/>
+  </g>
+  <path d="M62 14 l1.8 5.4 5.4 1.8 -5.4 1.8 -1.8 5.4 -1.8 -5.4 -5.4 -1.8 5.4 -1.8 z" fill="#B89B5E" opacity="0.8"/>
+</svg>
