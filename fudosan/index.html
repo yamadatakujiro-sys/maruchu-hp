@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>株式会社クレアシティ | 街に、つぎの物語を。（デモサイト）</title>
+  <meta name="description" content="オフィス・商業施設・住宅の開発と運営を手がける総合不動産、株式会社クレアシティ。※Web制作デモ用の架空企業サイトです">
+  <meta name="robots" content="noindex">
+  <!-- フォント：見出し=ゴシック / 英字=Jost -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Zen+Kaku+Gothic+New:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="header" id="header">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <!-- ロゴ（SVG自作：CREACITYの「C」と街並みをモチーフ） -->
+        <svg class="logo-mark" viewBox="0 0 44 44" aria-hidden="true">
+          <path d="M34 12 a16 16 0 1 0 0 20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <rect x="20" y="18" width="4" height="14" fill="currentColor"/>
+          <rect x="26" y="22" width="4" height="10" fill="currentColor"/>
+        </svg>
+        <span class="logo-text">
+          <span class="logo-main">CREACITY</span>
+          <span class="logo-sub">株式会社クレアシティ</span>
+        </span>
+      </a>
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#news">ニュース</a></li>
+          <li><a href="#business">事業内容</a></li>
+          <li><a href="#numbers">数字で見る</a></li>
+          <li><a href="#project">プロジェクト</a></li>
+          <li><a href="#sustainability">サステナビリティ</a></li>
+          <li><a href="#company">会社情報</a></li>
+          <li><a href="#contact" class="nav-cta">お問い合わせ</a></li>
+        </ul>
+        <button class="nav-toggle" id="navToggle" aria-label="メニューを開く">
+          <span></span><span></span><span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ヒーロー -->
+  <section class="hero">
+    <div class="hero-bg">
+      <img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1900&q=80" alt="都市の夜景" onerror="this.classList.add('img-error')">
+    </div>
+    <div class="hero-content">
+      <p class="hero-en">Create the City, Create the Story.</p>
+      <h1 class="hero-title">街に、<br>つぎの物語を。</h1>
+      <p class="hero-lead">オフィス、商業施設、住まい。<br class="pc-only">クレアシティは不動産の力で、人と街の未来を創造します。</p>
+      <a href="#business" class="btn btn-primary">事業内容を見る</a>
+    </div>
+    <div class="hero-scroll"><span></span>Scroll</div>
+  </section>
+
+  <!-- ニュース -->
+  <section class="section news" id="news">
+    <div class="container news-grid">
+      <div class="news-head">
+        <p class="section-en">News</p>
+        <h2 class="section-title">ニュース</h2>
+        <a href="#contact" class="text-link pc-only">一覧を見る →</a>
+      </div>
+      <ul class="news-list fade-up">
+        <li>
+          <time>2026.06.01</time><span class="news-cat">プレスリリース</span>
+          <a href="#news">複合商業施設「クレアモール川崎」が開業1周年、来館者数500万人を突破</a>
+        </li>
+        <li>
+          <time>2026.05.18</time><span class="news-cat">開発</span>
+          <a href="#news">「（仮称）日本橋三丁目オフィスプロジェクト」着工のお知らせ</a>
+        </li>
+        <li>
+          <time>2026.04.30</time><span class="news-cat">IR</span>
+          <a href="#news">2026年3月期 決算短信を掲載しました</a>
+        </li>
+        <li>
+          <time>2026.04.02</time><span class="news-cat">サステナビリティ</span>
+          <a href="#news">保有オフィスビル全棟で再生可能エネルギー由来電力への切替を完了</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 事業内容 -->
+  <section class="section business" id="business">
+    <div class="container">
+      <p class="section-en center">Business</p>
+      <h2 class="section-title center">事業内容</h2>
+      <p class="section-lead">都心を中心とした不動産の開発・保有・運営を通じて、街の価値を高めます。</p>
+      <div class="business-grid">
+        <a href="#contact" class="business-card fade-up">
+          <div class="business-img"><img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80" alt="オフィス事業" onerror="this.classList.add('img-error')"></div>
+          <div class="business-body">
+            <p class="business-en">Office</p>
+            <h3>オフィス事業</h3>
+            <p>駅近・好立地のオフィスビルを開発・保有。快適なワークプレイスを提供します。</p>
+          </div>
+        </a>
+        <a href="#contact" class="business-card fade-up">
+          <div class="business-img"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80" alt="商業施設事業" onerror="this.classList.add('img-error')"></div>
+          <div class="business-body">
+            <p class="business-en">Retail</p>
+            <h3>商業施設事業</h3>
+            <p>地域の暮らしを彩る商業施設を企画・運営。街のにぎわいを生み出します。</p>
+          </div>
+        </a>
+        <a href="#contact" class="business-card fade-up">
+          <div class="business-img"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80" alt="住宅事業" onerror="this.classList.add('img-error')"></div>
+          <div class="business-body">
+            <p class="business-en">Residence</p>
+            <h3>住宅事業</h3>
+            <p>都市型賃貸レジデンスの開発・運営。上質な住まいをお届けします。</p>
+          </div>
+        </a>
+        <a href="#contact" class="business-card fade-up">
+          <div class="business-img"><img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=80" alt="都市開発事業" onerror="this.classList.add('img-error')"></div>
+          <div class="business-body">
+            <p class="business-en">Development</p>
+            <h3>都市開発事業</h3>
+            <p>再開発・建替えプロジェクトを推進。次世代の街づくりに挑みます。</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 数字で見る -->
+  <section class="section numbers" id="numbers">
+    <div class="container">
+      <p class="section-en center light">Numbers</p>
+      <h2 class="section-title center light">数字で見るクレアシティ</h2>
+      <div class="numbers-grid">
+        <div class="number fade-up">
+          <p class="number-num"><span class="count" data-count="52">0</span><small>年</small></p>
+          <p class="number-label">創業からの歩み</p>
+        </div>
+        <div class="number fade-up">
+          <p class="number-num"><span class="count" data-count="287">0</span><small>棟</small></p>
+          <p class="number-label">保有・運営物件数</p>
+        </div>
+        <div class="number fade-up">
+          <p class="number-num"><span class="count" data-count="99.2" data-decimal="1">0</span><small>%</small></p>
+          <p class="number-label">オフィス入居率</p>
+        </div>
+        <div class="number fade-up">
+          <p class="number-num"><span class="count" data-count="312">0</span><small>名</small></p>
+          <p class="number-label">従業員数</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- プロジェクト紹介（横スクロール） -->
+  <section class="section project" id="project">
+    <div class="container">
+      <p class="section-en center">Project</p>
+      <h2 class="section-title center">プロジェクト紹介</h2>
+      <p class="section-lead">クレアシティが手がけた代表的なプロジェクトをご紹介します。</p>
+    </div>
+    <div class="project-scroll fade-up">
+      <article class="project-card">
+        <div class="project-img"><img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1000&q=80" alt="クレアシティ八重洲タワー" onerror="this.classList.add('img-error')"></div>
+        <div class="project-body">
+          <p class="project-cat">オフィス</p>
+          <h3>クレアシティ八重洲タワー</h3>
+          <p>環境認証を取得した、地上25階のランドマークオフィス。</p>
+        </div>
+      </article>
+      <article class="project-card">
+        <div class="project-img"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80" alt="クレアモール川崎" onerror="this.classList.add('img-error')"></div>
+        <div class="project-body">
+          <p class="project-cat">商業施設</p>
+          <h3>クレアモール川崎</h3>
+          <p>「公園のようなモール」がコンセプトの地域密着型商業施設。</p>
+        </div>
+      </article>
+      <article class="project-card">
+        <div class="project-img"><img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1000&q=80" alt="クレアレジデンス代官山" onerror="this.classList.add('img-error')"></div>
+        <div class="project-body">
+          <p class="project-cat">住宅</p>
+          <h3>クレアレジデンス代官山</h3>
+          <p>緑と暮らす都市型レジデンス。全戸スマートホーム標準対応。</p>
+        </div>
+      </article>
+      <article class="project-card">
+        <div class="project-img"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1000&q=80" alt="日本橋三丁目プロジェクト" onerror="this.classList.add('img-error')"></div>
+        <div class="project-body">
+          <p class="project-cat">開発中</p>
+          <h3>日本橋三丁目プロジェクト</h3>
+          <p>2028年竣工予定。オフィスと商業の複合再開発。</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- サステナビリティ -->
+  <section class="section sustainability" id="sustainability">
+    <div class="container">
+      <p class="section-en center">Sustainability</p>
+      <h2 class="section-title center">サステナビリティ</h2>
+      <p class="section-lead">不動産事業を通じて、環境と社会の持続可能性に貢献します。</p>
+      <div class="sus-grid">
+        <div class="sus-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42 C12 34 8 24 14 16 q6 -8 10 2 q4 -10 10 -2 c6 8 2 18 -10 26z" fill="none"/><path d="M24 26 v10" fill="none"/></svg>
+          <h3>環境への取り組み</h3>
+          <p>保有全ビルで再エネ電力を導入。2030年カーボンニュートラルを目指します。</p>
+        </div>
+        <div class="sus-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="16" cy="14" r="5" fill="none"/><circle cx="32" cy="14" r="5" fill="none"/><path d="M6 38 q0 -12 10 -12 q5 0 8 3 q3 -3 8 -3 q10 0 10 12" fill="none"/></svg>
+          <h3>地域とともに</h3>
+          <p>施設を活用した防災拠点づくり、地域イベントの開催で街に貢献します。</p>
+        </div>
+        <div class="sus-card fade-up">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="14" width="32" height="24" rx="3" fill="none"/><path d="M18 14 v-4 h12 v4 M8 26 h32" fill="none"/></svg>
+          <h3>働きがいの向上</h3>
+          <p>健康経営優良法人認定。多様な人材が活躍できる環境を整えています。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 会社情報 -->
+  <section class="section company" id="company">
+    <div class="container">
+      <p class="section-en center">Company</p>
+      <h2 class="section-title center">会社情報</h2>
+      <table class="company-table fade-up">
+        <tr><th>商号</th><td>株式会社クレアシティ（CREACITY Co., Ltd.）</td></tr>
+        <tr><th>本社</th><td>〒104-0031 東京都中央区京橋1-1-1 クレアシティビル</td></tr>
+        <tr><th>設立</th><td>1974年4月</td></tr>
+        <tr><th>資本金</th><td>120億円</td></tr>
+        <tr><th>代表者</th><td>代表取締役社長 神崎 亮一</td></tr>
+        <tr><th>事業内容</th><td>オフィスビル・商業施設・住宅の開発、保有、賃貸および運営管理</td></tr>
+        <tr><th>従業員数</th><td>312名（2026年3月末現在）</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- お問い合わせCTA -->
+  <section class="contact" id="contact">
+    <div class="container">
+      <p class="section-en center light">Contact</p>
+      <h2 class="contact-title">お問い合わせ</h2>
+      <p class="contact-lead">物件のご相談、テナント募集、取材依頼など、<br>お気軽にお問い合わせください。</p>
+      <div class="contact-actions">
+        <a href="tel:0300000000" class="btn btn-light">📞 03-0000-0000（代表）</a>
+        <button class="btn btn-outline-light" id="openChatBtn">💬 AIコンシェルジュに質問する</button>
+      </div>
+      <p class="contact-note">受付時間 平日 9:00〜17:30</p>
+    </div>
+  </section>
+
+  <!-- フッター -->
+  <footer class="footer">
+    <p class="footer-logo">CREACITY<span>株式会社クレアシティ</span></p>
+    <p class="footer-copy">&copy; 2026 CREACITY Co., Ltd.</p>
+    <p class="footer-demo">※本サイトはWeb制作サービスのデモンストレーション用に作成した架空の不動産会社サイトです。実在の企業・物件・人物とは関係ありません。</p>
+  </footer>
+
+  <!-- チャットボット -->
+  <button class="chat-fab" id="chatFab" aria-label="チャットを開く">💬</button>
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <div>
+        <p class="chat-title">CREACITY AIコンシェルジュ</p>
+        <p class="chat-status">事業・物件についてお答えします</p>
+      </div>
+      <button class="chat-close" id="chatClose" aria-label="チャットを閉じる">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chatInput" placeholder="事業内容・物件・会社についてなど">
+      <button class="chat-send" id="chatSend">送信</button>
+    </div>
+  </div>
+
+  <!-- 設定ファイル（config.example.js をコピーして config.js を作成） -->
+  <script src="config.js" onerror=""></script>
+  <script>
+    // config.js が無い環境（デモ公開時など）でもエラーにしない保険
+    if (typeof ANTHROPIC_API_KEY === 'undefined') { var ANTHROPIC_API_KEY = ''; }
+  </script>
+  <script src="chatbot.js"></script>
+</body>
+</html>
