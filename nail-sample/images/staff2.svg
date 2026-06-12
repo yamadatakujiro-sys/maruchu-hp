@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
+  <!-- スタッフ2：上品なポートレートイラスト（ボブヘア） -->
+  <defs>
+    <linearGradient id="s2Bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EFE6D5"/>
+      <stop offset="1" stop-color="#F8F4EC"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#s2Bg)"/>
+  <circle cx="80" cy="90" r="100" fill="#FFFFFF" opacity="0.4"/>
+  <circle cx="340" cy="330" r="90" fill="#FFFFFF" opacity="0.3"/>
+
+  <!-- 髪（ボブ） -->
+  <path d="M125 260 q-18 -30 -10 -115 q8 -70 85 -70 q77 0 85 70 q8 85 -10 115 q-16 10 -28 -4 l0 -60 q-2 28 -47 28 q-45 0 -47 -28 l0 60 q-12 14 -28 4 z" fill="#4E4238"/>
+
+  <!-- 首と顔 -->
+  <path d="M178 235 l44 0 l0 36 q-22 10 -44 0 z" fill="#EFD9C4"/>
+  <path d="M200 130 q52 0 52 58 q0 60 -52 62 q-52 -2 -52 -62 q0 -58 52 -58 z" fill="#F6E5D2"/>
+  <!-- 前髪（斜め分け） -->
+  <path d="M148 190 q-6 -68 52 -69 q58 1 52 69 q-4 -40 -30 -47 q-44 16 -68 12 q-4 16 -6 35 z" fill="#4E4238"/>
+
+  <!-- 表情 -->
+  <g stroke="#473A2E" stroke-width="2.4" fill="none" stroke-linecap="round">
+    <path d="M172 198 q8 7 16 0"/>
+    <path d="M212 198 q8 7 16 0"/>
+    <path d="M190 240 q10 7 20 0"/>
+  </g>
+  <g stroke="#4E4238" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M170 184 q9 -6 19 -2"/>
+    <path d="M211 182 q10 -4 19 2"/>
+  </g>
+  <circle cx="166" cy="224" r="7" fill="#E8B9A4" opacity="0.5"/>
+  <circle cx="234" cy="224" r="7" fill="#E8B9A4" opacity="0.5"/>
+
+  <!-- 服（ベージュのサロンウェア） -->
+  <path d="M110 400 q0 -86 90 -88 q90 2 90 88 z" fill="#F3EDE3"/>
+  <path d="M110 400 q0 -86 90 -88 q90 2 90 88" fill="none" stroke="#B89B5E" stroke-width="1.6"/>
+  <path d="M200 312 l-16 20 16 28 16 -28 z" fill="#FFFFFF"/>
+  <!-- スカーフ -->
+  <path d="M176 316 q24 16 48 0 l-6 14 q-18 10 -36 0 z" fill="#D4BC8B"/>
+</svg>

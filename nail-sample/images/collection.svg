@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" preserveAspectRatio="xMidYMid slice">
+  <!-- 夏の新色コレクション：ポリッシュボトルのイラスト -->
+  <defs>
+    <linearGradient id="colBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F3EDE3"/>
+      <stop offset="1" stop-color="#E5D5B8"/>
+    </linearGradient>
+    <linearGradient id="cap" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D4BC8B"/>
+      <stop offset="1" stop-color="#A98D52"/>
+    </linearGradient>
+    <linearGradient id="c1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EFD9C8"/><stop offset="1" stop-color="#DDB89E"/>
+    </linearGradient>
+    <linearGradient id="c2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8C9C4"/><stop offset="1" stop-color="#CD9A92"/>
+    </linearGradient>
+    <linearGradient id="c3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D9CDBF"/><stop offset="1" stop-color="#B3A18C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="480" fill="url(#colBg)"/>
+  <circle cx="850" cy="80" r="200" fill="#FFFFFF" opacity="0.30"/>
+  <circle cx="120" cy="420" r="140" fill="#FFFFFF" opacity="0.22"/>
+
+  <!-- ボトル3本（中央配置） -->
+  <g>
+    <!-- ボトル1：シアーベージュ -->
+    <g transform="translate(330 130) rotate(-4 60 160)">
+      <rect x="38" y="0" width="44" height="58" rx="6" fill="url(#cap)"/>
+      <rect x="50" y="58" width="20" height="26" fill="#8C8478" opacity="0.6"/>
+      <path d="M20 96 Q20 84 36 82 L84 82 Q100 84 100 96 L100 196 Q100 214 82 214 L38 214 Q20 214 20 196 Z" fill="url(#c1)"/>
+      <path d="M30 100 Q30 92 40 91 L48 91 L48 200 L40 200 Q30 200 30 192 Z" fill="#FFFFFF" opacity="0.35"/>
+    </g>
+    <!-- ボトル2：モーヴピンク（中央・大きめ） -->
+    <g transform="translate(455 105)">
+      <rect x="38" y="0" width="44" height="62 " rx="6" fill="url(#cap)"/>
+      <rect x="50" y="62" width="20" height="28" fill="#8C8478" opacity="0.6"/>
+      <path d="M16 104 Q16 90 34 88 L86 88 Q104 90 104 104 L104 216 Q104 236 84 236 L36 236 Q16 236 16 216 Z" fill="url(#c2)"/>
+      <path d="M27 108 Q27 99 38 98 L47 98 L47 222 L38 222 Q27 222 27 213 Z" fill="#FFFFFF" opacity="0.35"/>
+    </g>
+    <!-- ボトル3：グレージュ -->
+    <g transform="translate(585 135) rotate(4 60 160)">
+      <rect x="38" y="0" width="44" height="58" rx="6" fill="url(#cap)"/>
+      <rect x="50" y="58" width="20" height="26" fill="#8C8478" opacity="0.6"/>
+      <path d="M20 96 Q20 84 36 82 L84 82 Q100 84 100 96 L100 192 Q100 210 82 210 L38 210 Q20 210 20 192 Z" fill="url(#c3)"/>
+      <path d="M30 100 Q30 92 40 91 L48 91 L48 196 L40 196 Q30 196 30 188 Z" fill="#FFFFFF" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- カラースウォッチ -->
+  <g>
+    <circle cx="395" cy="400" r="16" fill="#E5C3A8"/>
+    <circle cx="445" cy="400" r="16" fill="#D8A49B"/>
+    <circle cx="495" cy="400" r="16" fill="#C7B299"/>
+    <circle cx="545" cy="400" r="16" fill="#E8D7BC"/>
+    <circle cx="595" cy="400" r="16" fill="#B89B5E"/>
+  </g>
+
+  <!-- きらめき -->
+  <g fill="#B89B5E">
+    <path d="M270 110 l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3 z" opacity="0.8"/>
+    <path d="M760 180 l2.4 7.4 7.4 2.4 -7.4 2.4 -2.4 7.4 -2.4 -7.4 -7.4 -2.4 7.4 -2.4 z" opacity="0.65"/>
+    <path d="M700 70 l1.8 5.4 5.4 1.8 -5.4 1.8 -1.8 5.4 -1.8 -5.4 -5.4 -1.8 5.4 -1.8 z" opacity="0.55"/>
+  </g>
+</svg>

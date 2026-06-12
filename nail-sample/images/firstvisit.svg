@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" preserveAspectRatio="xMidYMid slice">
+  <!-- 初回限定特典：優美な手のラインアート＋月桂樹 -->
+  <defs>
+    <linearGradient id="fvBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EFE6D5"/>
+      <stop offset="1" stop-color="#F8F4EC"/>
+    </linearGradient>
+    <linearGradient id="fvGold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C9AD72"/>
+      <stop offset="1" stop-color="#B89B5E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="480" fill="url(#fvBg)"/>
+  <circle cx="160" cy="100" r="180" fill="#FFFFFF" opacity="0.35"/>
+  <circle cx="870" cy="420" r="150" fill="#FFFFFF" opacity="0.3"/>
+
+  <!-- 中央の円形フレーム -->
+  <circle cx="500" cy="240" r="150" fill="#FFFFFF" opacity="0.55"/>
+  <circle cx="500" cy="240" r="150" fill="none" stroke="#B89B5E" stroke-width="1.2" opacity="0.8"/>
+  <circle cx="500" cy="240" r="162" fill="none" stroke="#B89B5E" stroke-width="0.6" opacity="0.45"/>
+
+  <!-- 優美な手のラインアート（指先にネイル） -->
+  <g stroke="#A98D52" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 手首から手の甲 -->
+    <path d="M436 368 C438 322 442 298 456 274"/>
+    <path d="M540 368 C548 332 551 306 547 280"/>
+    <!-- 小指 -->
+    <path d="M456 274 C449 252 446 232 450 216 C451.5 210 458.5 209.5 460.5 215.5 C465 231 467 252 467 268"/>
+    <!-- 薬指 -->
+    <path d="M467 266 C463 238 463.5 212 469 191 C471 184 478.5 184 480.5 191 C485 212 485.5 240 485 262"/>
+    <!-- 中指 -->
+    <path d="M485 262 C483 232 485 202 491 180 C493 173 500.5 173 502.5 180 C507 203 506 236 504.5 260"/>
+    <!-- 人差し指 -->
+    <path d="M504.5 260 C504.5 235 507 210 513.5 191 C516 184 523 184.5 524.5 191.5 C528 210 526 240 523.5 262"/>
+    <!-- 親指 -->
+    <path d="M547 280 C559 264 567 252 571 238 C572.5 232 566.5 227 560.5 231.5 C549 240 541 252 535 265"/>
+  </g>
+  <!-- ネイルチップ（ゴールド） -->
+  <g fill="url(#fvGold)" opacity="0.9">
+    <ellipse cx="455.5" cy="215" rx="4.6" ry="7.4" transform="rotate(-8 455.5 215)"/>
+    <ellipse cx="475" cy="190" rx="5" ry="8" transform="rotate(-4 475 190)"/>
+    <ellipse cx="497" cy="178" rx="5" ry="8.4"/>
+    <ellipse cx="519" cy="189" rx="5" ry="8" transform="rotate(5 519 189)"/>
+    <ellipse cx="565" cy="234" rx="4.6" ry="7" transform="rotate(38 565 234)"/>
+  </g>
+
+  <!-- 月桂樹（左右） -->
+  <g stroke="#B89B5E" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.8">
+    <path d="M320 330 C300 290 296 240 316 196"/>
+    <path d="M680 330 C700 290 704 240 684 196"/>
+  </g>
+  <g fill="#C9AD72" opacity="0.55">
+    <ellipse cx="310" cy="306" rx="17" ry="6.5" transform="rotate(30 310 306)"/>
+    <ellipse cx="300" cy="270" rx="17" ry="6.5" transform="rotate(12 300 270)"/>
+    <ellipse cx="300" cy="234" rx="17" ry="6.5" transform="rotate(-6 300 234)"/>
+    <ellipse cx="310" cy="202" rx="17" ry="6.5" transform="rotate(-24 310 202)"/>
+    <ellipse cx="690" cy="306" rx="17" ry="6.5" transform="rotate(-30 690 306)"/>
+    <ellipse cx="700" cy="270" rx="17" ry="6.5" transform="rotate(-12 700 270)"/>
+    <ellipse cx="700" cy="234" rx="17" ry="6.5" transform="rotate(6 700 234)"/>
+    <ellipse cx="690" cy="202" rx="17" ry="6.5" transform="rotate(24 690 202)"/>
+  </g>
+
+  <!-- きらめき -->
+  <g fill="#B89B5E">
+    <path d="M620 120 l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3 z" opacity="0.8"/>
+    <path d="M370 130 l2.2 6.8 6.8 2.2 -6.8 2.2 -2.2 6.8 -2.2 -6.8 -6.8 -2.2 6.8 -2.2 z" opacity="0.6"/>
+    <path d="M560 90 l1.8 5.4 5.4 1.8 -5.4 1.8 -1.8 5.4 -1.8 -5.4 -5.4 -1.8 5.4 -1.8 z" opacity="0.55"/>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <!-- メニューアイコン：ポリッシュボトル -->
+  <g stroke="#B89B5E" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="32" y="8" width="16" height="16" rx="2.5"/>
+    <path d="M36 24 l0 6 8 0 0 -6"/>
+    <path d="M27 36 q0 -6 9 -6 l8 0 q9 0 9 6 l0 26 q0 8 -8 8 l-10 0 q-8 0 -8 -8 z"/>
+    <path d="M33 38 l0 28"/>
+  </g>
+  <path d="M58 14 l1.8 5.4 5.4 1.8 -5.4 1.8 -1.8 5.4 -1.8 -5.4 -5.4 -1.8 5.4 -1.8 z" fill="#B89B5E" opacity="0.8"/>
+</svg>
