@@ -25,8 +25,8 @@ for INBOX in "$ROOT"/members/*/inbox; do
   for STATE in task task_asked; do
     F="$INBOX/$STATE.md"
     [ -f "$F" ] || continue
-    # mtime 取得（macOS: stat -f %m / Linux: stat -c %Y）
-    MTIME=$(stat -f %m "$F" 2>/dev/null || stat -c %Y "$F")
+    # mtime 取得（Linux: stat -c %Y を先に試し、ダメなら macOS: stat -f %m）
+    MTIME=$(stat -c %Y "$F" 2>/dev/null || stat -f %m "$F")
     AGE_MIN=$(( (NOW_TS - MTIME) / 60 ))
     if [ "$AGE_MIN" -ge "$THRESHOLD_MIN" ]; then
       echo "⚠ STALL: $MEMBER_DIR / $STATE.md (${AGE_MIN} min old)"

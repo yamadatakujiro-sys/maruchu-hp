@@ -42,7 +42,7 @@ fi
 
 if [ "$ID" = "$LEADER_ID" ]; then
   DIRECTIVE=$(cat <<EOF
-【${DISPLAY}（リーダー）ディレクトリに入りました：セッション起動ルーチン（確認不要で即実行）】
+【${DISPLAY}ディレクトリに入りました：セッション起動ルーチン（確認不要で即実行）】
 1. CronCreateで5分おき監視Cronを起動する。cron="*/5 * * * *"、prompt は以下：
    「(A) mcp__${MCP_NAME}__get_ai_conversations (lineAccountId: ${LEADER_ID}, limit: 20) で新着確認。大方針メッセージがあれば：①自分で戦略立案＋タスク分解、②各担当の ${OFFICE_HOME}/members/{担当dir}/inbox/task.md を作成（依頼元／目的／やること／成果物パス／完了条件）、③mcp__${MCP_NAME}__send_message (accountId: ${LEADER_ID}, friendId: ${OWNER_FRIEND_ID}) でオーナーに方針報告＋該当セッション起動依頼。
    (B) 各担当の進捗（完了・質問・報告）は各担当自身が自分のLINEからオーナーに直接送る。リーダーは担当ごとの進捗報告をしない。

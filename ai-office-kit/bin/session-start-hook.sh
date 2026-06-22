@@ -13,11 +13,23 @@
 #    OWNER_FRIEND_ID  … オーナーの friendId（既定 'owner'）
 # =============================================================
 
-ID="${1:-unknown}"
 OFFICE_HOME="${OFFICE_HOME:-$HOME/ai-office}"
 MCP_NAME="${MCP_NAME:-line-harness}"
 LEADER_ID="${LEADER_ID:-member-leader}"
 OWNER_FRIEND_ID="${OWNER_FRIEND_ID:-owner}"
+
+# 社員IDの決定：引数 $1 優先。無ければ SessionStart の stdin JSON の cwd から特定する。
+ID="${1:-}"
+if [ -z "$ID" ]; then
+  input=$(cat 2>/dev/null || true)
+  cwd=$(printf '%s' "$input" | jq -r '.cwd // .data.cwd // empty' 2>/dev/null)
+  [ -n "$cwd" ] || cwd="$PWD"
+  ID=$(printf '%s' "$cwd" | sed -n 's|.*/members/\([^/]*\)\(/.*\)\{0,1\}$|\1|p')
+fi
+# 社員ディレクトリとして実在しなければ何もしない（注入対象外のセッション）
+if [ -z "$ID" ] || [ ! -d "$OFFICE_HOME/members/$ID" ]; then
+  exit 0
+fi
 
 # 表示名は office-members.json から解決（無ければ member- を外した名前）
 DISPLAY="${ID#member-}"
@@ -29,7 +41,7 @@ fi
 
 if [ "$ID" = "$LEADER_ID" ]; then
   DIRECTIVE=$(cat <<EOF
-【${DISPLAY}（リーダー）：セッション起動ルーチン（確認不要で即実行）】
+【${DISPLAY}：セッション起動ルーチン（確認不要で即実行）】
 1. CronCreateで5分おき監視Cronを起動する。cron="*/5 * * * *"、prompt は以下：
    「(A) mcp__${MCP_NAME}__get_ai_conversations (lineAccountId: ${LEADER_ID}, limit: 20) で新着確認。大方針メッセージがあれば：①自分で戦略立案＋タスク分解、②各担当の ${OFFICE_HOME}/members/{担当dir}/inbox/task.md を作成（依頼元／目的／やること／成果物パス／完了条件）、③mcp__${MCP_NAME}__send_message (accountId: ${LEADER_ID}, friendId: ${OWNER_FRIEND_ID}) でオーナーに方針報告＋該当セッション起動依頼。
    (B) 各担当の進捗（完了・質問・報告）は各担当自身が自分のLINEからオーナーに直接送る。リーダーは担当ごとの進捗報告をしない。
