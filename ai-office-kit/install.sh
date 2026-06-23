@@ -44,7 +44,7 @@ command -v node >/dev/null 2>&1 || die "node が見つかりません"
 #    誤って unbound 扱いになるため、いったんスカラー変数に取り出してから切り出す
 first_member="${MEMBERS[0]}"
 LEADER_ID="${first_member%%:*}"
-ok "事前チェック完了（leader=$LEADER_ID）"
+ok "事前チェック完了 (leader=$LEADER_ID)"
 
 # --- 3. フォルダ構成の作成 -----------------------------------
 log "フォルダ構成を作成: $OFFICE_HOME"
@@ -75,7 +75,7 @@ for entry in "${MEMBERS[@]}"; do
     -e "s|{{OFFICE_HOME}}|$OFFICE_HOME|g" \
     "$COMMON_LAYER" >> "$claude_md"
 
-  ok "$disp（$dir） ← $tpl + 共通層"
+  ok "$disp ($dir) <- $tpl + 共通層"
 done
 
 # --- 4.5 社員マニフェスト生成（bin/フックが表示名解決に使う）------
@@ -223,13 +223,13 @@ done
 if command -v launchctl >/dev/null 2>&1 && command -v curl >/dev/null 2>&1; then
   sleep 2
   if curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null 2>&1; then
-    ok "bridge /health 応答OK（:$PORT）"
+    ok "bridge /health 応答OK (port=$PORT)"
   else
-    err "bridge /health 無応答（:$PORT）。logs/bridge.err.log を確認してください"; fail=1
+    err "bridge /health 無応答 (port=$PORT)。logs/bridge.err.log を確認してください"; fail=1
   fi
 fi
 
 [ "$fail" -eq 0 ] || die "自己テストで問題を検出しました"
 
-log "完了。組み立て済み社員数: ${#MEMBERS[@]}（leader=$LEADER_ID）"
+log "完了。組み立て済み社員数: ${#MEMBERS[@]} (leader=$LEADER_ID)"
 log "常駐確認: launchctl list | grep com.lineaioffice"
