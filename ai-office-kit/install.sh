@@ -37,7 +37,8 @@ command -v node >/dev/null 2>&1 || die "node が見つかりません"
 [[ "${MEMBERS[0]}" == member-leader:* ]] || err "警告: MEMBERS の先頭が leader ではありません（推奨: 先頭に leader）"
 [ -d "$BIN_DIR" ] || die "bin/ が見つかりません: $BIN_DIR"
 # リーダーの社員ID（MEMBERS 先頭の dir フィールド）を確定
-IFS=':' read -r LEADER_ID _ _ <<< "${MEMBERS[0]}"
+# ※ macOS の bash 3.2 でも確実に動くようパラメータ展開で切り出す
+LEADER_ID="${MEMBERS[0]%%:*}"
 ok "事前チェック完了（leader=$LEADER_ID）"
 
 # --- 3. フォルダ構成の作成 -----------------------------------
@@ -49,7 +50,7 @@ ok "members/ logs/ を用意"
 #   各社員 = 役割層(roles/<tpl>) + 共通層(SESSION-MODE-TEMPLATE)
 log "社員を組み立て（役割層 → 共通層 の順で CLAUDE.md を生成）"
 for entry in "${MEMBERS[@]}"; do
-  IFS=':' read -r dir disp tpl <<< "$entry"
+  dir="${entry%%:*}"; rest="${entry#*:}"; disp="${rest%%:*}"; tpl="${rest#*:}"
   [ -n "$dir" ] && [ -n "$disp" ] && [ -n "$tpl" ] || die "MEMBERS の書式が不正: '$entry' （正: dir:表示名:tpl.md）"
 
   role_src="$ROLES_DIR/$tpl"
@@ -77,7 +78,7 @@ log "社員マニフェストを生成: office-members.json"
 if command -v jq >/dev/null 2>&1; then
   members_json="$(
     for entry in "${MEMBERS[@]}"; do
-      IFS=':' read -r dir disp tpl <<< "$entry"
+      dir="${entry%%:*}"; rest="${entry#*:}"; disp="${rest%%:*}"; tpl="${rest#*:}"
       jq -n --arg dir "$dir" --arg name "$disp" '{dir:$dir, name:$name}'
     done | jq -s '.'
   )"
@@ -200,7 +201,7 @@ fi
 log "自己テスト（組み立て結果の検証）"
 fail=0
 for entry in "${MEMBERS[@]}"; do
-  IFS=':' read -r dir disp tpl <<< "$entry"
+  dir="${entry%%:*}"; rest="${entry#*:}"; disp="${rest%%:*}"; tpl="${rest#*:}"
   f="$OFFICE_HOME/members/$dir/CLAUDE.md"
   if [ -s "$f" ] && grep -q "動作モード（全社員共通" "$f"; then
     ok "$disp: CLAUDE.md 生成OK（役割層＋共通層）"
