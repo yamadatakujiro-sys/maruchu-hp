@@ -37,8 +37,10 @@ command -v node >/dev/null 2>&1 || die "node が見つかりません"
 [[ "${MEMBERS[0]}" == member-leader:* ]] || err "警告: MEMBERS の先頭が leader ではありません（推奨: 先頭に leader）"
 [ -d "$BIN_DIR" ] || die "bin/ が見つかりません: $BIN_DIR"
 # リーダーの社員ID（MEMBERS 先頭の dir フィールド）を確定
-# ※ macOS の bash 3.2 でも確実に動くようパラメータ展開で切り出す
-LEADER_ID="${MEMBERS[0]%%:*}"
+# ※ bash 3.2 では「配列要素＋パターン除去」を一度にやると set -u 下で
+#    誤って unbound 扱いになるため、いったんスカラー変数に取り出してから切り出す
+first_member="${MEMBERS[0]}"
+LEADER_ID="${first_member%%:*}"
 ok "事前チェック完了（leader=$LEADER_ID）"
 
 # --- 3. フォルダ構成の作成 -----------------------------------
