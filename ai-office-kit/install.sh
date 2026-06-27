@@ -44,7 +44,9 @@ command -v node >/dev/null 2>&1 || die "node が見つかりません"
 #    誤って unbound 扱いになるため、いったんスカラー変数に取り出してから切り出す
 first_member="${MEMBERS[0]}"
 LEADER_ID="${first_member%%:*}"
-ok "事前チェック完了 (leader=$LEADER_ID)"
+# 動作モード（既定 push）: push=LINE着信時のみ動く（省トークン） / poll=受付係30秒＋5分Cron監視
+MODE="${MODE:-push}"
+ok "事前チェック完了 (leader=$LEADER_ID, mode=$MODE)"
 
 # --- 3. フォルダ構成の作成 -----------------------------------
 log "フォルダ構成を作成: $OFFICE_HOME"
@@ -106,7 +108,7 @@ ok "bin/（7部品）と templates/SESSION-MODE-TEMPLATE.md を配置"
 
 # 各部品へ流し込む共通の環境変数（office.conf 由来）
 read -r -d '' COMMON_ENV <<EOF || true
-OFFICE_HOME='$OFFICE_HOME' CLAUDE_BIN='$CLAUDE_BIN' MCP_NAME='$MCP_NAME' LEADER_ID='$LEADER_ID' OWNER_FRIEND_ID='$OWNER_FRIEND_ID'
+OFFICE_HOME='$OFFICE_HOME' CLAUDE_BIN='$CLAUDE_BIN' MCP_NAME='$MCP_NAME' LEADER_ID='$LEADER_ID' OWNER_FRIEND_ID='$OWNER_FRIEND_ID' MODE='$MODE'
 EOF
 
 # --- 6. launchd 常駐登録（bridge / watcher / leader-poll）-----
@@ -170,9 +172,19 @@ PLIST
   register_agent "watcher" \
 "        <string>$NODE_BIN</string>
         <string>$OFFICE_HOME/bin/spawn-watcher.mjs</string>" keepalive
-  register_agent "leaderpoll" \
+  # leader-poll は poll運用時のみ常駐（push運用では待機トークンを消費しないため登録しない）
+  if [ "$MODE" = "poll" ]; then
+    register_agent "leaderpoll" \
 "        <string>/bin/bash</string>
         <string>$OFFICE_HOME/bin/leader-poll.sh</string>" interval
+  else
+    # 既存の leader-poll 常駐が残っていれば push 運用に切替時に確実に止める
+    if [ -f "$LA_DIR/com.lineaioffice.leaderpoll.plist" ]; then
+      launchctl unload "$LA_DIR/com.lineaioffice.leaderpoll.plist" 2>/dev/null || true
+      rm -f "$LA_DIR/com.lineaioffice.leaderpoll.plist"
+    fi
+    ok "push運用: leader-poll は常駐させません（省トークン）"
+  fi
 else
   err "launchctl が無いため常駐登録をスキップ（macOS以外。Macで再実行すると登録されます）"
 fi

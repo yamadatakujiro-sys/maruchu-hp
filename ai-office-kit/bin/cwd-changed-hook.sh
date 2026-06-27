@@ -16,6 +16,8 @@ OFFICE_HOME="${OFFICE_HOME:-$HOME/ai-office}"
 MCP_NAME="${MCP_NAME:-line-harness}"
 LEADER_ID="${LEADER_ID:-member-leader}"
 OWNER_FRIEND_ID="${OWNER_FRIEND_ID:-owner}"
+# 動作モード: push=LINE着信時のみ動く（監視Cronを作らない・待機消費ほぼゼロ） / poll=5分Cron監視あり
+MODE="${MODE:-push}"
 
 input=$(cat)
 new_cwd=$(printf '%s' "$input" | jq -r '.cwd // .newCwd // .new_cwd // .data.cwd // empty' 2>/dev/null)
@@ -40,8 +42,10 @@ if command -v jq >/dev/null 2>&1 && [ -f "$MANIFEST" ]; then
   [ -n "$N" ] && [ "$N" != "null" ] && DISPLAY="$N"
 fi
 
-if [ "$ID" = "$LEADER_ID" ]; then
-  DIRECTIVE=$(cat <<EOF
+if [ "$MODE" = "poll" ]; then
+  # ===== poll運用：5分おき監視Cronを立てる（即応性高いが常時トークン消費）=====
+  if [ "$ID" = "$LEADER_ID" ]; then
+    DIRECTIVE=$(cat <<EOF
 【${DISPLAY}ディレクトリに入りました：セッション起動ルーチン（確認不要で即実行）】
 1. CronCreateで5分おき監視Cronを起動する。cron="*/5 * * * *"、prompt は以下：
    「(A) mcp__${MCP_NAME}__get_ai_conversations (lineAccountId: ${LEADER_ID}, limit: 20) で新着確認。大方針メッセージがあれば：①自分で戦略立案＋タスク分解、②各担当の ${OFFICE_HOME}/members/{担当dir}/inbox/task.md を作成（依頼元／目的／やること／成果物パス／完了条件）、③mcp__${MCP_NAME}__send_message (accountId: ${LEADER_ID}, friendId: ${OWNER_FRIEND_ID}) でオーナーに方針報告＋該当セッション起動依頼。
@@ -52,8 +56,8 @@ if [ "$ID" = "$LEADER_ID" ]; then
 3. CLAUDE.md の役割仕様に完全準拠。
 EOF
 )
-else
-  DIRECTIVE=$(cat <<EOF
+  else
+    DIRECTIVE=$(cat <<EOF
 【${DISPLAY}ディレクトリに入りました：セッション起動ルーチン（確認不要で即実行）】
 1. CronCreateで5分おき監視Cronを起動する。cron="*/5 * * * *"、prompt は以下：
    「(A) inbox/task.md があれば：内容を読み、作業方針の不明点を3〜5個リストアップ（番号選択式で明確に）。mcp__${MCP_NAME}__send_message (accountId: ${ID}, friendId: ${OWNER_FRIEND_ID}) でオーナーに質問送信 → task.md を task_asked.md にリネーム。
@@ -65,6 +69,30 @@ else
 4. CLAUDE.md の役割仕様に完全準拠。
 EOF
 )
+  fi
+else
+  # ===== push運用：監視Cronは作らない（LINE着信時のみ起動・待機消費ほぼゼロ）=====
+  if [ "$ID" = "$LEADER_ID" ]; then
+    DIRECTIVE=$(cat <<EOF
+【${DISPLAY}（受付）：push運用 / 監視Cronは作らないこと】
+このディレクトリではLINEで届いた依頼にのみ対応します。CronCreate は実行しないこと。
+1. mcp__${MCP_NAME}__get_ai_conversations (lineAccountId: ${LEADER_ID}, limit: 20) でオーナーとの会話を確認し、未返信があれば対応。
+2. 作業依頼は各担当の ${OFFICE_HOME}/members/{担当dir}/inbox/task.md に振り分け。担当は自動起動する。
+3. 返信は mcp__${MCP_NAME}__send_message (accountId: ${LEADER_ID}, friendId: ${OWNER_FRIEND_ID}) で。「ターミナルを開いて」等は言わず「〇〇担当が自動で着手します」と伝える。
+対応が終わったらセッションを終了してよい。
+EOF
+)
+  else
+    DIRECTIVE=$(cat <<EOF
+【${DISPLAY}：push運用 / 監視Cronは作らないこと】
+CronCreate は実行しないこと（LINE着信時のみ起動する運用）。
+- inbox/task.md があれば内容を読んで対応。不明点は mcp__${MCP_NAME}__send_message (accountId: ${ID}, friendId: ${OWNER_FRIEND_ID}) でオーナーに質問し、task.md を task_asked.md にリネーム。
+- inbox/task_asked.md があり、オーナーの回答が来ていれば作業を進め、完了時に成果物パスを自分のLINE（${ID}）で報告 → task_asked.md を task_done.md にリネーム。
+- 質問・進捗・完了報告は必ず自分のLINE（${ID}）から送信（リーダー経由にしない）。
+対応が終わったらセッションを終了してよい。
+EOF
+)
+  fi
 fi
 
 jq -n --arg ctx "$DIRECTIVE" '{
