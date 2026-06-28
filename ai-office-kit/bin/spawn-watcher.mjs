@@ -92,8 +92,9 @@ function spawnMember(member) {
   const prompt = [
     `あなたは「${member.name}」担当です。`,
     `inbox/task_doing.md に作業依頼が入っています。内容を読み、作業を最後まで完遂してください。`,
-    `完了したら成果物を保存し、inbox/task_doing.md を inbox/done/ に移動してください。`,
-    `【報告ルール】結果は mcp__${MCP_NAME}__send_message で、必ずリーダー（accountId: "${LEADER_ID}"／アカウント名: ${leaderName}）のルームに送ってください${ownerNote}。メッセージの冒頭に必ず【${member.name}】を付けること。自分の担当アカウントには絶対に送らないでください（オーナーのトークルームを増やさないため、報告はすべてリーダーのルームに集約します）。`,
+    `【着手の一報・最優先】作業を始める前に、まず最初に mcp__${MCP_NAME}__send_message で、リーダー（accountId: "${LEADER_ID}"／アカウント名: ${leaderName}）のルームに「【${member.name}】了解しました。着手します。」と一言だけ送ってください${ownerNote}。これにより、オーナーは担当が動き出したことを確認できます。`,
+    `その後に作業を進めます。完了したら成果物を保存し、inbox/task_doing.md を inbox/done/ に移動してください。`,
+    `【報告ルール】着手の一報も完了報告も、結果はすべて mcp__${MCP_NAME}__send_message で、必ずリーダー（accountId: "${LEADER_ID}"／アカウント名: ${leaderName}）のルームに送ってください${ownerNote}。メッセージの冒頭に必ず【${member.name}】を付けること。自分の担当アカウントには絶対に送らないでください（オーナーのトークルームを増やさないため、報告はすべてリーダーのルームに集約します）。`,
   ].join('\n');
 
   log(`▶ spawn: ${member.dir}`);
