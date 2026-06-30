@@ -23,6 +23,21 @@
 - `docs/`：RUNBOOK（納品手順）/ PRODUCT-SUPPORT（商品・サポート設計）/ SALES-ONEPAGER（営業1枚＋SNS素材）/
   COCONALA-LISTING（ココナラ出品テンプレ）/ X-LAUNCH-30DAYS（X運用30日プラン）/ 本ファイル。
 
+## 2b. 原システムからの再構築の記録（Part1・最初にやった核心）
+- **元システム**：オーナーのMac `~/ai-company`（addnessの講座由来のAI社員システム）。**原本はオーナーのMac上に現存**＝消えない。本キットはそれをオリジナルに作り替えたもの。
+- **7部品の旧→新マッピング**（中身は各 `bin/` ファイル冒頭コメントにも記載）：
+  - `line-bridge/server.mjs` → `bin/office-bridge.mjs`（LINE push受信→spawn）
+  - `scripts/auto-spawn-watcher.mjs` → `bin/spawn-watcher.mjs`（task.md監視→spawn）
+  - `scripts/leader-poll.sh` → `bin/leader-poll.sh`（受付係）
+  - `scripts/watchdog.sh` → `bin/watchdog.sh`（死活監視）
+  - `scripts/session-start-hook.sh` → `bin/session-start-hook.sh`（フック）
+  - `scripts/cwd-changed-hook.sh` → `bin/cwd-changed-hook.sh`（フック）
+  - `scripts/inject-session-mode.sh` → `bin/inject-session-mode.sh`（共通層注入）
+- **パラメータ化**：ハードコード値を `config/office.conf` に外出し（`~/ai-company`→OFFICE_HOME／`/opt/homebrew/bin/claude`→CLAUDE_BIN／ポート18789→PORT／メンバー英名→MEMBERS／friendId→OWNER_FRIEND_ID／MCP名line-harness→MCP_NAME／POLL_MS・MAX_CONCURRENT・THRESHOLD_MIN）。社員はフォルダ自動判定＋office-members.jsonで管理。
+- **役割の仕分け**：元10メンバー→**v1は8職種採用**（leader/lp/designer/writer/video/sns/researcher/analyst）。**product＝自社テンプレ依存で当面除外／brunson＝市販書籍複製で著作権リスクのため除外**。
+- **リブランド**：「AI企業」→「LINE AIオフィス」。コメント/ログ/プロンプトの文言を自社のものに統一。文言「経営者」→「オーナー」。line-harness(MIT)の表記は同梱方針。
+- ＝**「AI社員を作った部分」は会話ではなく `bin/`(7部品)＋`roles/`(8職種)＋`install.sh`＋`config`＋`templates` として main に永続**。実機(Mac)で組み立て・常駐・health確認まで成功済み。
+
 ## 3. 確定した決定事項
 - **v1出荷=8職種**：leader / lp / designer / writer / video / sns / researcher / analyst。
   - product（自社テンプレ依存）は当面除外。brunson（市販書籍複製で著作権リスク）は商品から除外。
