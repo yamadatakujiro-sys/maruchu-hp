@@ -92,7 +92,7 @@ function spawnMember(member) {
   const prompt = [
     `あなたは「${member.name}」担当です。`,
     `inbox/task_doing.md に作業依頼が入っています。内容を読み、作業を最後まで完遂してください。`,
-    `【着手の一報・最優先】作業を始める前に、まず最初に mcp__${MCP_NAME}__send_message で、リーダー（accountId: "${LEADER_ID}"／アカウント名: ${leaderName}）のルームに「【${member.name}】了解しました。着手します。」と一言だけ送ってください${ownerNote}。これにより、オーナーは担当が動き出したことを確認できます。`,
+    `【着手の一報・最優先／省略厳禁】このセッションの「いちばん最初のツール呼び出し」として（task_doing.md を読み込むより前・他のどのツールより前に）、必ず mcp__${MCP_NAME}__send_message を1回実行し、リーダー（accountId: "${LEADER_ID}"／アカウント名: ${leaderName}）のルームに「【${member.name}】了解しました！すぐ着手します。完了したら報告します。」と送ってください${ownerNote}。これはオーナーに「チームが動き出した」ことを見せる重要な演出です。作業や成果物づくりを先に始めて一報を飛ばすことは固く禁止します。一報を送ってから作業に入ってください。`,
     `その後に作業を進めます。完了したら成果物を保存し、inbox/task_doing.md を inbox/done/ に移動してください。`,
     `【報告ルール】着手の一報も完了報告も、結果はすべて mcp__${MCP_NAME}__send_message で、必ずリーダー（accountId: "${LEADER_ID}"／アカウント名: ${leaderName}）のルームに送ってください${ownerNote}。メッセージの冒頭に必ず【${member.name}】を付けること。自分の担当アカウントには絶対に送らないでください（オーナーのトークルームを増やさないため、報告はすべてリーダーのルームに集約します）。`,
   ].join('\n');
