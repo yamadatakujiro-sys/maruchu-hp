@@ -41,8 +41,10 @@
 ## 3. 確定した決定事項
 - **v1出荷=8職種**：leader / lp / designer / writer / video / sns / researcher / analyst。
   - product（自社テンプレ依存）は当面除外。brunson（市販書籍複製で著作権リスク）は商品から除外。
-- **動作モードの既定は push**（`MODE="push"`）。LINE着信時のみ動く＝**待機トークン消費ほぼゼロ**。
-  - poll運用（受付係30秒＋5分Cron監視）は即応性高いが常時消費。必要時のみ `MODE="poll"`。
+- **動作モードは push 固定・poll 禁止で確定（2026-07-08）**。自分用も出荷商品も必ず `MODE="push"`。LINE着信時"だけ"動く＝待機トークン消費ゼロ。
+  - 理由：pollは受付係(leader-poll)が30秒ごとにClaudeを起動し続け、**顧客の利用枠を枯らして「トークン切れで使えない」クレームの直接原因**になる。実機で発生→leaderpollのplist削除で根絶済み。
+  - 番人 bridge/watcher はNode製で待機中トークン=0（起動したままでOK）。Claude(課金)はLINE着信時のみ起動。
+  - Mac再起動でleaderpollが復活し得るため、`launchctl list | grep leaderpoll` が空か確認する運用（手順は`RUNBOOK.md` §C）。
 - **【最新決定】販売モデルは B（あなたが管理する1台に集約・運用代行）＋(あ)（顧客名義のClaude契約）に変更（2026-06-28）。**
   - 当初Aを選んだが、「他人のMacに非技術者が毎回構築」は事故リスクが高いと判明（オーナー自身も非技術者）。
   - B＝Mac mini等の常時起動1台に顧客ごとの“個室”を作る。顧客はLINEで使うだけ＝売りやすい・月額収益。

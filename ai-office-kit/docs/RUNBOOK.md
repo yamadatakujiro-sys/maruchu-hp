@@ -150,6 +150,7 @@ AIは顧客のMac上で動くため、**Macがスリープすると全社員が�
 | 「ngrokは？」と聞かれる | 旧情報。本構成は Cloudflare 受け口 | ngrok不要と周知 |
 | 報告がオーナーに直送される | 共通層ルールの未注入 | 各社員 `CLAUDE.md` に共通層が入っているか確認（install.sh再実行）|
 | 担当の「着手の一報（了解しました）」が出ない | 担当が作業を先に始めて一報を省略 | 一報を「最初の必須ツール呼び出し」に強化済み（spawn-watcher/SESSION-MODE-TEMPLATE）。反映は install.sh 再実行 |
+| **何もしてないのにトークンを激しく消費** | **pollモードの leader-poll が30秒ごとにClaude起動**（Mac再起動で復活し得る） | §C参照。**pushモードに固定**し leaderpoll のplistを削除する。`launchctl list \| grep leaderpoll` が空になればOK |
 
 ---
 
@@ -170,6 +171,25 @@ git checkout origin/<branch> -- ai-office-kit/bin/spawn-watcher.mjs ai-office-ki
 cd ai-office-kit && bash install.sh
 ```
 指定ファイルだけ更新され、`config/office.conf`（OFFICE_HOME/PORT/MODE等の顧客設定）は触らない。
+
+### C. 動作モードは push 固定（poll禁止）＝トークン浪費クレームの予防
+**納品時も自分用も、必ず `MODE="push"`。** poll は待機中も Claude を起動し続け、顧客の利用枠を枯らして「使えない」クレームになる。
+- push固定にする：
+  ```
+  sed -i '' 's|^MODE=.*|MODE="push"|' config/office.conf
+  bash install.sh   # push運用なら leader-poll は常駐登録されない（既存plistも削除される）
+  ```
+- **Mac再起動後の残存チェック**（leaderpollが復活してないか）：
+  ```
+  launchctl list | grep leaderpoll        # 何も出なければOK
+  ```
+- 万一 leaderpoll が残っていたら完全削除（再起動でも復活しない）：
+  ```
+  launchctl unload ~/Library/LaunchAgents/com.lineaioffice.leaderpoll.plist 2>/dev/null
+  rm -f ~/Library/LaunchAgents/com.lineaioffice.leaderpoll.plist
+  pkill -f "claude -p" 2>/dev/null
+  ```
+- 番人（bridge/watcher）は起動したままでOK（Node製・待機中トークンゼロ）。完全停止したい時のみ各plistをunload。
 
 ---
 
