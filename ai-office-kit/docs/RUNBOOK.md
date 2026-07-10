@@ -191,6 +191,16 @@ cd ai-office-kit && bash install.sh
   ```
 - 番人（bridge/watcher）は起動したままでOK（Node製・待機中トークンゼロ）。完全停止したい時のみ各plistをunload。
 
+### D. LINEに送っても無反応（bridgeは生きてるのに届かない）＝トンネル切れ ★重要
+- 構成：LINE → **Cloudflare Worker(line-harness)** → **cloudflaredトンネル** → Macのbridge。**Mac再起動でトンネル(cloudflared)が落ちると、着信がbridgeに届かず全て無反応**になる（push運用は着信起動なので、これが起きると沈黙する）。
+- 切り分け：`ps aux | grep -Ei "cloudflared|wrangler" | grep -v grep`（何も出なければトンネル停止）／bridgeは `curl http://127.0.0.1:<PORT>/health` が `ok` なら生きている（PORTは office.conf。過去に18789→18790へ変わっていた事例あり）。
+- **当面の回避策（トンネル無しで手動起動）**：オーナーがLINEで依頼を送った後、下記でリーダーを1回手動起動すると、リーダーがLINEを直接読んで担当に振り分ける（送受信はWorker API経由なのでトンネル不要）：
+  ```
+  cd ~/line-ai-office-test/members/member-leader && /opt/homebrew/bin/claude -p 'LINEの未返信メッセージを確認し、依頼があれば担当のinbox/task.mdに振り分け、オーナーのLINEに一言返信して。friendIdはリーダーの会話履歴から確認' --permission-mode bypassPermissions
+  ```
+  ⚠️ `claude -p '...'` は**必ずシングルクォート**で囲む（`!`等が含まれるとzshが `event not found` で壊す）。
+- **恒久対策(宿題)**：cloudflaredトンネルを **launchd等で再起動時に自動復帰**させる（未実装＝商品の弱点。顧客Macでも同じ沈黙が起きるため要対応）。
+
 ---
 
 ## 検証（再現性の最終確認）
