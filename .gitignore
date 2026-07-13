@@ -1,5 +1,8 @@
 # APIキー（公開しない）
 config.js
+# 画像生成APIキー（Replicate等。絶対にコミットしない）
+.image-api-key
+**/.image-api-key
 
 # macOS
 .DS_Store

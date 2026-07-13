@@ -101,7 +101,7 @@ log "7部品と共通層テンプレを配置: $OFFICE_HOME/bin, $OFFICE_HOME/te
 mkdir -p "$OFFICE_HOME/bin" "$OFFICE_HOME/templates"
 cp "$BIN_DIR"/office-bridge.mjs "$BIN_DIR"/spawn-watcher.mjs "$BIN_DIR"/leader-poll.sh \
    "$BIN_DIR"/watchdog.sh "$BIN_DIR"/session-start-hook.sh "$BIN_DIR"/cwd-changed-hook.sh \
-   "$BIN_DIR"/inject-session-mode.sh "$OFFICE_HOME/bin/"
+   "$BIN_DIR"/inject-session-mode.sh "$BIN_DIR"/gen-image.mjs "$OFFICE_HOME/bin/"
 chmod +x "$OFFICE_HOME"/bin/*.sh
 cp "$COMMON_LAYER" "$OFFICE_HOME/templates/"
 ok "bin/（7部品）と templates/SESSION-MODE-TEMPLATE.md を配置"
