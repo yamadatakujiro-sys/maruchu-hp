@@ -102,6 +102,7 @@ mkdir -p "$OFFICE_HOME/bin" "$OFFICE_HOME/templates"
 cp "$BIN_DIR"/office-bridge.mjs "$BIN_DIR"/spawn-watcher.mjs "$BIN_DIR"/leader-poll.sh \
    "$BIN_DIR"/watchdog.sh "$BIN_DIR"/session-start-hook.sh "$BIN_DIR"/cwd-changed-hook.sh \
    "$BIN_DIR"/inject-session-mode.sh "$BIN_DIR"/gen-image.mjs "$BIN_DIR"/send-line-image.mjs \
+   "$BIN_DIR"/tunnel-run.sh \
    "$OFFICE_HOME/bin/"
 chmod +x "$OFFICE_HOME"/bin/*.sh "$OFFICE_HOME"/bin/*.mjs
 cp "$COMMON_LAYER" "$OFFICE_HOME/templates/"
@@ -115,7 +116,7 @@ EOF
 # --- 6. launchd 常駐登録（bridge / watcher / leader-poll）-----
 LA_DIR="$HOME/Library/LaunchAgents"
 if command -v launchctl >/dev/null 2>&1; then
-  log "launchd 常駐を登録（bridge / watcher / leader-poll）"
+  log "launchd 常駐を登録（bridge / watcher / leader-poll / tunnel）"
   mkdir -p "$LA_DIR"
   NODE_BIN="$(command -v node)"
   BIN_PATH_DIR="$(dirname "$CLAUDE_BIN")"
@@ -154,6 +155,7 @@ $prog_xml
         <key>POLL_MS</key><string>$POLL_MS</string>
         <key>MAX_CONCURRENT</key><string>$MAX_CONCURRENT</string>
         <key>THRESHOLD_MIN</key><string>$THRESHOLD_MIN</string>
+        <key>TUNNEL_CMD</key><string>${TUNNEL_CMD:-}</string>
         <key>PATH</key><string>$BIN_PATH_DIR:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     </dict>
 $run_xml
@@ -185,6 +187,19 @@ PLIST
       rm -f "$LA_DIR/com.lineaioffice.leaderpoll.plist"
     fi
     ok "push運用: leader-poll は常駐させません（省トークン）"
+  fi
+  # cloudflaredトンネル：TUNNEL_CMD 設定時のみ keepalive 常駐（Mac再起動でも自動復帰＝無反応の恒久対策）
+  if [ -n "${TUNNEL_CMD:-}" ]; then
+    register_agent "tunnel" \
+"        <string>/bin/bash</string>
+        <string>$OFFICE_HOME/bin/tunnel-run.sh</string>" keepalive
+  else
+    # 未設定なら当キット由来のトンネル常駐が残っていても解除しておく（設定を消した時の後始末）
+    if [ -f "$LA_DIR/com.lineaioffice.tunnel.plist" ]; then
+      launchctl unload "$LA_DIR/com.lineaioffice.tunnel.plist" 2>/dev/null || true
+      rm -f "$LA_DIR/com.lineaioffice.tunnel.plist"
+    fi
+    err "警告: TUNNEL_CMD が未設定＝cloudflaredトンネルは自動復帰しません（Mac再起動でLINE無反応の恐れ。office.conf 参照）"
   fi
 else
   err "launchctl が無いため常駐登録をスキップ（macOS以外。Macで再実行すると登録されます）"
@@ -229,7 +244,7 @@ for entry in "${MEMBERS[@]}"; do
 done
 # 部品が配置されているか
 for b in office-bridge.mjs spawn-watcher.mjs leader-poll.sh watchdog.sh \
-         session-start-hook.sh cwd-changed-hook.sh inject-session-mode.sh; do
+         session-start-hook.sh cwd-changed-hook.sh inject-session-mode.sh tunnel-run.sh; do
   [ -s "$OFFICE_HOME/bin/$b" ] || { err "部品が未配置: bin/$b"; fail=1; }
 done
 # ブリッジ稼働確認（launchd 登録時のみ。起動の猶予を見て health を叩く）

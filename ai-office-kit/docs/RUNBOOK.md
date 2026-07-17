@@ -199,7 +199,16 @@ cd ai-office-kit && bash install.sh
   cd ~/line-ai-office-test/members/member-leader && /opt/homebrew/bin/claude -p 'LINEの未返信メッセージを確認し、依頼があれば担当のinbox/task.mdに振り分け、オーナーのLINEに一言返信して。friendIdはリーダーの会話履歴から確認' --permission-mode bypassPermissions
   ```
   ⚠️ `claude -p '...'` は**必ずシングルクォート**で囲む（`!`等が含まれるとzshが `event not found` で壊す）。
-- **恒久対策(宿題)**：cloudflaredトンネルを **launchd等で再起動時に自動復帰**させる（未実装＝商品の弱点。顧客Macでも同じ沈黙が起きるため要対応）。
+- **恒久対策（実装済み・2026-07-17）**：cloudflaredトンネルを launchd で自動復帰させる。手順：
+  1. **名前付きトンネルであることを確認**（起動毎にURLが変わる quick tunnel は不可）：
+     `cloudflared tunnel list` にトンネル名が出る／`cat ~/.cloudflared/config.yml` に tunnel/credentials がある。
+     無ければ `cloudflared tunnel login → create <名前> → route dns …` で作成し、LINE側Webhook URLを安定URLに更新。
+  2. `config/office.conf` の **`TUNNEL_CMD`** に起動コマンドを設定（例：`TUNNEL_CMD="cloudflared tunnel run my-office"`）。
+  3. `bash install.sh` → `com.lineaioffice.tunnel` が **keepalive + RunAtLoad** で常駐登録される。
+  4. 検証：`launchctl list | grep com.lineaioffice.tunnel` に出る／`pkill -f cloudflared` 後に数秒で自動復活する
+     ／Mac再起動後もLINE 1通で担当AIが自動起動する。あわせて§6のスリープ無効も必須。
+  - ログ：`$OFFICE_HOME/logs/tunnel.log` / `tunnel.err.log`。死活監視：`watchdog.sh` が cloudflared 停止時に `⚠ TUNNEL DOWN` を出す。
+  - `TUNNEL_CMD` 未設定のまま `install.sh` を実行すると警告が出る（トンネル常駐なし＝従来の手動運用）。
 
 ---
 
