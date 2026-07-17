@@ -5,14 +5,28 @@
 //        Claude セッションを即 spawn する（同時起動ロックあり）。
 //
 //  設定はすべて環境変数で受け取る（install.sh が office.conf から流し込む）：
-//    OFFICE_HOME      … オフィス本体の基準パス（必須）
-//    PORT             … 待受ポート（既定 18789）
-//    CLAUDE_BIN       … claude 実行ファイル（既定 'claude'）
-//    MCP_NAME         … line-harness MCP のサーバ名（既定 'line-harness'）
-//    LEADER_ID        … リーダーの lineAccountId（既定 'member-leader'）
-//    OWNER_FRIEND_ID  … オーナーの friendId（プロンプト注意書きに使用・任意）
+//    OFFICE_HOME           … オフィス本体の基準パス（必須）
+//    PORT                  … 待受ポート（既定 18789）
+//    CLAUDE_BIN            … claude 実行ファイル（既定 'claude'）
+//    MCP_NAME              … line-harness MCP のサーバ名（既定 'line-harness'）
+//    LEADER_ID             … リーダーの lineAccountId（既定 'member-leader'）
+//    OWNER_FRIEND_ID       … オーナーの friendId（プロンプト注意書きに使用・任意）
+//    LINE_HARNESS_API_URL  … line-harness Worker の URL（UUID→メンバー解決に使用）
+//    LINE_HARNESS_API_KEY  … line-harness Admin API キー（同上）
+//                            ※ install.sh が生成する bridge.plist に手動で追記が必要。
+//                              ~/.mcp.json の line-harness エントリから値を確認できる。
+//
+// 【Worker側変更メモ（2026-07-17 適用）】
+//  line-harness の services/event-bus.ts を修正し、outgoing webhook ペイロードに
+//  lineAccountId（チャネル UUID）を含めてデプロイ済み。
+//  変更箇所: fireOutgoingWebhooks() のシグネチャに lineAccountId? を追加し、
+//  JSON body のトップレベルに lineAccountId フィールドを出力するよう変更。
+//  送信される outgoing webhook ペイロード形式:
+//    { event, timestamp, lineAccountId: "<channel-UUID>",
+//      data: { friendId, eventData: { text, matched, ... } } }
 // =============================================================
 import http from 'node:http';
+import https from 'node:https';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
@@ -36,6 +50,46 @@ const LOG_DIR = path.join(OFFICE_HOME, 'logs');
 // 必要なディレクトリを用意
 fs.mkdirSync(INBOX_DIR, { recursive: true });
 fs.mkdirSync(LOG_DIR, { recursive: true });
+
+// line-harness の accountId(UUID) → member-<displayName> マッピング
+// 起動時に /api/line-accounts から取得してキャッシュする
+let accountIdToMemberDir = {};
+
+async function fetchJson(url, headers = {}) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, { headers }, (res) => {
+      let data = '';
+      res.on('data', (c) => { data += c; });
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); } catch (e) { reject(e); }
+      });
+    });
+    req.on('error', reject);
+  });
+}
+
+async function buildAccountMapping() {
+  const apiUrl = process.env.LINE_HARNESS_API_URL;
+  const apiKey = process.env.LINE_HARNESS_API_KEY;
+  if (!apiUrl || !apiKey || apiKey === 'XXXXXXXXXXXXXXXX') return;
+  try {
+    const res = await fetchJson(`${apiUrl}/api/line-accounts`, {
+      'Authorization': `Bearer ${apiKey}`,
+      'User-Agent': 'line-harness-mcp/1.0',
+    });
+    const mapping = {};
+    for (const acct of (res.data || [])) {
+      const dir = `member-${acct.displayName}`;
+      if (fs.existsSync(path.join(MEMBERS_DIR, dir))) {
+        mapping[acct.id] = dir;
+      }
+    }
+    accountIdToMemberDir = mapping;
+    console.log(`[bridge] アカウントマッピング取得: ${Object.keys(mapping).length}件`);
+  } catch (e) {
+    console.error('[bridge] アカウントマッピング取得失敗:', e.message);
+  }
+}
 
 // 同時起動防止用ロック（社員単位）
 const spawnLocks = new Set();
@@ -138,7 +192,25 @@ const server = http.createServer(async (req, res) => {
 
     try {
       const payload = JSON.parse(body);
-      const { lineAccountId, message, friendId } = payload;
+      let lineAccountId, message, friendId;
+
+      if (payload.event && payload.data) {
+        // line-harness outgoing webhook 形式:
+        // { event, timestamp, lineAccountId(UUID), data: { friendId, eventData: { text } } }
+        const uuidAccountId = payload.lineAccountId;
+        lineAccountId = accountIdToMemberDir[uuidAccountId];
+        if (!lineAccountId) {
+          console.log(`[bridge] 未登録アカウント UUID=${uuidAccountId}、スキップ`);
+          res.writeHead(200);
+          res.end(JSON.stringify({ success: true, skipped: true }));
+          return;
+        }
+        message = payload.data?.eventData?.text;
+        friendId = payload.data?.friendId;
+      } else {
+        // レガシー形式: { lineAccountId, message, friendId }
+        ({ lineAccountId, message, friendId } = payload);
+      }
 
       if (!lineAccountId || !message) {
         res.writeHead(400);
@@ -185,4 +257,6 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, '127.0.0.1', () => {
   console.log(`LINE AIオフィス bridge 起動: http://127.0.0.1:${PORT}`);
   console.log(`Inbox: ${INBOX_DIR}`);
+  // 起動後に line-harness アカウントマッピングを取得
+  buildAccountMapping();
 });
