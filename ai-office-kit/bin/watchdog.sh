@@ -19,10 +19,13 @@ ROOT="$OFFICE_HOME"
 NOW_TS=$(date +%s)
 
 # --- トンネル死活（TUNNEL_CMD 運用時のみ）------------------------
-# cloudflared が落ちていると LINE 着信が bridge に届かず全て無反応になる（RUNBOOK §D）。
+# トンネル(ngrok / cloudflared 等)が落ちていると LINE 着信が bridge に届かず無反応になる（RUNBOOK §D）。
 if [ -n "${TUNNEL_CMD:-}" ]; then
-  if ! pgrep -f cloudflared >/dev/null 2>&1; then
-    echo "⚠ TUNNEL DOWN: cloudflared が動いていません（LINE着信が届かない状態）。launchd の com.lineaioffice.tunnel を確認"
+  # TUNNEL_CMD の先頭語＝トンネル実体のプロセス名（例: ngrok / cloudflared）
+  TUNNEL_BIN="${TUNNEL_CMD%% *}"
+  TUNNEL_BIN="$(basename "$TUNNEL_BIN")"
+  if ! pgrep -f "$TUNNEL_BIN" >/dev/null 2>&1; then
+    echo "⚠ TUNNEL DOWN: $TUNNEL_BIN が動いていません（LINE着信が届かない状態）。launchd の com.lineaioffice.tunnel を確認"
   fi
 fi
 

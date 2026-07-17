@@ -192,22 +192,39 @@ cd ai-office-kit && bash install.sh
 - 番人（bridge/watcher）は起動したままでOK（Node製・待機中トークンゼロ）。完全停止したい時のみ各plistをunload。
 
 ### D. LINEに送っても無反応（bridgeは生きてるのに届かない）＝トンネル切れ ★重要
-- 構成：LINE → **Cloudflare Worker(line-harness)** → **cloudflaredトンネル** → Macのbridge。**Mac再起動でトンネル(cloudflared)が落ちると、着信がbridgeに届かず全て無反応**になる（push運用は着信起動なので、これが起きると沈黙する）。
-- 切り分け：`ps aux | grep -Ei "cloudflared|wrangler" | grep -v grep`（何も出なければトンネル停止）／bridgeは `curl http://127.0.0.1:<PORT>/health` が `ok` なら生きている（PORTは office.conf。過去に18789→18790へ変わっていた事例あり）。
+- 構成：LINE → **Cloudflare Worker(line-harness)** → **トンネル(ngrok もしくは cloudflared)** → Macのbridge。**Mac再起動でトンネルが落ちると、着信がbridgeに届かず全て無反応**になる（push運用は着信起動なので、これが起きると沈黙する）。恒久対策は本項末尾（launchd自動復帰）を参照。
+- 切り分け：`ps aux | grep -Ei "ngrok|cloudflared|wrangler" | grep -v grep`（何も出なければトンネル停止）／bridgeは `curl http://127.0.0.1:<PORT>/health` が `ok` なら生きている（PORTは office.conf。過去に18789→18790へ変わっていた事例あり）。
 - **当面の回避策（トンネル無しで手動起動）**：オーナーがLINEで依頼を送った後、下記でリーダーを1回手動起動すると、リーダーがLINEを直接読んで担当に振り分ける（送受信はWorker API経由なのでトンネル不要）：
   ```
   cd ~/line-ai-office-test/members/member-leader && /opt/homebrew/bin/claude -p 'LINEの未返信メッセージを確認し、依頼があれば担当のinbox/task.mdに振り分け、オーナーのLINEに一言返信して。friendIdはリーダーの会話履歴から確認' --permission-mode bypassPermissions
   ```
   ⚠️ `claude -p '...'` は**必ずシングルクォート**で囲む（`!`等が含まれるとzshが `event not found` で壊す）。
-- **恒久対策（実装済み・2026-07-17）**：cloudflaredトンネルを launchd で自動復帰させる。手順：
-  1. **名前付きトンネルであることを確認**（起動毎にURLが変わる quick tunnel は不可）：
-     `cloudflared tunnel list` にトンネル名が出る／`cat ~/.cloudflared/config.yml` に tunnel/credentials がある。
-     無ければ `cloudflared tunnel login → create <名前> → route dns …` で作成し、LINE側Webhook URLを安定URLに更新。
-  2. `config/office.conf` の **`TUNNEL_CMD`** に起動コマンドを設定（例：`TUNNEL_CMD="cloudflared tunnel run my-office"`）。
-  3. `bash install.sh` → `com.lineaioffice.tunnel` が **keepalive + RunAtLoad** で常駐登録される。
-  4. 検証：`launchctl list | grep com.lineaioffice.tunnel` に出る／`pkill -f cloudflared` 後に数秒で自動復活する
-     ／Mac再起動後もLINE 1通で担当AIが自動起動する。あわせて§6のスリープ無効も必須。
-  - ログ：`$OFFICE_HOME/logs/tunnel.log` / `tunnel.err.log`。死活監視：`watchdog.sh` が cloudflared 停止時に `⚠ TUNNEL DOWN` を出す。
+- **恒久対策（実装済み・実機で動作確認 2026-07-17）**：トンネルを launchd で自動復帰させる。
+  トンネル実体は **ngrok の無料固定ドメイン**を推奨（cloudflared と違い**独自ドメイン不要**）。
+  - **確定した動作経路**（この形で実機の自動起動を確認済み）：
+    ```
+    LINEメッセージ
+      → line-harness Worker (…workers.dev/webhook)         ← LINE Developers の Webhook URL。変更不要
+      → line-harness Outgoing Webhook（message_received を転送・要登録）
+      → ngrok 固定URL  https://<xxxxx>.ngrok-free.dev/webhook   ← launchd keepalive で常駐
+      → Mac bridge (127.0.0.1:18789/webhook)
+      → 該当社員を spawn
+    ```
+    ※LINE Developers 側の Webhook URL は Worker のまま**触らない**。トンネルの差し替えは Worker の
+      Outgoing Webhook 転送先＝ngrok固定URLで行う。
+  - 手順（ngrok・推奨）：
+    1. `ngrok.com` 登録（メール＋パスワード推奨。OAuthはループしやすい）→ **Domains** で固定ドメイン発行 →
+       **Your Authtoken** をコピー。
+    2. Mac で `brew install ngrok` → `ngrok config add-authtoken <token>`。
+    3. `config/office.conf` の **`TUNNEL_CMD`** に設定：`TUNNEL_CMD="ngrok http --domain=<xxxxx>.ngrok-free.dev 18789"`。
+    4. `bash install.sh` → `com.lineaioffice.tunnel` が **keepalive + RunAtLoad** で常駐登録される。
+    5. line-harness Worker の Outgoing Webhook 転送先を `https://<xxxxx>.ngrok-free.dev/webhook` に設定
+       （payload に `lineAccountId`＝送信元チャネルのUUIDを含めること。bridge がこれで担当を解決する）。
+  - 別解（Cloudflareに独自ドメインを持っている場合）：`TUNNEL_CMD="cloudflared tunnel run my-office"`。
+  - 検証：`launchctl list | grep com.lineaioffice.tunnel` に出る／`pkill -f ngrok`（cloudflaredなら `pkill -f cloudflared`）後に
+    数秒で自動復活し**固定URLは不変**／Mac再起動後もLINE 1通で担当AIが自動起動。あわせて§6のスリープ無効も必須。
+  - ログ：`$OFFICE_HOME/logs/tunnel.log` / `tunnel.err.log`。死活監視：`watchdog.sh` が
+    トンネル停止時に `⚠ TUNNEL DOWN` を出す（`TUNNEL_CMD` の先頭語からプロセスを自動判定）。
   - `TUNNEL_CMD` 未設定のまま `install.sh` を実行すると警告が出る（トンネル常駐なし＝従来の手動運用）。
 
 ---
