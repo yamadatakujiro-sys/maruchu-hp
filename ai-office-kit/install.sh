@@ -97,14 +97,15 @@ else
 fi
 
 # --- 5. 部品配置（キットの bin/ → $OFFICE_HOME/bin/）----------
-log "7部品と共通層テンプレを配置: $OFFICE_HOME/bin, $OFFICE_HOME/templates"
+log "各部品と共通層テンプレを配置: $OFFICE_HOME/bin, $OFFICE_HOME/templates"
 mkdir -p "$OFFICE_HOME/bin" "$OFFICE_HOME/templates"
 cp "$BIN_DIR"/office-bridge.mjs "$BIN_DIR"/spawn-watcher.mjs "$BIN_DIR"/leader-poll.sh \
    "$BIN_DIR"/watchdog.sh "$BIN_DIR"/session-start-hook.sh "$BIN_DIR"/cwd-changed-hook.sh \
-   "$BIN_DIR"/inject-session-mode.sh "$BIN_DIR"/gen-image.mjs "$OFFICE_HOME/bin/"
-chmod +x "$OFFICE_HOME"/bin/*.sh
+   "$BIN_DIR"/inject-session-mode.sh "$BIN_DIR"/gen-image.mjs "$BIN_DIR"/send-line-image.mjs \
+   "$OFFICE_HOME/bin/"
+chmod +x "$OFFICE_HOME"/bin/*.sh "$OFFICE_HOME"/bin/*.mjs
 cp "$COMMON_LAYER" "$OFFICE_HOME/templates/"
-ok "bin/（7部品）と templates/SESSION-MODE-TEMPLATE.md を配置"
+ok "bin/（各部品）と templates/SESSION-MODE-TEMPLATE.md を配置"
 
 # 各部品へ流し込む共通の環境変数（office.conf 由来）
 read -r -d '' COMMON_ENV <<EOF || true
