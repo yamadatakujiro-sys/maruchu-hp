@@ -52,9 +52,9 @@ node "$OFFICE_HOME/bin/send-line-image.mjs" --image <成果物の絶対パス> -
 ```
 
 - 送信先 `--to` は、対応中の会話のオーナー friendId をそのまま使う。
-- `send-line-image.mjs` が未設定（キー未登録）でエラーになる場合のみ、従来どおり
+- 内部で line-harness R2（`POST /api/images`）に画像をアップロードしてから LINE に送信する（外部サービス不要）。
+- スクリプトがエラーになる場合のみ、従来どおり
   `open "<絶対パス>"` 形式のコマンド付きテキストで報告する（オーナーがコピペで開ける形）。
-- セットアップ手順は `docs/LINE-IMAGE-SETUP.md`。
 
 ## 素材追加時
 素材サイト等からダウンロードした素材は `shared/` の適切なフォルダに入れる。
