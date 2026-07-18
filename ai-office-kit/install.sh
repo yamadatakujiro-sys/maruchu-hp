@@ -30,6 +30,45 @@ die()  { err "$*"; exit 1; }
 source "$CONF"
 log "設定を読み込みました: $CONF"
 
+# --- 1.5. 秘密情報の読み込み（鍵ファイル）------------------
+#   秘密情報は office.conf にコミットせず、$OFFICE_HOME 配下の鍵ファイルに置く。
+#
+#   $OFFICE_HOME/.line-harness-key  … R2画像送信に必要な認証情報
+#     書式（KEY=VALUE 形式、#コメント可）:
+#       LINE_HARNESS_API_URL=https://line-harness.yourname.workers.dev
+#       LINE_HARNESS_API_KEY=XXXXXXXXXXXXXXXX
+#     ない場合: bridge plist への LINE_HARNESS_* 注入はスキップ
+#              （send-line-image.mjs は起動時に .line-harness-key を直接読めるため動作は継続する）
+#
+#   $OFFICE_HOME/.tunnel-cmd        … TUNNEL_CMD の上書き（office.conf が空の場合のフォールバック）
+#     書式: コマンド文字列を1行で記述
+#       例: ngrok http --url=xxxxx.ngrok-free.dev 18789
+#     ない場合: office.conf の TUNNEL_CMD をそのまま使う（空なら tunnel 常駐しない）
+LINE_HARNESS_API_URL=""
+LINE_HARNESS_API_KEY=""
+if [ -f "${OFFICE_HOME}/.line-harness-key" ]; then
+  while IFS='=' read -r _lhk _lhv || [ -n "$_lhk" ]; do
+    # コメント行・空行をスキップ
+    [[ "$_lhk" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "${_lhk// }" ]] && continue
+    _lhv="${_lhv%%#*}"   # インラインコメントを除去
+    case "${_lhk// }" in
+      LINE_HARNESS_API_URL) LINE_HARNESS_API_URL="${_lhv}" ;;
+      LINE_HARNESS_API_KEY) LINE_HARNESS_API_KEY="${_lhv}" ;;
+    esac
+  done < "${OFFICE_HOME}/.line-harness-key"
+  ok "R2認証情報を読み込みました: .line-harness-key"
+else
+  err "警告: ${OFFICE_HOME}/.line-harness-key が未作成です。send-line-image.mjs による画像LINE送信が機能しません。"
+  err "       作成例: printf 'LINE_HARNESS_API_URL=...\nLINE_HARNESS_API_KEY=...\n' > ${OFFICE_HOME}/.line-harness-key && chmod 600 ${OFFICE_HOME}/.line-harness-key"
+fi
+
+# TUNNEL_CMD フォールバック: office.conf が空でも .tunnel-cmd があれば使う
+if [ -z "${TUNNEL_CMD:-}" ] && [ -f "${OFFICE_HOME}/.tunnel-cmd" ]; then
+  TUNNEL_CMD="$(head -1 "${OFFICE_HOME}/.tunnel-cmd")"
+  ok "TUNNEL_CMD を .tunnel-cmd から読み込みました: $TUNNEL_CMD"
+fi
+
 # --- 2. 事前チェック -----------------------------------------
 log "事前チェック"
 [ -n "${OFFICE_HOME:-}" ] || die "OFFICE_HOME が未設定です"
@@ -123,8 +162,9 @@ if command -v launchctl >/dev/null 2>&1; then
 
   # plist を1本生成して load し直すヘルパ
   #   $1=ラベル接尾 $2=ProgramArguments(XML断片) $3=常駐方式(keepalive|interval)
+  #   $4=追加 EnvironmentVariables XML断片（省略可。<key>K</key><string>V</string>… の形式）
   register_agent() {
-    local suffix="$1" prog_xml="$2" mode="$3"
+    local suffix="$1" prog_xml="$2" mode="$3" extra_env_xml="${4:-}"
     local label="com.lineaioffice.$suffix"
     local plist="$LA_DIR/$label.plist"
     local run_xml
@@ -157,6 +197,7 @@ $prog_xml
         <key>THRESHOLD_MIN</key><string>$THRESHOLD_MIN</string>
         <key>TUNNEL_CMD</key><string>${TUNNEL_CMD:-}</string>
         <key>PATH</key><string>$BIN_PATH_DIR:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+$extra_env_xml
     </dict>
 $run_xml
     <key>StandardOutPath</key><string>$OFFICE_HOME/logs/$suffix.log</string>
@@ -169,9 +210,15 @@ PLIST
     ok "launchd: $label"
   }
 
+  # bridge には R2画像送信用の認証情報を追加注入する（.line-harness-key から読み込んだ値）
+  lh_env_xml=""
+  if [ -n "$LINE_HARNESS_API_URL" ] && [ -n "$LINE_HARNESS_API_KEY" ]; then
+    lh_env_xml="        <key>LINE_HARNESS_API_URL</key><string>${LINE_HARNESS_API_URL}</string>
+        <key>LINE_HARNESS_API_KEY</key><string>${LINE_HARNESS_API_KEY}</string>"
+  fi
   register_agent "bridge" \
 "        <string>$NODE_BIN</string>
-        <string>$OFFICE_HOME/bin/office-bridge.mjs</string>" keepalive
+        <string>$OFFICE_HOME/bin/office-bridge.mjs</string>" keepalive "$lh_env_xml"
   register_agent "watcher" \
 "        <string>$NODE_BIN</string>
         <string>$OFFICE_HOME/bin/spawn-watcher.mjs</string>" keepalive

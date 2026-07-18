@@ -5,8 +5,9 @@
 //
 // LINE は push メッセージにローカルファイルを直接添付できず、
 // 「公開HTTPS URL」を要求する。そこで本スクリプトは：
-//   1) 画像を line-harness R2 バケットにアップロード（公開URLを取得）
-//   2) 得られた公開URLで LINE Messaging API の画像メッセージを push 送信
+//   1) 画像を line-harness R2 バケットにアップロード（POST /api/images）
+//   2) 得られた公開URLで line-harness API（POST /api/friends/:id/messages）経由で送信
+//      ※ LINEチャネルアクセストークンは line-harness が友だちレコードから自動解決する
 // という2段階で「LINE画面に実物の画像を出す」を実現する。
 //
 // 使い方:
@@ -15,13 +16,12 @@
 //   node send-line-image.mjs ./poster.png <friendId>            # 位置引数でもOK
 //
 // 必要な認証情報（秘密情報。コミット禁止・環境変数で渡す）:
-//   LINE_HARNESS_API_URL         … line-harness Worker の URL
-//   LINE_HARNESS_API_KEY         … line-harness Admin API キー
-//   LINE_CHANNEL_ACCESS_TOKEN    … 送信するLINE公式アカウントのチャネルアクセストークン
-//     読み込み順: 環境変数 → $OFFICE_HOME/.line-channel-token
+//   LINE_HARNESS_API_URL … line-harness Worker の URL
+//   LINE_HARNESS_API_KEY … line-harness Admin API キー
 //
-// LINE_HARNESS_API_URL / LINE_HARNESS_API_KEY は com.lineaioffice.bridge.plist の
-// EnvironmentVariables に設定済みのため、bridge 経由の spawn では自動で利用できる。
+// これらは com.lineaioffice.bridge.plist の EnvironmentVariables に設定済みのため、
+// bridge 経由で spawn された社員セッションでは自動で利用できる。
+// 手動実行時は環境変数か $OFFICE_HOME/.line-harness-key ファイルで設定する。
 // =============================================================
 
 import { readFile } from 'node:fs/promises';
@@ -61,21 +61,32 @@ function parseArgs(argv) {
 }
 
 // --- 認証情報の解決（環境変数 → キーファイルの順）---------------------------
-async function resolveSecret(envName, fileName) {
-  if (process.env[envName]) return process.env[envName].trim();
+// $OFFICE_HOME/.line-harness-key の書式（KEY=VALUE 形式）:
+//   LINE_HARNESS_API_URL=https://line-harness.yourname.workers.dev
+//   LINE_HARNESS_API_KEY=XXXXXXXXXXXXXXXX
+async function resolveHarnessCredentials() {
+  let apiUrl = process.env.LINE_HARNESS_API_URL;
+  let apiKey = process.env.LINE_HARNESS_API_KEY;
+  if (apiUrl && apiKey && apiKey !== 'XXXXXXXXXXXXXXXX') return { apiUrl, apiKey };
+
   const candidates = [
-    process.env.OFFICE_HOME ? join(process.env.OFFICE_HOME, fileName) : null,
-    join(__dirname, fileName),
-    join(__dirname, '..', fileName),
-    join(__dirname, '..', 'config', fileName),
+    process.env.OFFICE_HOME ? join(process.env.OFFICE_HOME, '.line-harness-key') : null,
+    join(__dirname, '..', '.line-harness-key'),
   ].filter(Boolean);
+
   for (const p of candidates) {
     if (existsSync(p)) {
-      const t = (await readFile(p, 'utf8')).split('\n')[0].trim();
-      if (t) return t;
+      const lines = (await readFile(p, 'utf8')).split('\n');
+      for (const line of lines) {
+        const [k, ...rest] = line.split('=');
+        const v = rest.join('=').trim();
+        if (k?.trim() === 'LINE_HARNESS_API_URL') apiUrl = v;
+        if (k?.trim() === 'LINE_HARNESS_API_KEY') apiKey = v;
+      }
+      if (apiUrl && apiKey) break;
     }
   }
-  return null;
+  return { apiUrl: apiUrl || null, apiKey: apiKey || null };
 }
 
 // --- line-harness R2 へアップロードして公開URLを得る --------------------------
@@ -100,30 +111,49 @@ async function uploadToR2({ apiUrl, apiKey, imagePath }) {
   let json;
   try { json = JSON.parse(text); } catch { throw new Error(`R2の応答が不正です: ${text.slice(0, 200)}`); }
 
+  // レスポンス形式: { data: { url, ... } } または { url, ... }
   const url = json?.data?.url || json?.url;
   if (!url) throw new Error(`R2からURLを取得できませんでした: ${text.slice(0, 200)}`);
   return url;
 }
 
-// --- LINE 画像メッセージを push 送信 -----------------------------------------
-async function pushLineImage({ token, to, imageUrl, caption }) {
-  const messages = [];
-  if (caption) messages.push({ type: 'text', text: caption });
-  messages.push({ type: 'image', originalContentUrl: imageUrl, previewImageUrl: imageUrl });
+// --- line-harness API 経由で LINE 画像メッセージを送信 -------------------------
+// POST /api/friends/:friendId/messages
+// LINEチャネルアクセストークンは line-harness が友だちレコードから自動解決する
+async function sendImageViaHarness({ apiUrl, apiKey, friendId, imageUrl, caption }) {
+  if (caption) {
+    // テキストキャプションを先に送信
+    const capRes = await fetch(`${apiUrl}/api/friends/${encodeURIComponent(friendId)}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'line-harness-mcp/1.0',
+      },
+      body: JSON.stringify({ messageType: 'text', content: caption }),
+    });
+    if (!capRes.ok) {
+      const t = await capRes.text();
+      throw new Error(`キャプション送信失敗（${capRes.status}）: ${t.slice(0, 200)}`);
+    }
+  }
 
-  const res = await fetch('https://api.line.me/v2/bot/message/push', {
+  // 画像本体を送信
+  const imageContent = JSON.stringify({ originalContentUrl: imageUrl, previewImageUrl: imageUrl });
+  const res = await fetch(`${apiUrl}/api/friends/${encodeURIComponent(friendId)}/messages`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
+      'User-Agent': 'line-harness-mcp/1.0',
     },
-    body: JSON.stringify({ to, messages }),
+    body: JSON.stringify({ messageType: 'image', content: imageContent }),
   });
 
   const text = await res.text();
-  if (res.status === 401) throw new Error('LINEチャネルアクセストークンが無効です（401）。LINE_CHANNEL_ACCESS_TOKEN を確認してください。');
-  if (res.status === 400) throw new Error(`LINE送信失敗（400・宛先friendIdや画像URLを確認）: ${text.slice(0, 300)}`);
-  if (!res.ok) throw new Error(`LINE送信失敗（${res.status}）: ${text.slice(0, 300)}`);
+  if (res.status === 401) throw new Error('line-harness API 認証エラー（401）。LINE_HARNESS_API_KEY を確認してください。');
+  if (res.status === 404) throw new Error(`friendId が見つかりません（404）: ${friendId}`);
+  if (!res.ok) throw new Error(`LINE画像送信失敗（${res.status}）: ${text.slice(0, 300)}`);
   return true;
 }
 
@@ -145,18 +175,11 @@ async function main() {
   if (!existsSync(imagePath)) { console.error(`❌ 画像が見つかりません: ${imagePath}`); process.exit(2); }
   if (!to) { console.error('❌ 送信先 friendId が必要です（--to <friendId> か 第2引数）。'); process.exit(2); }
 
-  const apiUrl = process.env.LINE_HARNESS_API_URL;
-  const apiKey = process.env.LINE_HARNESS_API_KEY;
-  if (!apiUrl || !apiKey || apiKey === 'XXXXXXXXXXXXXXXX') {
+  const { apiUrl, apiKey } = await resolveHarnessCredentials();
+  if (!apiUrl || !apiKey) {
     console.error('❌ LINE_HARNESS_API_URL または LINE_HARNESS_API_KEY が未設定です。');
-    console.error('   com.lineaioffice.bridge.plist の EnvironmentVariables に追記してください。');
-    process.exit(2);
-  }
-
-  const lineToken = await resolveSecret('LINE_CHANNEL_ACCESS_TOKEN', '.line-channel-token');
-  if (!lineToken) {
-    console.error('❌ LINEチャネルアクセストークンが見つかりません。');
-    console.error('   環境変数 LINE_CHANNEL_ACCESS_TOKEN か $OFFICE_HOME/.line-channel-token に設定してください。');
+    console.error('   環境変数か $OFFICE_HOME/.line-harness-key に設定してください。');
+    console.error('   書式: LINE_HARNESS_API_URL=https://...\n        LINE_HARNESS_API_KEY=xxxx');
     process.exit(2);
   }
 
@@ -165,7 +188,7 @@ async function main() {
   console.log(`🔗 公開URL: ${imageUrl}`);
 
   console.log(`📤 LINEへ画像を送信中 → friendId=${to}`);
-  await pushLineImage({ token: lineToken, to, imageUrl, caption });
+  await sendImageViaHarness({ apiUrl, apiKey, friendId: to, imageUrl, caption });
   console.log('✅ LINEに画像を送信しました。');
 }
 
