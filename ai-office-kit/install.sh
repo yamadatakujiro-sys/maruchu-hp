@@ -116,7 +116,7 @@ EOF
 # --- 6. launchd 常駐登録（bridge / watcher / leader-poll）-----
 LA_DIR="$HOME/Library/LaunchAgents"
 if command -v launchctl >/dev/null 2>&1; then
-  log "launchd 常駐を登録（bridge / watcher / leader-poll / tunnel）"
+  log "launchd 常駐を登録（bridge / watcher / leader-poll / tunnel / caffeinate）"
   mkdir -p "$LA_DIR"
   NODE_BIN="$(command -v node)"
   BIN_PATH_DIR="$(dirname "$CLAUDE_BIN")"
@@ -200,6 +200,19 @@ PLIST
       rm -f "$LA_DIR/com.lineaioffice.tunnel.plist"
     fi
     err "警告: TUNNEL_CMD が未設定＝cloudflaredトンネルは自動復帰しません（Mac再起動でLINE無反応の恐れ。office.conf 参照）"
+  fi
+  # スリープ恒久防止：PREVENT_SLEEP=true なら caffeinate を常駐（Macが寝てAI・トンネルが止まるのを防ぐ）
+  if [ "${PREVENT_SLEEP:-true}" = "true" ]; then
+    register_agent "caffeinate" \
+"        <string>/usr/bin/caffeinate</string>
+        <string>-s</string>
+        <string>-i</string>" keepalive
+  else
+    if [ -f "$LA_DIR/com.lineaioffice.caffeinate.plist" ]; then
+      launchctl unload "$LA_DIR/com.lineaioffice.caffeinate.plist" 2>/dev/null || true
+      rm -f "$LA_DIR/com.lineaioffice.caffeinate.plist"
+    fi
+    ok "PREVENT_SLEEP=false: スリープ防止(caffeinate)は登録しません"
   fi
 else
   err "launchctl が無いため常駐登録をスキップ（macOS以外。Macで再実行すると登録されます）"

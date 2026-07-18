@@ -104,10 +104,15 @@
 
 AIは顧客のMac上で動くため、**Macがスリープすると全社員が止まる**。納品時に必ず設定する。
 
-1. システム設定 → ディスプレイ/バッテリー：電源接続時に**スリープしない**。
-2. 必要に応じて電源アダプタ接続時のスリープを無効化（`pmset` 系の設定）。
-3. 自動再起動・自動ログイン・常駐3本の自動起動（launchd）を有効にし、
-   **再起動後もオフィスが自動復帰する**ことを確認する。
+1. **`office.conf` の `PREVENT_SLEEP="true"`（既定）** で `install.sh` 実行 → `caffeinate` が
+   launchd 常駐（`com.lineaioffice.caffeinate`・`caffeinate -s -i`）で登録され、**Mac再起動後も
+   スリープを自動抑止**する。確認：`pmset -g | grep sleep` に `sleep prevented by ... caffeinate`。
+2. 併せてシステム設定 → ディスプレイ/バッテリー：電源接続時に**スリープしない**にしておくと確実
+   （`pmset` 系の設定も可）。
+3. 自動再起動・自動ログイン・常駐（launchd）を有効にし、**再起動後もオフィスが自動復帰する**ことを確認する。
+
+> ⚠️ 実機事故（2026-07-18）：`caffeinate` が一時タイマー（`-t`付き）だけだと Mac が寝て
+>   トンネル・bridge ごと止まり「翌朝 無反応」になった。**恒久常駐（keepalive・`-t`なし）が必須**。
 
 > 強く推奨：顧客の作業用Macではなく、**据え置きの専用 Mac mini**（またはクラウドMac）を使う。
 > 「常時起動問題」が運用トラブルの大半なので、上位プランとして提案する（§商品設計）。
@@ -226,6 +231,13 @@ cd ai-office-kit && bash install.sh
   - ログ：`$OFFICE_HOME/logs/tunnel.log` / `tunnel.err.log`。死活監視：`watchdog.sh` が
     トンネル停止時に `⚠ TUNNEL DOWN` を出す（`TUNNEL_CMD` の先頭語からプロセスを自動判定）。
   - `TUNNEL_CMD` 未設定のまま `install.sh` を実行すると警告が出る（トンネル常駐なし＝従来の手動運用）。
+- **Worker のビルド漏れ注意（実機ハマり・2026-07-18）**：line-harness Worker（`event-bus.ts` 等）を
+  直したら、**`wrangler deploy` 単独では TypeScript が未コンパイル**で反映されないことがある。
+  必ず **`vite build && wrangler deploy`**（＝正式ビルド）で出す。未ビルドだと outgoing webhook の
+  `lineAccountId` が空になり、bridge が `UUID=undefined` で**全メッセージを黙って無視**する。
+- **成果物画像のLINE自動表示**：imgbb等の外部登録は不要。line-harness の R2 (`POST /api/images`) に
+  画像をアップ→公開URL→LINE画像メッセージで送る。デザイナー等の完成報告に組み込むと、
+  **成果物が"画像そのもの"としてトークに並ぶ**（顧客がファイル場所を知らなくても見える＝商品価値）。
 
 ---
 
