@@ -2,7 +2,7 @@
 
 > 背景（2026-07-18 更新）：完成報告が「テキスト＋ファイルパス」だけだと、オーナーは `open` しないと
 > 中身を見られない。**商品として売る時も「LINEの画面に実物の画像が出ている」方が圧倒的に分かりやすい**
-> （顧客がファイル場所を知らなくても成果物が見える）。`bin/send-line-image.mjs` でこれを自動化する。
+> （顧客がファイル場所を知らなくても成果物が見える）。`bin/send-line-media.mjs` でこれを自動化する。
 > **外部サービス（imgbb等）の登録は不要**——line-harness が既に持つ **R2** をそのまま使う。
 
 ---
@@ -29,7 +29,7 @@ LINE は push メッセージに**ローカルのファイルを直接添付で�
 ---
 
 ## デザイナー等の自動化（役割定義に組み込み済み）
-`roles/designer.md` の「成果物の完成報告」に、`send-line-image.mjs` で画像もLINEに送る手順を明記。
+`roles/designer.md` の「成果物の完成報告」に、`send-line-media.mjs` で画像もLINEに送る手順を明記。
 これにより、**完成のたびに「テキスト報告＋実物画像」がLINEに自動で並ぶ**。キー未設定等でエラーの時のみ、
 従来の `open "<絶対パス>"` 付きテキストにフォールバックする。
 
@@ -38,7 +38,7 @@ LINE は push メッセージに**ローカルのファイルを直接添付で�
 ## テスト（LINEに画像が出るか）
 `<friendId>` は自分（オーナー）の friendId。
 ```
-node "$OFFICE_HOME/bin/send-line-image.mjs" \
+node "$OFFICE_HOME/bin/send-line-media.mjs" \
   --image <成果物の絶対パス> \
   --to <あなたのfriendId> \
   --caption "テスト送信です"
@@ -58,4 +58,4 @@ node "$OFFICE_HOME/bin/send-line-image.mjs" \
 
 ## メモ（商品化）
 - **追加の画像ホスティングは不要**（line-harness の R2 を再利用）。顧客ごとの外部アカウント作成が要らない＝導入が軽い。
-- 別の保存先（S3等）に替える場合は `send-line-image.mjs` の `uploadToR2()` を差し替える（戻り値＝公開URL文字列を合わせる）。
+- 別の保存先（S3等）に替える場合は `send-line-media.mjs` の `uploadToR2()` を差し替える（戻り値＝公開URL文字列を合わせる）。
