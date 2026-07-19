@@ -38,7 +38,7 @@ log "設定を読み込みました: $CONF"
 #       LINE_HARNESS_API_URL=https://line-harness.yourname.workers.dev
 #       LINE_HARNESS_API_KEY=XXXXXXXXXXXXXXXX
 #     ない場合: bridge plist への LINE_HARNESS_* 注入はスキップ
-#              （send-line-image.mjs は起動時に .line-harness-key を直接読めるため動作は継続する）
+#              （send-line-media.mjs は起動時に .line-harness-key を直接読めるため動作は継続する）
 #
 #   $OFFICE_HOME/.tunnel-cmd        … TUNNEL_CMD の上書き（office.conf が空の場合のフォールバック）
 #     書式: コマンド文字列を1行で記述
@@ -59,7 +59,7 @@ if [ -f "${OFFICE_HOME}/.line-harness-key" ]; then
   done < "${OFFICE_HOME}/.line-harness-key"
   ok "R2認証情報を読み込みました: .line-harness-key"
 else
-  err "警告: ${OFFICE_HOME}/.line-harness-key が未作成です。send-line-image.mjs による画像LINE送信が機能しません。"
+  err "警告: ${OFFICE_HOME}/.line-harness-key が未作成です。send-line-media.mjs による画像/動画LINE送信が機能しません。"
   err "       作成例: printf 'LINE_HARNESS_API_URL=...\nLINE_HARNESS_API_KEY=...\n' > ${OFFICE_HOME}/.line-harness-key && chmod 600 ${OFFICE_HOME}/.line-harness-key"
 fi
 
@@ -140,7 +140,7 @@ log "各部品と共通層テンプレを配置: $OFFICE_HOME/bin, $OFFICE_HOME/
 mkdir -p "$OFFICE_HOME/bin" "$OFFICE_HOME/templates"
 cp "$BIN_DIR"/office-bridge.mjs "$BIN_DIR"/spawn-watcher.mjs "$BIN_DIR"/leader-poll.sh \
    "$BIN_DIR"/watchdog.sh "$BIN_DIR"/session-start-hook.sh "$BIN_DIR"/cwd-changed-hook.sh \
-   "$BIN_DIR"/inject-session-mode.sh "$BIN_DIR"/gen-image.mjs "$BIN_DIR"/send-line-image.mjs \
+   "$BIN_DIR"/inject-session-mode.sh "$BIN_DIR"/gen-image.mjs "$BIN_DIR"/send-line-media.mjs \
    "$BIN_DIR"/tunnel-run.sh \
    "$OFFICE_HOME/bin/"
 chmod +x "$OFFICE_HOME"/bin/*.sh "$OFFICE_HOME"/bin/*.mjs
