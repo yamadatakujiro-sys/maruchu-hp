@@ -141,7 +141,7 @@ mkdir -p "$OFFICE_HOME/bin" "$OFFICE_HOME/templates"
 cp "$BIN_DIR"/office-bridge.mjs "$BIN_DIR"/spawn-watcher.mjs "$BIN_DIR"/leader-poll.sh \
    "$BIN_DIR"/watchdog.sh "$BIN_DIR"/session-start-hook.sh "$BIN_DIR"/cwd-changed-hook.sh \
    "$BIN_DIR"/inject-session-mode.sh "$BIN_DIR"/gen-image.mjs "$BIN_DIR"/send-line-media.mjs \
-   "$BIN_DIR"/tunnel-run.sh \
+   "$BIN_DIR"/tunnel-run.sh "$BIN_DIR"/line-notify.mjs "$BIN_DIR"/authwatch.sh \
    "$OFFICE_HOME/bin/"
 chmod +x "$OFFICE_HOME"/bin/*.sh "$OFFICE_HOME"/bin/*.mjs
 cp "$COMMON_LAYER" "$OFFICE_HOME/templates/"
@@ -163,13 +163,14 @@ if command -v launchctl >/dev/null 2>&1; then
   # plist を1本生成して load し直すヘルパ
   #   $1=ラベル接尾 $2=ProgramArguments(XML断片) $3=常駐方式(keepalive|interval)
   #   $4=追加 EnvironmentVariables XML断片（省略可。<key>K</key><string>V</string>… の形式）
+  #   $5=interval秒数（$3=interval のときのみ有効。省略時 30秒）
   register_agent() {
-    local suffix="$1" prog_xml="$2" mode="$3" extra_env_xml="${4:-}"
+    local suffix="$1" prog_xml="$2" mode="$3" extra_env_xml="${4:-}" interval_sec="${5:-30}"
     local label="com.lineaioffice.$suffix"
     local plist="$LA_DIR/$label.plist"
     local run_xml
     if [ "$mode" = "interval" ]; then
-      run_xml="    <key>StartInterval</key><integer>30</integer>"
+      run_xml="    <key>StartInterval</key><integer>$interval_sec</integer>"
     else
       run_xml="    <key>KeepAlive</key><true/>
     <key>RunAtLoad</key><true/>"
@@ -261,6 +262,23 @@ PLIST
     fi
     ok "PREVENT_SLEEP=false: スリープ防止(caffeinate)は登録しません"
   fi
+  # watchdog：死活監視を15分おきに常駐（トンネル/bridge停止・タスク滞留を検知しLINE通知）。
+  # bash+curlのみでClaudeは起動しない＝待機トークンゼロ。line-notify用に LINE_HARNESS_* も注入。
+  register_agent "watchdog" \
+"        <string>/bin/bash</string>
+        <string>$OFFICE_HOME/bin/watchdog.sh</string>" interval "$lh_env_xml" 900
+  # authwatch：Claudeログイン切れの"先回り"点検（既定6時間おき）。AUTH_WATCH=false で無効化。
+  if [ "${AUTH_WATCH:-true}" = "true" ]; then
+    register_agent "authwatch" \
+"        <string>/bin/bash</string>
+        <string>$OFFICE_HOME/bin/authwatch.sh</string>" interval "$lh_env_xml" 21600
+  else
+    if [ -f "$LA_DIR/com.lineaioffice.authwatch.plist" ]; then
+      launchctl unload "$LA_DIR/com.lineaioffice.authwatch.plist" 2>/dev/null || true
+      rm -f "$LA_DIR/com.lineaioffice.authwatch.plist"
+    fi
+    ok "AUTH_WATCH=false: ログイン切れの定期点検(authwatch)は登録しません"
+  fi
 else
   err "launchctl が無いため常駐登録をスキップ（macOS以外。Macで再実行すると登録されます）"
 fi
@@ -304,7 +322,8 @@ for entry in "${MEMBERS[@]}"; do
 done
 # 部品が配置されているか
 for b in office-bridge.mjs spawn-watcher.mjs leader-poll.sh watchdog.sh \
-         session-start-hook.sh cwd-changed-hook.sh inject-session-mode.sh tunnel-run.sh; do
+         session-start-hook.sh cwd-changed-hook.sh inject-session-mode.sh tunnel-run.sh \
+         line-notify.mjs authwatch.sh; do
   [ -s "$OFFICE_HOME/bin/$b" ] || { err "部品が未配置: bin/$b"; fail=1; }
 done
 # ブリッジ稼働確認（launchd 登録時のみ。起動の猶予を見て health を叩く）

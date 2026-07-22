@@ -94,6 +94,63 @@ async function buildAccountMapping() {
 // 同時起動防止用ロック（社員単位）
 const spawnLocks = new Set();
 
+// =============================================================
+//  Claude ログイン切れ（認証失効）検知＋LINE通知
+//
+//  push型では LINE着信で claude を spawn するが、Claude Code のログイン(OAuth)が
+//  切れていると spawn した claude が 401 で即死し、**AI社員は何も返せず完全に沈黙**する
+//  （Claude自身が認証切れなので「ログイン切れ」とすら言えない）。
+//  そこで bridge（＝Node製・Claude認証に非依存）が spawn ログから 401 を検知し、
+//   ①送信者へ「少々お待ちください」を自動返信（顧客を沈黙させない）
+//   ②オーナーへ「Macで /login して」を通知（重複抑制つき）
+//  を line-notify.mjs（Claude不要のLINE送信部品）で行う。
+// =============================================================
+const AUTH_ERROR_RE = /Please run \/login|OAuth access token has expired|Invalid authentication credentials|Re-authenticate to continue/i;
+const NOTIFY_BIN = path.join(OFFICE_HOME, 'bin', 'line-notify.mjs');
+const AUTH_ALERT_COOLDOWN_MS = 10 * 60 * 1000; // オーナー通知は10分に1回まで（連投抑制）
+let lastAuthAlertAt = 0;
+
+// line-notify.mjs を叩いてLINEテキストを送る（fire and forget・失敗しても bridge は落とさない）
+function notifyLineText(friendId, text) {
+  if (!friendId) return;
+  try {
+    const child = spawn(process.execPath, [NOTIFY_BIN, '--to', friendId, text], {
+      detached: true,
+      stdio: 'ignore',
+      env: process.env,
+    });
+    child.on('error', (e) => console.error('[bridge] line-notify 起動失敗:', e.message));
+    child.unref();
+  } catch (e) {
+    console.error('[bridge] line-notify 例外:', e.message);
+  }
+}
+
+// spawn ログの末尾を見て認証切れなら通知する
+function handlePossibleAuthFailure(logPath, friendId) {
+  let tail = '';
+  try {
+    tail = fs.readFileSync(logPath, 'utf8').slice(-4000);
+  } catch { return; }
+  if (!AUTH_ERROR_RE.test(tail)) return;
+
+  console.error('[bridge] ⚠ Claudeログイン切れを検知（401）。LINE通知を送ります。');
+  // ①送信者を沈黙させない（オーナー本人でも顧客でも）
+  notifyLineText(friendId, 'ただいま一時的に応答できない状態です🙏 担当が確認して折り返しますので、少々お待ちください。');
+  // ②オーナーへ復旧アクションを通知（重複抑制）
+  const owner = process.env.OWNER_FRIEND_ID;
+  const now = Date.now();
+  if (now - lastAuthAlertAt > AUTH_ALERT_COOLDOWN_MS) {
+    lastAuthAlertAt = now;
+    if (owner && owner !== friendId) {
+      notifyLineText(owner, '⚠️ AI社員のログイン(認証)が切れています。Macで Claude Code を開き /login で再ログインしてください。それまで全社員が応答できません。');
+    } else if (friendId) {
+      // オーナー自身が送信者だった場合は復旧アクションを直接伝える
+      notifyLineText(friendId, '⚠️ ログイン(認証)が切れています。Macで Claude Code を開き /login で再ログインしてください。');
+    }
+  }
+}
+
 // lineAccountId から社員ディレクトリを解決する。
 // このキットでは members/<lineAccountId> が社員ディレクトリ（例: members/member-lp）。
 function resolveMemberDir(lineAccountId) {
@@ -169,6 +226,8 @@ ${nonLeaderRestrictions}
     console.log(`[SPAWN] ${lineAccountId} は終了コード ${code} で終了`);
     spawnLocks.delete(lineAccountId);
     try { fs.closeSync(logFd); } catch {}
+    // ログイン切れ（401）で即死していないかを確認し、必要ならLINE通知
+    handlePossibleAuthFailure(logPath, friendId);
   });
   child.on('error', (err) => {
     console.error(`[SPAWN] ${lineAccountId} エラー:`, err);

@@ -150,6 +150,7 @@ AIは顧客のMac上で動くため、**Macがスリープすると全社員が�
 | 症状 | 原因 | 一次対処 |
 |---|---|---|
 | LINEに反応しない | **Macがスリープ/再起動で停止** | Mac起動・スリープ設定確認・常駐3本の生存確認 |
+| LINEに反応しない（トンネル/bridgeは生存） | **Claude Code のログイン(OAuth)切れ** | Macで `claude` を開き **`/login`** で再ログイン（§E）。authwatch/bridge が切れをLINE通知する |
 | 途中で止まる/エラー頻発 | **Claude 利用量の上限** | プラン確認、上限到達時はリセットまで待機 or 上位プラン |
 | 別の担当名で返信が来る | チャンネルとメンバーの対応ミス | `.env` とチャンネル対応表を突き合わせて修正 |
 | 「ngrokは？」と聞かれる | 旧情報。本構成は Cloudflare 受け口 | ngrok不要と周知 |
@@ -238,6 +239,24 @@ cd ai-office-kit && bash install.sh
 - **成果物画像のLINE自動表示**：imgbb等の外部登録は不要。line-harness の R2 (`POST /api/images`) に
   画像をアップ→公開URL→LINE画像メッセージで送る。デザイナー等の完成報告に組み込むと、
   **成果物が"画像そのもの"としてトークに並ぶ**（顧客がファイル場所を知らなくても見える＝商品価値）。
+
+### E. Claudeログイン切れ（認証失効）で全社員が沈黙 ★重要（2026-07-22 実機発生）
+- **症状**：トンネルもbridgeも生きているのに、LINEを送っても無反応。spawn ログ（`logs/spawn-<member>.log`）に
+  `Please run /login` / `401 OAuth access token has expired. Re-authenticate to continue.` が出る。
+- **原因**：Claude Code のログイン(OAuthトークン)が失効。push型は着信で `claude` を spawn するが、
+  認証切れだと spawn した claude が **401 で即死**し、AI社員は何も返せない。しかも Claude 自身が認証切れなので
+  「ログイン切れ」とすら言えず**完全な沈黙**になる（トンネル対策では絶対に防げない別系統の弱点）。
+- **一次対処（30秒）**：Macで対象オフィスの Claude Code を開き、**`/login`** → `1. Claude account with subscription`
+  → ブラウザで承認。完了後、リーダーに一言送れば復旧。急ぎは手動キック（§Dの `claude -p '...'`）。
+- **恒久対策（キット実装済み・2026-07-22）**：Claude認証に依存しない Node/bash 層で検知＆LINE通知する：
+  - `bin/line-notify.mjs`：line-harness API 直叩きのテキスト送信部品（**認証切れでも飛ぶ**通知路）。
+  - `office-bridge.mjs`：spawn ログの401を検知→**①送信者へ「少々お待ちください」自動返信（顧客を沈黙させない）
+    ②オーナーへ「/loginして」を通知**（10分に1回まで）。
+  - `bin/authwatch.sh`：既定6時間おきに最小プロンプトで認証を点検→切れていれば**先回りでオーナーに通知**
+    （`office.conf` の `AUTH_WATCH="true"`。切りたい時のみ false）。
+  - `bin/watchdog.sh`：トンネル停止・bridge停止も検知して**オーナーのLINEに通知**（15分おき常駐・連投抑制）。
+  - いずれも通知先は `OWNER_FRIEND_ID`。反映は `bash install.sh` 再実行（`com.lineaioffice.watchdog` /
+    `com.lineaioffice.authwatch` が登録される）。→ **「沈黙して顧客が離脱」を構造的に予防**できる。
 
 ---
 
