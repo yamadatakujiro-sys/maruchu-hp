@@ -60,6 +60,19 @@ if command -v curl >/dev/null 2>&1; then
   fi
 fi
 
+# --- ログ肥大の抑制（長期運用でのディスク逼迫＝別種の停止を防ぐ）------------
+# logs/*.log が LOG_MAX_MB を超えたら、末尾の一定行だけ残して切り詰める（cheap保険）。
+LOG_MAX_MB="${LOG_MAX_MB:-5}"
+if [ -d "$ROOT/logs" ]; then
+  for LF in "$ROOT"/logs/*.log; do
+    [ -f "$LF" ] || continue
+    SZ_MB=$(( $(stat -c %s "$LF" 2>/dev/null || stat -f %z "$LF" 2>/dev/null || echo 0) / 1048576 ))
+    if [ "$SZ_MB" -ge "$LOG_MAX_MB" ]; then
+      tail -n 2000 "$LF" > "$LF.tmp" 2>/dev/null && mv "$LF.tmp" "$LF" && echo "🧹 ログ切り詰め: $(basename "$LF") (${SZ_MB}MB)"
+    fi
+  done
+fi
+
 # 社員一覧は members/*/inbox を持つディレクトリから自動取得
 shopt -s nullglob
 for INBOX in "$ROOT"/members/*/inbox; do

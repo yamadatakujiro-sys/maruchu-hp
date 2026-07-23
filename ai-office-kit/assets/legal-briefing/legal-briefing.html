@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body {
+    font-family:'IPAGothic','IPAPGothic',sans-serif;
+    color:#1a2330; font-size:10.3pt; line-height:1.65; letter-spacing:.1px;
+  }
+  /* --- 表紙ヘッダ --- */
+  .cover { border-bottom:3px solid #123a6b; padding-bottom:14px; margin-bottom:20px; }
+  .cover .kicker { color:#2b6cb0; font-size:9pt; font-weight:bold; letter-spacing:2px; }
+  .cover h1 { font-size:20pt; color:#0e2a52; margin:6px 0 4px; letter-spacing:.5px; }
+  .cover .sub { font-size:11pt; color:#123a6b; font-weight:bold; }
+  .cover .meta { margin-top:10px; font-size:9pt; color:#556; display:flex; gap:26px; flex-wrap:wrap; }
+  .cover .meta b { color:#1a2330; }
+
+  h2 {
+    font-size:12.5pt; color:#0e2a52; margin:22px 0 9px; padding:6px 0 6px 11px;
+    border-left:5px solid #2b6cb0; background:linear-gradient(90deg,#eef4fb,transparent);
+  }
+  h3 { font-size:10.6pt; color:#123a6b; margin:12px 0 3px; }
+  p { margin:4px 0; }
+  ul { margin:4px 0 4px 20px; } li { margin:2px 0; }
+  .lead { color:#333; }
+  strong { color:#0e2a52; }
+
+  /* --- 事実テーブル --- */
+  table { width:100%; border-collapse:collapse; margin:8px 0; font-size:9.6pt; }
+  th, td { border:1px solid #cdd8e6; padding:6px 9px; vertical-align:top; text-align:left; }
+  th { background:#123a6b; color:#fff; font-weight:bold; white-space:nowrap; width:30%; }
+  tr:nth-child(even) td { background:#f6f9fd; }
+
+  /* --- 論点カード --- */
+  .q { border:1px solid #d3ddea; border-radius:6px; padding:10px 13px; margin:9px 0; page-break-inside:avoid; background:#fff; }
+  .q .qh { font-size:10.8pt; font-weight:bold; color:#0e2a52; margin-bottom:4px; }
+  .q .qh .num {
+    display:inline-block; background:#2b6cb0; color:#fff; font-size:9pt; width:20px; height:20px;
+    line-height:20px; text-align:center; border-radius:50%; margin-right:7px;
+  }
+  .q .bg { font-size:9.3pt; color:#4a5568; margin:3px 0 5px; }
+  .q .ask { font-size:9.7pt; }
+  .q .ask b { color:#123a6b; }
+  .q .ask ul { margin-left:18px; }
+
+  .callout {
+    background:#fff8e6; border:1px solid #f0d68a; border-radius:6px; padding:11px 14px; margin:10px 0;
+    page-break-inside:avoid;
+  }
+  .callout h3 { color:#8a6d1a; margin-top:0; }
+
+  .note { margin-top:18px; padding-top:10px; border-top:1px dashed #b9c4d4; font-size:8.6pt; color:#66707d; }
+  .flow {
+    display:flex; align-items:stretch; gap:8px; margin:10px 0; font-size:9pt; text-align:center;
+  }
+  .flow .box { flex:1; border:1.5px solid #2b6cb0; border-radius:6px; padding:8px 6px; background:#eef4fb; }
+  .flow .box b { display:block; color:#0e2a52; font-size:9.4pt; margin-bottom:2px; }
+  .flow .arw { align-self:center; color:#2b6cb0; font-weight:bold; font-size:13pt; }
+  .pb { page-break-before:always; }
+</style>
+</head>
+<body>
+
+  <div class="cover">
+    <div class="kicker">法務相談 ／ 論点整理資料</div>
+    <h1>「LINE AIオフィス」事業 法務確認事項</h1>
+    <div class="sub">Claude（生成AI）× LINE の「AI社員チーム」運用代行サービス</div>
+    <div class="meta">
+      <span><b>作成日</b>：2026年7月23日</span>
+      <span><b>相談先</b>：ご担当弁護士 様</span>
+      <span><b>作成</b>：事業者（当方）</span>
+    </div>
+  </div>
+
+  <p class="lead">本書は、下記サービスの立ち上げ・継続運用にあたり<strong>事前に確認しておきたい法的論点</strong>を整理したものです。
+  まず事業の概要と前提事実をご説明し、そのうえで具体的に伺いたい点を8項目に整理しています。</p>
+
+  <h2>1. 事業の概要</h2>
+  <ul>
+    <li><strong>サービス名</strong>：LINE AIオフィス</li>
+    <li><strong>内容</strong>：生成AI「Claude」とLINEを組み合わせた<strong>「AI社員チーム」</strong>（リーダー＋職種別AI）を、
+      当方が管理するPC上に<strong>顧客ごとに構築</strong>し、<strong>月額で運用代行</strong>するサービス。
+      顧客はLINEで指示を送るだけで、AIが投稿文・画像・動画・LP等の制作物を作成し、LINEに納品する。</li>
+    <li><strong>提供形態</strong>：AIの頭脳であるClaudeは<strong>顧客名義で契約</strong>してもらい、
+      その「個室」を当方の管理PC上に構築・運用代行する（サーバー等の設備は当方が用意）。</li>
+    <li><strong>役割分担</strong>：当方＝PC・通信環境・接続経路・構築キット・運用/サポート／
+      顧客＝Claude契約・LINE公式アカウント。</li>
+    <li><strong>料金</strong>：初期構築費 <strong>39,800円</strong>（税込）＋ 月額運用代行費 <strong>9,800円</strong>（税込・継続課金）。</li>
+    <li><strong>決済</strong>：Stripe（クレジットカード）による継続課金。カード明細の表記は「LUCENT」。</li>
+    <li><strong>販路・集客</strong>：ココナラ（受注・決済）、X（旧Twitter）・公式LINE（集客）。</li>
+    <li><strong>基盤技術</strong>：オープンソース「line-harness」（MITライセンス）を土台に自社改変して利用。</li>
+    <li><strong>運用体制</strong>：現状は当方のPC1台で複数顧客を運用（将来的に専用機へ移行予定）。</li>
+  </ul>
+
+  <div class="flow">
+    <div class="box"><b>① 顧客</b>LINEで指示を送る<br>（例：投稿を作って）</div>
+    <div class="arw">→</div>
+    <div class="box"><b>② 当方管理PC</b>顧客名義Claudeの<br>AI社員が自動で制作</div>
+    <div class="arw">→</div>
+    <div class="box"><b>③ 納品</b>成果物をLINEに返信<br>（画像・動画・文章）</div>
+  </div>
+
+  <h2>2. 前提となる事実（ご判断の材料）</h2>
+  <table>
+    <tr><th>契約・課金</th><td>初期39,800円＋月額9,800円（サブスク）。決済はStripe。ネット経由の非対面契約。</td></tr>
+    <tr><th>Claudeの名義と操作</th><td>契約は顧客名義。実際のログイン・設定・運用操作は<strong>当方が当方の管理PC上で代行</strong>する。</td></tr>
+    <tr><th>当方が預かり得る情報</th><td>顧客のClaude／LINE／Cloudflare等の<strong>ログイン情報・APIトークン</strong>（構築・運用に必要なため）。</td></tr>
+    <tr><th>取り扱うデータ</th><td>顧客のさらに先の<strong>エンドユーザー（LINE利用者）の会話・個人情報</strong>を、AIが処理する場合がある。</td></tr>
+    <tr><th>成果の考え方</th><td>「収益が上がる」等の<strong>成果保証はしない</strong>方針。AI生成物には誤りが含まれ得る前提。</td></tr>
+    <tr><th>ノウハウの由来</th><td>他社の有料講座で学んだ考え方を土台に、<strong>自社で作り替えた独自実装・独自表現</strong>で提供している。</td></tr>
+    <tr><th>運用の単一障害点</th><td>現状はPC1台運用。障害・仕様変更で全顧客が一時停止し得る。</td></tr>
+  </table>
+
+  <h2 class="pb">3. 確認したい論点</h2>
+
+  <div class="q">
+    <div class="qh"><span class="num">1</span>顧客名義アカウントの代理運用</div>
+    <div class="bg">背景：Claudeは顧客名義契約だが、実操作は当方が当方PC上で行う（アカウント共有・代理ログインに近い形）。</div>
+    <div class="ask"><b>伺いたいこと：</b>
+      <ul>
+        <li>各サービスの利用規約・アカウント共有の観点で問題が生じないか。生じ得る場合の回避策。</li>
+        <li>契約書・同意書で「委任・代理運用」をどう明記すれば安全か。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="num">2</span>認証情報・データの預かり</div>
+    <div class="bg">背景：顧客のClaude／LINE／Cloudflare等のログイン情報・トークンを預かり保管する。</div>
+    <div class="ask"><b>伺いたいこと：</b>
+      <ul>
+        <li>預かり保管時の責任分界と管理義務。</li>
+        <li>情報漏えい・不正利用が起きた場合の責任範囲をどう定めるべきか。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="num">3</span>業務委託契約書に入れるべき条項</div>
+    <div class="bg">背景：初期構築費＋月額サブスクの継続的な受託サービス。契約ひな型を整えたい。</div>
+    <div class="ask"><b>伺いたいこと：</b>
+      <ul>
+        <li>提供範囲・成果物の定義、料金・支払条件、解約・返金、再委託、知的財産権の帰属、秘密保持、免責、サービス停止時の取り扱い。</li>
+        <li>継続課金（サブスク）特有の契約条件。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="num">4</span>成果・品質の保証と広告表現（景品表示法）</div>
+    <div class="bg">背景：SNS・販売ページで訴求する。収益保証・誇大広告は避けたい。</div>
+    <div class="ask"><b>伺いたいこと：</b>
+      <ul>
+        <li>「収益が上がる／成果が出る」等を<strong>保証しない</strong>旨の適切な明記方法（景表法・誇大広告の回避）。</li>
+        <li>AI生成物の品質・誤りに関する免責の書き方。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="num">5</span>特定商取引法に基づく表記</div>
+    <div class="bg">背景：ネット上での継続課金サービス販売（ココナラ／自社決済）。</div>
+    <div class="ask"><b>伺いたいこと：</b>
+      <ul>
+        <li>特商法に基づく表記は必要か。必要な場合、何を・どこに載せるべきか（個人事業の氏名・住所・連絡先の扱い含む）。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="num">6</span>個人情報保護</div>
+    <div class="bg">背景：顧客の先のエンドユーザー（LINE利用者）の会話・個人情報をAIが処理し得る。</div>
+    <div class="ask"><b>伺いたいこと：</b>
+      <ul>
+        <li>プライバシーポリシーの要否と記載内容。</li>
+        <li>第三者（生成AI事業者）へのデータ送信を含む運用上の注意・同意取得の要否。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="num">7</span>第三者ソフト・ノウハウ</div>
+    <div class="bg">背景：基盤にOSS（line-harness＝MIT）を使用。事業ノウハウは他社講座を土台に自社で作り替えている。</div>
+    <div class="ask"><b>伺いたいこと：</b>
+      <ul>
+        <li>MITライセンスの表記義務の範囲と、当方の対応で十分か。</li>
+        <li>学習元（他社有料講座）由来の考え方を、自社実装・自社表現に作り替えて提供することの法的リスク（著作権・契約上の制約）の整理。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="num">8</span>サービス停止・障害時</div>
+    <div class="bg">背景：現状はPC1台運用。当方環境やClaude／LINEの仕様変更で停止し得る。</div>
+    <div class="ask"><b>伺いたいこと：</b>
+      <ul>
+        <li>障害時に全顧客が停止した場合の責任範囲・SLA・免責の定め方。</li>
+        <li>顧客側環境や外部サービスの仕様変更で動かなくなった場合の取り扱い。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <h3>特に優先して助言いただきたい点</h3>
+    <ul>
+      <li><strong>論点1・2</strong>：顧客名義Claudeの代理運用と認証情報の預かり（本サービスの根幹。まずここを安全にしたい）。</li>
+      <li><strong>論点3</strong>：業務委託契約書のひな型（提供範囲・免責・解約返金・IP帰属）。</li>
+      <li><strong>論点4・5</strong>：景表法に触れない広告表現と、特商法表記の要否・記載内容。</li>
+    </ul>
+  </div>
+
+  <div class="note">
+    ※ 本書は法的助言を求めるための「確認すべき論点」の整理であり、それ自体は法的助言ではありません。
+    記載の価格・体制等は現時点の計画であり、ご助言を踏まえて変更する場合があります。
+  </div>
+
+</body>
+</html>

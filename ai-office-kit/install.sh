@@ -197,6 +197,11 @@ $prog_xml
         <key>MAX_CONCURRENT</key><string>$MAX_CONCURRENT</string>
         <key>THRESHOLD_MIN</key><string>$THRESHOLD_MIN</string>
         <key>TUNNEL_CMD</key><string>${TUNNEL_CMD:-}</string>
+        <key>SPAWN_TIMEOUT_MIN</key><string>${SPAWN_TIMEOUT_MIN:-8}</string>
+        <key>STALE_DOING_MIN</key><string>${STALE_DOING_MIN:-10}</string>
+        <key>MAX_TASK_RETRY</key><string>${MAX_TASK_RETRY:-2}</string>
+        <key>MAPPING_REFRESH_MIN</key><string>${MAPPING_REFRESH_MIN:-10}</string>
+        <key>LOG_MAX_MB</key><string>${LOG_MAX_MB:-5}</string>
         <key>PATH</key><string>$BIN_PATH_DIR:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
 $extra_env_xml
     </dict>
@@ -222,7 +227,7 @@ PLIST
         <string>$OFFICE_HOME/bin/office-bridge.mjs</string>" keepalive "$lh_env_xml"
   register_agent "watcher" \
 "        <string>$NODE_BIN</string>
-        <string>$OFFICE_HOME/bin/spawn-watcher.mjs</string>" keepalive
+        <string>$OFFICE_HOME/bin/spawn-watcher.mjs</string>" keepalive "$lh_env_xml"
   # leader-poll は poll運用時のみ常駐（push運用では待機トークンを消費しないため登録しない）
   if [ "$MODE" = "poll" ]; then
     register_agent "leaderpoll" \

@@ -258,6 +258,18 @@ cd ai-office-kit && bash install.sh
   - いずれも通知先は `OWNER_FRIEND_ID`。反映は `bash install.sh` 再実行（`com.lineaioffice.watchdog` /
     `com.lineaioffice.authwatch` が登録される）。→ **「沈黙して顧客が離脱」を構造的に予防**できる。
 
+### F. その他の"沈黙する穴"の自己修復（2026-07-22 実装・office.conf でしきい値調整可）
+コード精査で見つかった同種の停止要因も自動復旧するようにした（bridge / spawn-watcher）。既定値で妥当に動く。
+- **アカウント対応表の取得失敗＝全社員沈黙**：bridge は起動時に取得できるまでバックオフ再試行＋`MAPPING_REFRESH_MIN`
+  間隔で定期リフレッシュ＋未知UUID着信時に即時再取得。空のまま（API不調）ならオーナーへ通知。
+- **利用上限(usage limit)で沈黙**：ログイン切れと同様に bridge / spawn-watcher / authwatch が検知→送信者へ一次応答＋オーナー通知。
+- **AI社員のハング**：`SPAWN_TIMEOUT_MIN`（既定8分）を超えたら子プロセスを停止しロック解放（1社員の永久沈黙を防ぐ）。
+- **孤立 task_doing.md で恒久停止**：クラッシュ/強制終了で残った task_doing.md を `STALE_DOING_MIN`（既定10分）超で
+  自動再キュー。`MAX_TASK_RETRY`（既定2）超で `inbox/task_failed.md` へ退避＋オーナー通知（無限リトライ防止）。
+  ＝**再起動しても直らなかった停止**が自動で解消する。
+- **ログ肥大でディスク逼迫**：watchdog が `logs/*.log` を `LOG_MAX_MB`（既定5MB）超で末尾を残し切り詰め。
+- しきい値は `config/office.conf` の「信頼性しきい値」ブロックで変更可。反映は `bash install.sh` 再実行。
+
 ---
 
 ## 検証（再現性の最終確認）
