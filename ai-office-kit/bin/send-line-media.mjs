@@ -24,7 +24,7 @@
 // bridge 経由で spawn された社員セッションでは bridge plist から自動で引き継がれる。
 // =============================================================
 
-import { readFile, unlink, writeFile } from 'node:fs/promises';
+import { readFile, unlink, writeFile, mkdtemp, readdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { basename, dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -71,9 +71,37 @@ function detectFileType(filePath) {
   const ext = extname(filePath).toLowerCase();
   if (IMAGE_TYPES[ext]) return { kind: 'image', mime: IMAGE_TYPES[ext] };
   if (VIDEO_TYPES[ext]) return { kind: 'video', mime: VIDEO_TYPES[ext] };
+  // PDF は各ページを画像化して送る（LINEに実体で表示できる＝リンクより顧客体験が良い）
+  if (ext === '.pdf') return { kind: 'pdf', mime: 'application/pdf' };
   if (DOC_TYPES[ext]) return { kind: 'file', mime: DOC_TYPES[ext] };
   // 未知の拡張子も「ファイル」として扱う（動画分岐に落として ffmpeg で壊れるのを防ぐ）
   return { kind: 'file', mime: 'application/octet-stream' };
+}
+
+// PDF の各ページを PNG 画像に変換する（poppler の pdftoppm を使用）。
+// 返り値：ページ画像の絶対パス配列（1ページ目→N）。呼び出し側で後始末（dir削除）する。
+const PDF_MAX_PAGES = 30; // 送りすぎ防止の上限
+async function convertPdfToPngs(pdfPath) {
+  const dir = await mkdtemp(join(tmpdir(), 'line-pdf-'));
+  try {
+    // -r 150dpi で page-1.png, page-2.png ... を生成（ページ数に応じ0詰め）
+    await execFileAsync('pdftoppm', ['-png', '-r', '150', pdfPath, join(dir, 'page')]);
+  } catch (e) {
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+    if (e.code === 'ENOENT') {
+      throw new Error('PDF→画像変換ツール pdftoppm が見つかりません。Macで `brew install poppler` を実行してください（install.sh でも自動導入します）。');
+    }
+    throw new Error(`PDF変換に失敗しました（pdftoppm）: ${e.message}`);
+  }
+  const files = (await readdir(dir))
+    .filter(f => f.toLowerCase().endsWith('.png'))
+    .sort((a, b) => {
+      const na = parseInt(a.match(/(\d+)/)?.[1] || '0', 10);
+      const nb = parseInt(b.match(/(\d+)/)?.[1] || '0', 10);
+      return na - nb;
+    })
+    .map(f => join(dir, f));
+  return { dir, pages: files };
 }
 
 // --- 引数パース（--key value と 位置引数の両対応）---------------------------
@@ -228,6 +256,32 @@ async function main() {
     const content = JSON.stringify({ originalContentUrl: imageUrl, previewImageUrl: imageUrl });
     await sendViaHarness({ apiUrl, apiKey, friendId: to, messageType: 'image', content, caption });
     console.log('✅ LINE に画像を送信しました。');
+
+  } else if (kind === 'pdf') {
+    // PDF → 各ページを画像化して順番に送る（顧客はLINE上でそのままスライドを見られる）
+    console.log(`🖼️  PDF を画像に変換中: ${filePath}`);
+    const { dir, pages } = await convertPdfToPngs(filePath);
+    try {
+      if (pages.length === 0) throw new Error('PDFからページ画像を生成できませんでした。');
+      const total = pages.length;
+      const sendCount = Math.min(total, PDF_MAX_PAGES);
+      console.log(`📄 ${total}ページ → ${sendCount}枚を送信します`);
+      for (let i = 0; i < sendCount; i++) {
+        const pageUrl = await uploadToR2({ apiUrl, apiKey, filePath: pages[i], mime: 'image/png' });
+        // キャプションは1枚目だけに付ける（総ページ数も添える）
+        const cap = i === 0 ? `${caption ? caption + ' ' : ''}（${basename(filePath)}／全${total}ページ）` : undefined;
+        const content = JSON.stringify({ originalContentUrl: pageUrl, previewImageUrl: pageUrl });
+        await sendViaHarness({ apiUrl, apiKey, friendId: to, messageType: 'image', content, caption: cap });
+        console.log(`  ✓ ${i + 1}/${sendCount} ページ送信`);
+      }
+      if (total > sendCount) {
+        await sendViaHarness({ apiUrl, apiKey, friendId: to, messageType: 'text',
+          content: `※このPDFは全${total}ページあり、先頭${sendCount}枚を送りました。残りが必要な場合はお知らせください。` });
+      }
+      console.log('✅ LINE に PDF（画像）を送信しました。');
+    } finally {
+      await rm(dir, { recursive: true, force: true }).catch(() => {});
+    }
 
   } else if (kind === 'video') {
     console.log(`⬆️  R2 へアップロード中（動画 ${mime}）: ${filePath}`);

@@ -87,6 +87,22 @@ LEADER_ID="${first_member%%:*}"
 MODE="${MODE:-push}"
 ok "事前チェック完了 (leader=$LEADER_ID, mode=$MODE)"
 
+# --- 2.5. PDF→画像 変換ツール（poppler / pdftoppm）の確認・自動導入 --------
+# 成果物がPDF（プレゼン資料・チラシ等）の時、各ページを画像化して顧客のLINEに送るのに使う。
+# LINE公式アカウントAPIはPDFを実体で送れないため画像化が必要（send-line-media.mjs が使用）。
+if command -v pdftoppm >/dev/null 2>&1; then
+  ok "PDF変換ツール pdftoppm を確認（PDF成果物を画像でLINE納品できます）"
+elif command -v brew >/dev/null 2>&1; then
+  log "PDF変換ツール(poppler)が未導入 → brew install poppler を実行します"
+  if brew install poppler >/dev/null 2>&1; then
+    ok "poppler を導入しました（pdftoppm 利用可能）"
+  else
+    err "poppler の自動導入に失敗。手動で 'brew install poppler' を実行してください（PDFの画像納品に必要）"
+  fi
+else
+  err "PDF変換に必要な poppler が未導入で brew もありません。'brew install poppler' 実行推奨（PDF成果物を画像でLINE納品する場合）"
+fi
+
 # --- 3. フォルダ構成の作成 -----------------------------------
 log "フォルダ構成を作成: $OFFICE_HOME"
 mkdir -p "$OFFICE_HOME/members" "$OFFICE_HOME/logs" "$OFFICE_HOME/納品"
