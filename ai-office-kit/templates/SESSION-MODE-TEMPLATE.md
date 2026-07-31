@@ -61,10 +61,10 @@ node "$OFFICE_HOME/bin/send-line-media.mjs" --file <成果物の絶対パス> --
 | 画像（.png / .jpg / .gif / .webp） | `send-line-media.mjs` で LINE 画像メッセージ |
 | 動画（.mp4 / .mov / .webm / .m4v） | `send-line-media.mjs` で LINE 動画メッセージ（サムネ自動生成） |
 | **テキスト成果物**（キャプション/投稿文/記事/原稿など、文章そのものが成果物） | **本文そのものをLINEに送る**（下記ルール） |
-| その他バイナリ（ZIP・設定ファイル等） | `open "<絶対パス>"` コマンド付きテキストで報告 |
+| **書類・ファイル**（PDF / PowerPoint / Word / Excel / ZIP など） | `send-line-media.mjs` で送る＝**R2にアップして「タップで開けるダウンロードリンク」をLINEに送信**（顧客は自分のPCを触らず受け取れる） |
 
 - `--to` は対応中の会話のオーナー friendId をそのまま使う
-- スクリプトがエラーになった場合のみ `open "<絶対パス>"` 形式のコマンド付きテキストで報告する
+- `open "<絶対パス>"` 形式のコマンドは**自分のMacでしか開けない＝顧客には届かない**。顧客向けの成果物は必ず本文貼付 or `send-line-media.mjs`（画像/動画は実体、書類はリンク）で「LINEを見れば受け取れる」状態にする。`open` はスクリプトがエラーになった時のオーナー向け最終手段としてのみ使う
 - `LINE_HARNESS_API_URL` / `LINE_HARNESS_API_KEY` は bridge セッションから自動で引き継がれる（手動セッションでは `$OFFICE_HOME/.line-harness-key` ファイルから読む）
 
 **テキスト成果物は「本文そのもの」をLINEに届ける（要約＋パスだけで終えない）**

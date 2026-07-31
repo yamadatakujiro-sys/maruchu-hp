@@ -26,7 +26,7 @@
 
 import { readFile, unlink, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { dirname, extname, join } from 'node:path';
+import { basename, dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -51,11 +51,29 @@ const VIDEO_TYPES = {
   '.m4v': 'video/x-m4v',
 };
 
+// 書類・ファイル系（LINEには画像/動画のような実体では送れないため、R2にアップして
+// 「タップで開けるダウンロードリンク」をテキストで送る）
+const DOC_TYPES = {
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.ppt': 'application/vnd.ms-powerpoint',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.xls': 'application/vnd.ms-excel',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.csv': 'text/csv',
+  '.txt': 'text/plain',
+  '.md': 'text/markdown',
+  '.zip': 'application/zip',
+};
+
 function detectFileType(filePath) {
   const ext = extname(filePath).toLowerCase();
   if (IMAGE_TYPES[ext]) return { kind: 'image', mime: IMAGE_TYPES[ext] };
   if (VIDEO_TYPES[ext]) return { kind: 'video', mime: VIDEO_TYPES[ext] };
-  return { kind: 'other', mime: null };
+  if (DOC_TYPES[ext]) return { kind: 'file', mime: DOC_TYPES[ext] };
+  // 未知の拡張子も「ファイル」として扱う（動画分岐に落として ffmpeg で壊れるのを防ぐ）
+  return { kind: 'file', mime: 'application/octet-stream' };
 }
 
 // --- 引数パース（--key value と 位置引数の両対応）---------------------------
@@ -211,8 +229,7 @@ async function main() {
     await sendViaHarness({ apiUrl, apiKey, friendId: to, messageType: 'image', content, caption });
     console.log('✅ LINE に画像を送信しました。');
 
-  } else {
-    // 動画
+  } else if (kind === 'video') {
     console.log(`⬆️  R2 へアップロード中（動画 ${mime}）: ${filePath}`);
     const videoUrl = await uploadToR2({ apiUrl, apiKey, filePath, mime });
     console.log(`🔗 動画URL: ${videoUrl}`);
@@ -231,6 +248,22 @@ async function main() {
     } finally {
       await unlink(thumbPath).catch(() => {});
     }
+
+  } else {
+    // 書類・その他ファイル（PDF/PowerPoint/ZIP等）
+    // LINEには実体として送れないので、R2へアップして「タップで開けるリンク」をテキストで届ける。
+    // ＝お客さんは自分のMacやフォルダを触らずに、スマホのLINEから成果物を受け取れる。
+    console.log(`⬆️  R2 へアップロード中（ファイル ${mime}）: ${filePath}`);
+    const fileUrl = await uploadToR2({ apiUrl, apiKey, filePath, mime });
+    console.log(`🔗 ダウンロードURL: ${fileUrl}`);
+
+    const name = basename(filePath);
+    const head = caption ? `${caption}\n\n` : '';
+    const text = `${head}📄 ${name}\n▼ タップで開く・保存できます\n${fileUrl}`;
+    console.log(`📤 LINE へファイルのリンクを送信中 → friendId=${to}`);
+    // caption は本文に折り込み済みなので二重送信しない（caption 引数は渡さない）
+    await sendViaHarness({ apiUrl, apiKey, friendId: to, messageType: 'text', content: text });
+    console.log('✅ LINE にファイルのリンクを送信しました。');
   }
 }
 
