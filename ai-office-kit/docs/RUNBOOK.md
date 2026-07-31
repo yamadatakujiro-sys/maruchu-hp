@@ -240,6 +240,35 @@ cd ai-office-kit && bash install.sh
   画像をアップ→公開URL→LINE画像メッセージで送る。デザイナー等の完成報告に組み込むと、
   **成果物が"画像そのもの"としてトークに並ぶ**（顧客がファイル場所を知らなくても見える＝商品価値）。
 
+### D-2. line-harness に「書類ファイル配信」を足すパッチ ★git管理外のため要記録（2026-07-31）
+**なぜ**：`POST /api/images` の `allowedTypes` が画像・動画のみで **PDF/パワポ/Excel/ZIP を弾く**ため、
+顧客に「編集できる元ファイル」を渡す手段が `open <パス>`（オーナーのMacでしか開けない）しか無かった。
+＝**オーナーが在席して手渡すしかない＝運用が破綻**していた。これを解消し、AI社員が顧客のLINEへ
+**ダウンロードリンクを自動送信**できるようにする。
+
+⚠️ **line-harness は `~/.line-harness`（Mac上）にあり maruchu-hp リポジトリの外＝git管理外**。
+Macを再構築したらこのパッチは消えるので、**下記スクリプトで必ず再適用**すること。
+
+```bash
+# ① 適用（バックアップ自動取得・冪等・4箇所の置換を検証してから書き込む）
+node ~/maruchu-hp/ai-office-kit/patches/line-harness-allow-files.mjs
+#    事前確認だけしたい場合: 末尾に --check / 元に戻す場合: --restore
+
+# ② 正式ビルドでデプロイ（★これを外すと重大事故。上記「ビルド漏れ注意」参照）
+cd ~/.line-harness/apps/worker && npx vite build && npx wrangler deploy
+```
+
+パッチが変更する4箇所（`apps/worker/src/routes/images.ts`）：
+1. `allowedTypes` に書類MIMEを追加（pdf/pptx/docx/xlsx/ppt/doc/xls/zip/csv/txt/md）
+2. `extMap` に書類の拡張子を追加（既定の `mime.split('/')[1]` だと pptx 等が壊れるため）
+3. バイナリ送信時も `?filename=` で**元のファイル名**を受け取る（日本語名のまま保存させる）
+4. `GET /images/:key` で画像・動画以外に `Content-Disposition` を付与
+   （PDFは `inline`＝その場で閲覧、他は `attachment`＝保存。ファイル名はRFC5987でUTF-8エンコード）
+
+**認証まわりは触っていない**：`/images/` は `middleware/auth.ts` で既に認証免除のため、公開リンクはそのまま機能する。
+**リンクの性質**：キーはUUID＝推測困難だが**リンクを知っていれば誰でもDL可能・期限なし**（現在の画像と同じ扱い）。
+顧客の業務ファイルが恒久的に公開URLになる点は**法務の確認事項**（`assets/legal-briefing/`）。
+
 ### E. Claudeログイン切れ（認証失効）で全社員が沈黙 ★重要（2026-07-22 実機発生）
 - **症状**：トンネルもbridgeも生きているのに、LINEを送っても無反応。spawn ログ（`logs/spawn-<member>.log`）に
   `Please run /login` / `401 OAuth access token has expired. Re-authenticate to continue.` が出る。

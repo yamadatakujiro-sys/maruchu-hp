@@ -151,7 +151,11 @@ async function resolveHarnessCredentials() {
 async function uploadToR2({ apiUrl, apiKey, filePath, mime }) {
   const buf = await readFile(filePath);
 
-  const res = await fetch(`${apiUrl}/api/images`, {
+  // 元のファイル名をクエリで渡す（Worker が customMetadata.originalFilename に保存し、
+  // ダウンロード時に日本語のファイル名のまま保存できるようにする）。
+  // ※Worker が未対応でも無視されるだけなので後方互換。
+  const q = `?filename=${encodeURIComponent(basename(filePath))}`;
+  const res = await fetch(`${apiUrl}/api/images${q}`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
@@ -279,6 +283,18 @@ async function main() {
           content: `※このPDFは全${total}ページあり、先頭${sendCount}枚を送りました。残りが必要な場合はお知らせください。` });
       }
       console.log('✅ LINE に PDF（画像）を送信しました。');
+
+      // 元ファイル（PDF実体）のダウンロードリンクも1通添える。
+      // ＝顧客が「編集用の元データが欲しい」時に、オーナー不在でもLINEだけで受け取れる。
+      // ※line-harness が書類アップロードに未対応の間は静かにスキップする（画像は既に届いている）。
+      try {
+        const pdfUrl = await uploadToR2({ apiUrl, apiKey, filePath, mime });
+        await sendViaHarness({ apiUrl, apiKey, friendId: to, messageType: 'text',
+          content: `📄 元のファイルが必要な場合はこちら\n${basename(filePath)}\n${pdfUrl}` });
+        console.log('🔗 元PDFのダウンロードリンクも送信しました。');
+      } catch (e) {
+        console.error(`⚠️ 元PDFのリンク送信はスキップ（画像は送信済み）: ${e.message}`);
+      }
     } finally {
       await rm(dir, { recursive: true, force: true }).catch(() => {});
     }
