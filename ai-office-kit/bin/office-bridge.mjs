@@ -164,11 +164,15 @@ function maybeAlertOwner(key, text) {
   notifyLineText(owner, text);
 }
 
-// spawn ログの末尾を見て、ログイン切れ／利用上限なら通知する
-function handleSpawnFailure(logPath, friendId) {
+// spawn ログを見て、ログイン切れ／利用上限なら通知する。
+// fromOffset を渡すと「今回の実行分だけ」を対象にする（過去ログの古いエラー文字列で
+// 毎回誤検知して謝罪文が出るのを防ぐ）。呼び出し側は失敗時(終了コード≠0)のみ呼ぶこと。
+function handleSpawnFailure(logPath, friendId, fromOffset = 0) {
   let tail = '';
   try {
-    tail = fs.readFileSync(logPath, 'utf8').slice(-4000);
+    const buf = fs.readFileSync(logPath);
+    // fromOffset 以降＝今回のセッション出力のみをバイト単位で切り出す（日本語対応）
+    tail = buf.subarray(Math.min(fromOffset, buf.length)).toString('utf8');
   } catch { return; }
 
   if (AUTH_ERROR_RE.test(tail)) {
@@ -241,6 +245,9 @@ ${nonLeaderRestrictions}
   const logPath = path.join(LOG_DIR, `spawn-${lineAccountId}.log`);
   const logFd = fs.openSync(logPath, 'a');
   fs.writeSync(logFd, `\n=== ${new Date().toISOString()} ===\n`);
+  // 今回のセッション出力が始まるバイト位置。失敗判定はここ以降だけを見る（過去ログ誤検知の防止）。
+  let sessionStart = 0;
+  try { sessionStart = fs.fstatSync(logFd).size; } catch {}
 
   // 不正なプレースホルダーAPIキーを除外（OAuthにフォールバックさせる）
   const cleanEnv = { ...process.env };
@@ -270,8 +277,9 @@ ${nonLeaderRestrictions}
     console.log(`[SPAWN] ${lineAccountId} は終了コード ${code} で終了`);
     spawnLocks.delete(lineAccountId);
     try { fs.closeSync(logFd); } catch {}
-    // ログイン切れ(401)／利用上限で即死していないかを確認し、必要ならLINE通知
-    handleSpawnFailure(logPath, friendId);
+    // 成功(終了コード0)なら誤検知を避けて何もしない。
+    // 失敗した時だけ、今回のセッション出力からログイン切れ(401)／利用上限を判定してLINE通知。
+    if (code !== 0) handleSpawnFailure(logPath, friendId, sessionStart);
   });
   child.on('error', (err) => {
     clearTimeout(killTimer);

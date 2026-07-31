@@ -156,6 +156,9 @@ function spawnMember(member) {
   let logFd = null;
   try { logFd = fs.openSync(logPath, 'a'); fs.writeSync(logFd, `\n=== ${new Date().toISOString()} ${member.dir} ===\n`); } catch { logFd = null; }
   const outStdio = logFd !== null ? logFd : 'inherit';
+  // 今回のセッション出力が始まるバイト位置。失敗判定はここ以降だけを見る（過去ログ誤検知の防止）。
+  let sessionStart = 0;
+  if (logFd !== null) { try { sessionStart = fs.fstatSync(logFd).size; } catch {} }
 
   const child = spawn(CLAUDE_BIN, ['-p', prompt, '--permission-mode', 'bypassPermissions'], {
     cwd: memberRoot,
@@ -174,7 +177,7 @@ function spawnMember(member) {
     clearTimeout(killTimer);
     running--; inFlight.delete(member.dir);
     if (logFd !== null) { try { fs.closeSync(logFd); } catch {} }
-    onSessionEnd(member.dir, doingFile, logPath);
+    onSessionEnd(member.dir, doingFile, logPath, sessionStart);
     void code;
   };
   child.on('exit', (code) => { log(`■ done: ${member.dir} (exit ${code})`); finalize(code); });
@@ -183,12 +186,13 @@ function spawnMember(member) {
 }
 
 // セッション終了後の後始末：完了＝成功、未完了＝失敗種別に応じて再キュー/退避＋通知
-function onSessionEnd(dir, doingFile, logPath) {
+function onSessionEnd(dir, doingFile, logPath, fromOffset = 0) {
   // 完了していれば担当が task_doing.md を done/ に移動済み → 成功
   if (!fs.existsSync(doingFile)) { writeRetry(dir, 0); return; }
 
   let tail = '';
-  try { tail = fs.readFileSync(logPath, 'utf8').slice(-4000); } catch {}
+  // fromOffset 以降＝今回のセッション出力のみをバイト単位で切り出す（過去ログの古いエラーで誤分類しない）
+  try { const buf = fs.readFileSync(logPath); tail = buf.subarray(Math.min(fromOffset, buf.length)).toString('utf8'); } catch {}
 
   // 環境要因（ログイン切れ／利用上限）：リトライ数にカウントせず、クールダウン後に再試行＋オーナー通知
   if (AUTH_ERROR_RE.test(tail)) {
