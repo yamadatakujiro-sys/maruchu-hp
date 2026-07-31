@@ -89,8 +89,17 @@ ok "事前チェック完了 (leader=$LEADER_ID, mode=$MODE)"
 
 # --- 3. フォルダ構成の作成 -----------------------------------
 log "フォルダ構成を作成: $OFFICE_HOME"
-mkdir -p "$OFFICE_HOME/members" "$OFFICE_HOME/logs"
-ok "members/ logs/ を用意"
+mkdir -p "$OFFICE_HOME/members" "$OFFICE_HOME/logs" "$OFFICE_HOME/納品"
+ok "members/ logs/ 納品/ を用意"
+
+# --- 納品ボックスをデスクトップから1クリックで開けるようにする（成果物の迷子防止）----
+# 全社員の完成成果物は $OFFICE_HOME/納品/ に集約される（共通層ルール）。
+# デスクトップに「AI成果物」ショートカット（シンボリックリンク）を張り、オーナーが常に1か所で開ける状態にする。
+if [ -d "$HOME/Desktop" ]; then
+  ln -sfn "$OFFICE_HOME/納品" "$HOME/Desktop/AI成果物" 2>/dev/null \
+    && ok "デスクトップに「AI成果物」ショートカットを作成（→ $OFFICE_HOME/納品）" \
+    || err "デスクトップのショートカット作成をスキップ（手動作成可: ln -sfn \"$OFFICE_HOME/納品\" \"$HOME/Desktop/AI成果物\"）"
+fi
 
 # --- 4. 社員の組み立て（このキットの中核）--------------------
 #   各社員 = 役割層(roles/<tpl>) + 共通層(SESSION-MODE-TEMPLATE)
