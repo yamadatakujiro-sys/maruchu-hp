@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>出品告知IG</title><style>
+  /* Instagram 1080×1350・4枚組
+     ⚠️配色は紺＋青＋アンバー。LINEグリーンは使わない
+       （この商品はLINEを使わないので、緑にすると誤解される） */
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAPGothic','IPAGothic',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:#222;}
+
+  .slide{
+    width:1080px;height:1350px;position:relative;overflow:hidden;color:#fff;
+    background:radial-gradient(880px 680px at 84% -10%,rgba(42,109,176,.38),transparent 62%),
+      linear-gradient(155deg,#0a1c33 0%,#0f2a4a 54%,#0b2138 100%);
+    margin:0 auto 28px;
+  }
+  .slide::after{content:"";position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1.6px,transparent 1.6px);background-size:32px 32px;opacity:.5;}
+  .inner{position:relative;z-index:2;padding:76px 70px;height:100%;display:flex;flex-direction:column;}
+
+  .kick{font-size:25px;letter-spacing:.14em;color:#7fb2e5;font-weight:bold;margin-bottom:26px;}
+  h1{font-size:82px;font-weight:bold;line-height:1.2;letter-spacing:.02em;}
+  h1 .a{color:#f0b429;}
+  h2{font-size:58px;font-weight:bold;line-height:1.32;}
+  .lead{font-size:37px;color:#cfe0f2;font-weight:bold;line-height:1.55;margin-top:28px;}
+
+  /* 表紙の中央＝使い方の実例（空白を埋めつつ具体性を出す） */
+  .demo{margin:auto 0;display:flex;flex-direction:column;align-items:center;}
+  .bub{background:#fff;color:#0a1c33;border-radius:26px;padding:34px 40px;font-size:40px;font-weight:bold;
+    box-shadow:0 16px 40px rgba(0,0,0,.35);line-height:1.35;}
+  .dn{font-size:50px;color:#f0b429;margin:22px 0;}
+  .res{font-size:31px;font-weight:bold;color:#cfe0f2;text-align:center;line-height:1.5;}
+  .res b{color:#fff;}
+
+  /* 表紙の価格帯 */
+  .price{margin-top:auto;background:rgba(240,180,41,.12);border:3px solid #f0b429;border-radius:28px;padding:44px 46px;}
+  .price .big{font-size:66px;font-weight:bold;color:#f0b429;line-height:1.15;}
+  .price .sub{font-size:29px;color:#e7f0fb;margin-top:16px;line-height:1.5;}
+  .swipe{align-self:center;margin-top:34px;font-size:26px;color:#9db8d6;font-weight:bold;letter-spacing:.1em;}
+
+  /* 悩み */
+  /* margin-top:auto と .solve の margin-bottom:auto で上下中央に寄せる */
+  .pains{margin-top:auto;display:flex;flex-direction:column;gap:22px;}
+  .pain{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.17);border-radius:20px;
+    padding:30px 34px;font-size:34px;font-weight:bold;line-height:1.45;display:flex;gap:18px;align-items:flex-start;}
+  .pain .q{color:#f0b429;font-size:36px;flex:none;}
+  .arrow{align-self:center;font-size:56px;color:#f0b429;margin:24px 0 2px;}
+  .solve{margin-bottom:auto;background:rgba(42,109,176,.22);border:3px solid #2a6db0;border-radius:24px;padding:38px 40px;text-align:center;}
+  .solve .t{font-size:44px;font-weight:bold;line-height:1.4;}
+  .solve .t b{color:#f0b429;}
+
+  /* 9職種 */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;margin-top:34px;}
+  .role{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.06);
+    border:1.5px solid rgba(255,255,255,.15);border-radius:18px;padding:22px 22px;}
+  .role.lead2{grid-column:1 / -1;background:rgba(240,180,41,.14);border:2px solid #f0b429;}
+  .role .e{font-size:42px;flex:none;width:54px;text-align:center;}
+  .role .rt{font-size:30px;font-weight:bold;}
+  .role .rt small{display:block;font-size:21px;color:#a9c4de;font-weight:normal;margin-top:4px;}
+
+  /* 3枚目の締め（空白を埋める） */
+  .tail{margin-top:auto;background:rgba(42,109,176,.22);border:3px solid #2a6db0;border-radius:24px;
+    padding:36px 38px;text-align:center;font-size:37px;font-weight:bold;line-height:1.45;}
+  .tail b{color:#f0b429;}
+
+  /* 3ステップ */
+  .steps{margin-top:34px;display:flex;flex-direction:column;gap:24px;}
+  .st{display:flex;align-items:center;gap:26px;}
+  .st .no{width:76px;height:76px;flex:none;border-radius:50%;background:#2a6db0;
+    display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:bold;}
+  .st .tx{font-size:36px;font-weight:bold;line-height:1.35;}
+  .plans{margin-top:38px;display:flex;gap:16px;}
+  .pl{flex:1;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.18);
+    border-radius:18px;padding:26px 16px;text-align:center;}
+  .pl.on{background:rgba(240,180,41,.14);border:2px solid #f0b429;}
+  .pl .n{font-size:25px;color:#cfe0f2;font-weight:bold;}
+  .pl .p{font-size:38px;font-weight:bold;margin-top:10px;}
+  .pl.on .p{color:#f0b429;}
+  /* 含まれるもの（4枚目の空白を埋める） */
+  .incl{margin:auto 0;display:flex;flex-direction:column;gap:15px;}
+  .incl .ih{font-size:27px;color:#7fb2e5;font-weight:bold;letter-spacing:.08em;margin-bottom:4px;}
+  .it{font-size:30px;font-weight:bold;background:rgba(255,255,255,.06);
+    border:1.5px solid rgba(255,255,255,.14);border-radius:16px;padding:22px 26px;}
+  .note{margin-top:0;background:rgba(255,255,255,.08);border-left:10px solid #f0b429;
+    border-radius:12px;padding:30px 32px;font-size:27px;line-height:1.6;color:#e7f0fb;}
+  .cta{margin-top:26px;text-align:center;font-size:34px;font-weight:bold;color:#f0b429;line-height:1.45;}
+</style></head><body>
+
+<!-- 1: 表紙 -->
+<div class="slide"><div class="inner">
+  <div class="kick">AI OFFICE ｜ スタートキット</div>
+  <h1>人を雇わずに、<br><span class="a">9人。</span></h1>
+  <div class="lead">投稿・チラシ・LP・調査まで。<br>スマホで頼むだけ。</div>
+  <div class="demo">
+    <div class="bub">インスタの投稿を3本つくって</div>
+    <div class="dn">▼</div>
+    <div class="res">リーダーが担当に振り分けて、<br><b>投稿文が画面に返ってきます</b></div>
+  </div>
+  <div class="price">
+    <div class="big">買い切り 5,000円から</div>
+    <div class="sub">月額はありません。パソコンも不要です。</div>
+  </div>
+  <div class="swipe">▶ スワイプ</div>
+</div></div>
+
+<!-- 2: 悩み → 解決 -->
+<div class="slide"><div class="inner">
+  <div class="kick">こんな方へ</div>
+  <div class="pains">
+    <div class="pain"><span class="q">?</span><span>インスタの投稿が<br>追いつかない</span></div>
+    <div class="pain"><span class="q">?</span><span>チラシもLPも、外注するほどじゃない。<br>でも手が回らない</span></div>
+    <div class="pain"><span class="q">?</span><span>AIを使いたいけど、<br>設定が難しそう</span></div>
+  </div>
+  <div class="arrow">▼</div>
+  <div class="solve"><div class="t">その"作りもの"を<br><b>まるごと任せられる</b>チーム</div></div>
+</div></div>
+
+<!-- 3: 9職種 -->
+<div class="slide"><div class="inner">
+  <div class="kick">そろうAI社員</div>
+  <h2>9職種が、あなたの<br>会社専属で動きます</h2>
+  <div class="grid">
+    <div class="role lead2"><span class="e">🧭</span><span class="rt">リーダー<small>依頼の窓口・振り分け・仕上がりの確認</small></span></div>
+    <div class="role"><span class="e">🎨</span><span class="rt">デザイナー</span></div>
+    <div class="role"><span class="e">✍️</span><span class="rt">ライター</span></div>
+    <div class="role"><span class="e">📱</span><span class="rt">SNS担当</span></div>
+    <div class="role"><span class="e">🖥</span><span class="rt">LP担当</span></div>
+    <div class="role"><span class="e">🎬</span><span class="rt">動画制作</span></div>
+    <div class="role"><span class="e">🔎</span><span class="rt">リサーチャー</span></div>
+    <div class="role"><span class="e">📊</span><span class="rt">アナリスト</span></div>
+    <div class="role"><span class="e">💬</span><span class="rt">LINE配信文</span></div>
+  </div>
+  <div class="tail">担当を選ぶ必要はありません。<br><b>リーダーに話しかけるだけ。</b></div>
+</div></div>
+
+<!-- 4: 使い方＋価格＋必要なもの -->
+<div class="slide"><div class="inner">
+  <div class="kick">使い始めるまで</div>
+  <h2>3ステップで、今日から</h2>
+  <div class="steps">
+    <div class="st"><div class="no">1</div><div class="tx">アプリを入れる</div></div>
+    <div class="st"><div class="no">2</div><div class="tx">お渡ししたキットを開く</div></div>
+    <div class="st"><div class="no">3</div><div class="tx">話しかける</div></div>
+  </div>
+  <div class="plans">
+    <div class="pl on"><div class="n">ライト</div><div class="p">5,000円</div></div>
+    <div class="pl"><div class="n">スタンダード</div><div class="p">15,000円</div></div>
+    <div class="pl"><div class="n">プレミアム</div><div class="p">29,000円</div></div>
+  </div>
+  <div class="incl">
+    <div class="ih">ぜんぶ入っています</div>
+    <div class="it">🎥 使い方ガイド動画（約4分半）</div>
+    <div class="it">📝 会社情報ファイル（記入例つき）</div>
+    <div class="it">💬 依頼文サンプル集（コピペで使える）</div>
+    <div class="it">🛟 困ったときの対処ガイド</div>
+  </div>
+  <div class="note">
+    ご利用にはAI「Claude」の有料プラン契約が別途必要です（お客様名義）。<br>
+    使い方は約4分半の動画つき。効果を保証するものではありません。
+  </div>
+  <div class="cta">🔗 プロフィールのリンクから</div>
+</div></div>
+
+</body></html>
