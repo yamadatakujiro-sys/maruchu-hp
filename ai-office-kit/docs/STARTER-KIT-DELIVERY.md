@@ -40,32 +40,27 @@
 
 ---
 
-## 1.5 テンプレ同期（納品前に必ずやる・Macで1回）
+## 1.5 ★納品の元データは `maruchu-hp` だけ（テンプレ同期は不要にした）
 
-`~/ai-office-starter-template` が**納品の元になるテンプレ**。ここが古いと**古い商品を売ってしまう**。
-`starter-kit/` を直したら、**必ずここに反映してから納品する。**
+### 決定（2026-08-12）
+以前は `~/ai-office-starter-template` を「納品の元テンプレ」として使い、
+`starter-kit/` を直すたびに**手動で同期する運用**にしていた。
+→ **廃止する。** 理由＝**同期を忘れると古い商品を売ってしまう**（＝一番危ない事故）。
+オーナーがターミナル作業を嫌う以上、**忘れる前提で設計しないと必ず事故る**。
 
-### 手順（コピペ1回）
-```bash
-cd ~/maruchu-hp && git pull origin claude/relaxed-wright-7dlibu
-rsync -a --delete --exclude '.git' --exclude '納品' ~/maruchu-hp/ai-office-kit/starter-kit/ ~/ai-office-starter-template/
-cd ~/ai-office-starter-template && git add -A && git commit -m "テンプレを最新に同期" && git push
+**これからの唯一の元データ：**
 ```
-- `--delete`＝**消したファイルもテンプレから消す**（古い指示が残らない）
-- `--exclude '納品'`＝テストで作った成果物は残す
-- 「nothing to commit」と出たら**すでに最新**。それで正常。
-
-### 同期できたか確認（この2つが出ればOK）
-```bash
-grep -c "最大5個" ~/ai-office-starter-template/.claude/agents/sns.md   # 1以上ならハッシュタグ修正が入っている
-grep -c "必ず日本語" ~/ai-office-starter-template/CLAUDE.md            # 1以上なら日本語ルールが入っている
+~/maruchu-hp/ai-office-kit/starter-kit/
 ```
+ここは**常に最新**（このリポジトリを直せば即反映される）。**納品は必ずここからコピーする。**
 
-### 反映後に必ずやる実機テスト（スマホのClaudeアプリ）
-1. テンプレを開いて「**インスタの投稿を3本つくって**」と送る
-2. ✅**日本語だけで応答するか**（`sns` などの英語IDが出ないか）
-3. ✅**ハッシュタグが5個以内か**（6個以上なら同期できていない）
-4. ✅報告の最後に**「PRを作成」の案内**が出るか
+| 用途 | 使う場所 |
+|---|---|
+| **顧客への納品** | **`~/maruchu-hp/ai-office-kit/starter-kit/` から直接コピー**（下の §2） |
+| 自分の動作テスト | `ai-office-starter-template`（テスト専用。**納品には使わない**） |
+
+> ⚠️ `ai-office-starter-template` は**テスト用の置き場**に格下げ。古くても納品には影響しない。
+> スマホでテストしたい時だけ、最新を入れ直せばよい（急がない）。
 
 ---
 
@@ -75,12 +70,16 @@ grep -c "必ず日本語" ~/ai-office-starter-template/CLAUDE.md            # 1�
 GitHubで **Private** リポジトリを新規作成（例：`ai-office-<顧客名>`）。
 - README／.gitignore／ライセンスは**すべて無し**で作る
 
-### ② テンプレの中身を入れる
+### ② キットの中身を入れる（元データ＝`maruchu-hp` から直接）
 ```bash
+cd ~/maruchu-hp && git pull origin claude/relaxed-wright-7dlibu
 cd ~ && git clone https://github.com/yamadatakujiro-sys/<新リポジトリ名>.git
 cp -R ~/maruchu-hp/ai-office-kit/starter-kit/. ~/<新リポジトリ名>/
 cd ~/<新リポジトリ名> && git add -A && git commit -m "初期構築" && git branch -M main && git push -u origin main
 ```
+> 1行目の `git pull` が**最新を取ってくる部分**。ここを飛ばすと古いキットを渡してしまう。
+> **業種テンプレを重ねる場合**は `cp -R` のあとに：
+> `cp -R ~/maruchu-hp/ai-office-kit/starter-kit-industries/整備工場・鈑金塗装/. ~/<新リポジトリ名>/`
 > ⚠️ **キットは必ずリポジトリ直下に置く。** 奥のフォルダに入れると
 > `CLAUDE.md` と `.claude/agents/` が読まれず、AI社員が動かない（検証で確認済み）。
 
