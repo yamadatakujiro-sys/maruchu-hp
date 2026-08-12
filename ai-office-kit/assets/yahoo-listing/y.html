@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>ヤフオク出品画像</title><style>
+  /* ヤフオク出品画像 1200×1200（正方形）
+     ⚠️配色は紺＋青＋アンバー。LINEグリーンは使わない
+     ⚠️価格は ¥1,980（入口版）。ココナラの¥5,000を書かない */
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAPGothic','IPAGothic',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:#222;}
+  .slide{
+    width:1200px;height:1200px;position:relative;overflow:hidden;color:#fff;
+    background:radial-gradient(820px 640px at 84% -10%,rgba(42,109,176,.38),transparent 62%),
+      linear-gradient(155deg,#0a1c33 0%,#0f2a4a 54%,#0b2138 100%);
+    margin:0 auto 24px;
+  }
+  .slide::after{content:"";position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1.6px,transparent 1.6px);background-size:30px 30px;opacity:.5;}
+  .inner{position:relative;z-index:2;padding:72px 68px;height:100%;display:flex;flex-direction:column;}
+
+  .kick{font-size:26px;letter-spacing:.14em;color:#7fb2e5;font-weight:bold;margin-bottom:22px;}
+  h1{font-size:80px;font-weight:bold;line-height:1.2;}
+  h1 .a{color:#f0b429;}
+  h2{font-size:54px;font-weight:bold;line-height:1.3;}
+  .sub{font-size:34px;color:#cfe0f2;font-weight:bold;line-height:1.55;margin-top:24px;}
+
+  .price{margin-top:auto;background:rgba(240,180,41,.12);border:3px solid #f0b429;border-radius:26px;padding:38px 40px;}
+  .price .big{font-size:82px;font-weight:bold;color:#f0b429;line-height:1.1;}
+  .price .sub2{font-size:28px;color:#e7f0fb;margin-top:14px;line-height:1.5;}
+
+  .tags{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;}
+  .tag{background:rgba(255,255,255,.09);border:1.5px solid rgba(255,255,255,.2);
+    border-radius:100px;padding:14px 24px;font-size:26px;font-weight:bold;}
+
+  /* 条件表 */
+  table{width:100%;border-collapse:collapse;margin-top:30px;}
+  th,td{padding:20px 18px;font-size:28px;text-align:left;border-bottom:1.5px solid rgba(255,255,255,.16);}
+  th{color:#7fb2e5;font-size:24px;letter-spacing:.06em;}
+  td.mark{width:150px;text-align:center;font-size:34px;font-weight:bold;}
+  th.mark{width:150px;text-align:center;white-space:nowrap;}
+  .ok{color:#8fd694;}
+  .no{color:#ff9d9d;}
+  .foot{margin-top:auto;background:rgba(255,255,255,.08);border-left:9px solid #f0b429;
+    border-radius:12px;padding:26px 28px;font-size:25px;line-height:1.6;color:#e7f0fb;}
+</style></head><body>
+
+<!-- 1: 表紙 -->
+<div class="slide"><div class="inner">
+  <div class="kick">AI OFFICE ｜ 入口版</div>
+  <h1>AI社員<span class="a">9名</span>の<br>プロンプト集</h1>
+  <div class="sub">投稿・チラシ・LP・記事・調査まで。<br>スマホで話しかけるだけ。</div>
+  <div class="tags">
+    <div class="tag">Claude用</div>
+    <div class="tag">スマホだけでOK</div>
+    <div class="tag">パソコン不要</div>
+    <div class="tag">説明書＋動画つき</div>
+  </div>
+  <div class="price">
+    <div class="big">1,980円</div>
+    <div class="sub2">買い切り／月額なし。ダウンロードでお渡しします。</div>
+  </div>
+</div></div>
+
+<!-- 2: 含まれるもの／含まれないもの -->
+<div class="slide"><div class="inner">
+  <div class="kick">ご購入前にご確認ください</div>
+  <h2>含まれるもの／<br>含まれないもの</h2>
+  <table>
+    <tr><th>内容</th><th class="mark">本商品</th></tr>
+    <tr><td>AI社員9名の設定ファイル一式</td><td class="mark ok">○</td></tr>
+    <tr><td>会社情報ファイル（記入例つき）</td><td class="mark ok">○</td></tr>
+    <tr><td>依頼文サンプル集・困ったときは</td><td class="mark ok">○</td></tr>
+    <tr><td>使い方ガイド動画（約4分半）</td><td class="mark ok">○</td></tr>
+    <tr><td>購入後の個別サポート</td><td class="mark no">×</td></tr>
+    <tr><td>業種別テンプレート</td><td class="mark no">×</td></tr>
+    <tr><td>スマホ用の環境準備の代行</td><td class="mark no">×</td></tr>
+  </table>
+  <div class="foot">
+    別途 AI「Claude」の有料プラン契約が必要です（落札者様名義・ご負担）。<br>
+    「LINE」では使いません。効果を保証するものではありません。
+  </div>
+</div></div>
+
+</body></html>
