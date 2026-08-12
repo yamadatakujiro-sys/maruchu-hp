@@ -131,7 +131,19 @@ https://coconala.com/services/4350321
 
 ## 3. 添える画像
 
-`assets/instagram-launch/`（1080×1350・4枚組カルーセル）
+**`assets/instagram-launch/`（4:5の縦長・4枚組カルーセル）**
+
+Macでフォルダを開く：
+```bash
+cd ~/maruchu-hp && git pull origin claude/relaxed-wright-7dlibu
+open ai-office-kit/assets/instagram-launch
+```
+
+> ## ⚠️ ココナラ用の画像をInstagramに使わない（実際に事故った）
+> `assets/coconala-starter/` は **2400×1600の横長（3:2）**。
+> Instagramに上げると**切り取り画面で左右が切れて文字が読めなくなる**。
+> **Instagramに使うのは `instagram-launch/` の4枚だけ**（4:5＝そのまま全部入る）。
+> 素材の使い分けは **`assets/README.md`** に一覧がある。
 
 | ファイル | 内容 |
 |---|---|
