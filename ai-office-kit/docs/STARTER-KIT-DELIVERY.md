@@ -40,6 +40,35 @@
 
 ---
 
+## 1.5 テンプレ同期（納品前に必ずやる・Macで1回）
+
+`~/ai-office-starter-template` が**納品の元になるテンプレ**。ここが古いと**古い商品を売ってしまう**。
+`starter-kit/` を直したら、**必ずここに反映してから納品する。**
+
+### 手順（コピペ1回）
+```bash
+cd ~/maruchu-hp && git pull origin claude/relaxed-wright-7dlibu
+rsync -a --delete --exclude '.git' --exclude '納品' ~/maruchu-hp/ai-office-kit/starter-kit/ ~/ai-office-starter-template/
+cd ~/ai-office-starter-template && git add -A && git commit -m "テンプレを最新に同期" && git push
+```
+- `--delete`＝**消したファイルもテンプレから消す**（古い指示が残らない）
+- `--exclude '納品'`＝テストで作った成果物は残す
+- 「nothing to commit」と出たら**すでに最新**。それで正常。
+
+### 同期できたか確認（この2つが出ればOK）
+```bash
+grep -c "最大5個" ~/ai-office-starter-template/.claude/agents/sns.md   # 1以上ならハッシュタグ修正が入っている
+grep -c "必ず日本語" ~/ai-office-starter-template/CLAUDE.md            # 1以上なら日本語ルールが入っている
+```
+
+### 反映後に必ずやる実機テスト（スマホのClaudeアプリ）
+1. テンプレを開いて「**インスタの投稿を3本つくって**」と送る
+2. ✅**日本語だけで応答するか**（`sns` などの英語IDが出ないか）
+3. ✅**ハッシュタグが5個以内か**（6個以上なら同期できていない）
+4. ✅報告の最後に**「PRを作成」の案内**が出るか
+
+---
+
 ## 2. 納品リポジトリを作る（オーナー作業）
 
 ### ① 顧客用のリポジトリを作成
