@@ -10,6 +10,7 @@
 |---|---|---|---|---|
 | **`instagram-launch/`** | 2160×2700 | **4:5 縦長** | **Instagram（出品告知）**・Xに添える1枚目 | ✅**現行** |
 | **`yahoo-listing/`** | 1200×1200 | **1:1 正方形** | **ヤフオク出品**（¥1,980の入口版） | ✅**現行** |
+| **`lucent-ai-series/`** | 2160×2700 | **4:5 縦長** | **Lucent（@lucent_autoparts）の自動車業界向け発信**。濃紺＋オレンジ＝**Lucentの既存シリーズの見た目**（他と配色が違うのは意図的） | ✅**現行** |
 | **`coconala-starter/`** | 2400×1600 | **3:2 横長** | **ココナラ出品ページ**（サムネ＋ギャラリー4枚） | ✅**現行** |
 | **`onboarding-video/`** | 1920×1080 | 16:9 | **使い方ガイド動画**（＋商談資料に流用可） | ✅**現行** |
 | `line-setup-guide/` | — | — | 公式LINE作成の手順図解（LINE版の作業用） | 参考 |
@@ -21,6 +22,7 @@
 | やりたいこと | 使うもの |
 |---|---|
 | Instagramに投稿する | **`instagram-launch/ig-1〜4.png`**（この順で選ぶ＝カルーセルの順番） |
+| **Lucentで自動車業界向けに投稿する** | **`lucent-ai-series/p1-1〜5.png`**＋README内のキャプション |
 | **ヤフオクに出品する** | **`yahoo-listing/y-1.png` → `instagram-launch/ig-2.png` → `ig-3.png` → `yahoo-listing/y-2.png`** の4枚 |
 | Xに投稿する | 文＋**`instagram-launch/ig-1.png`** を1枚添える |
 | ココナラの出品画像を差し替える | `coconala-starter/thumbnail.png` ＋ `gallery-1〜4.png` |
