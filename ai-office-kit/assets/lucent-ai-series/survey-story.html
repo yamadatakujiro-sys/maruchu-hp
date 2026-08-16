@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>Lucent アンケート ストーリーズ</title><style>
+  /* ストーリーズ 1080×1920（9:16）
+     ⚠️アンケート／質問スタンプは"アプリ側で貼る"ので、
+        画像は上1/3に質問だけ置き、中央〜下は空けておく（スタンプ置き場） */
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAPGothic','IPAGothic',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:#111;}
+  .st{
+    width:1080px;height:1920px;position:relative;overflow:hidden;color:#fff;
+    background:linear-gradient(175deg,#0e1b2c 0%,#0a1420 55%,#080f18 100%);
+    margin:0 auto 26px;padding:200px 80px 120px;display:flex;flex-direction:column;
+  }
+  .st::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(760px 620px at 50% 5%,rgba(224,138,60,.12),transparent 70%);}
+  .in{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;}
+  .series{text-align:center;font-size:30px;color:#e08a3c;font-weight:bold;letter-spacing:.08em;margin-bottom:70px;}
+  h1{font-size:72px;font-weight:bold;line-height:1.55;text-align:center;}
+  h1 .o{color:#e08a3c;}
+  .sub{font-size:34px;color:#c8d6e5;text-align:center;margin-top:44px;line-height:1.7;}
+  .space{flex:1;}
+  .foot{text-align:center;font-size:30px;color:#8fa8c0;line-height:1.7;}
+  .foot b{color:#e08a3c;}
+</style></head><body>
+
+<!-- S1: 投票① 現場 vs それ以外 -->
+<div class="st"><div class="in">
+  <div class="series">― 部品屋から、聞かせてください ―</div>
+  <h1>時間を取られるのは<br><span class="o">どっち</span>ですか？</h1>
+  <div class="sub">板金屋さん・整備士さんに聞いてます</div>
+  <div class="space"></div>
+  <div class="foot">↓ タップで答えられます</div>
+</div></div>
+
+<!-- S2: 投票② 書類 vs 連絡 -->
+<div class="st"><div class="in">
+  <div class="series">― 部品屋から、聞かせてください ―</div>
+  <h1>現場作業以外だと<br><span class="o">どっちが重い</span>ですか？</h1>
+  <div class="sub">正解はないので、感覚でどうぞ</div>
+  <div class="space"></div>
+  <div class="foot">↓ タップで答えられます</div>
+</div></div>
+
+<!-- S3: 投票③ 人手 -->
+<div class="st"><div class="in">
+  <div class="series">― 部品屋から、聞かせてください ―</div>
+  <h1>人手、<br><span class="o">足りてますか？</span></h1>
+  <div class="sub">募集の文章づくりも地味に時間かかりますよね</div>
+  <div class="space"></div>
+  <div class="foot">↓ タップで答えられます</div>
+</div></div>
+
+<!-- S4: 質問スタンプ（自由記述） -->
+<div class="st"><div class="in">
+  <div class="series">― 部品屋から、聞かせてください ―</div>
+  <h1>「これ、<span class="o">なくなったら楽</span>」<br>って作業、ありますか？</h1>
+  <div class="sub">一言で大丈夫です。<br>あとで役に立てたいので、教えてください。</div>
+  <div class="space"></div>
+  <div class="foot">↓ ここに書いて送れます<br><b>売り込みではないです</b></div>
+</div></div>
+
+</body></html>
