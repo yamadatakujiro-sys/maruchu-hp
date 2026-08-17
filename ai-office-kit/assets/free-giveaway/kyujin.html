@@ -1,73 +1,101 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><title>無料配布：求人票をスマホで作る（A4・1枚）</title><style>
-  /* 無料配布物 A4 1枚（1240×1754＝150dpi／印刷可）
-     ⚠️目的は「集客」ではなく【試乗】＝AIを1回使ってもらうこと。
-        AIを分かっていない人が多いのが本当のボトルネック（オーナー実感・2026-08-17）。
-        車に乗ったことがない人に車は売れない → 試乗を作る。
-     ⚠️背景は【白】。クリーム地はインクを食うし印刷すると汚く見える（配達先で紙で渡す前提）。
+<html lang="ja"><head><meta charset="utf-8"><title>無料配布：求人原稿をスマホで作る（A4両面）</title><style>
+  /* 無料配布物 A4【両面2枚】（1240×1754＝150dpi／render.cjs で300dpi相当に）
+     ⚠️目的は【試乗】＝AIを1回使ってもらうこと。売ることではない。
+
+     🚨初版から全面改訂した理由（2026-08-17）：
+        オーナーが自動車業界専門の採用支援会社の実物（engage）を提示。
+        仕事内容欄を【750字使い切って】いた（1日の流れ・入庫割合・職場環境・会社紹介まで）。
+        初版は「要確認」を並べた骨だけの出力で、比べると弱すぎた。
+        → 「AIって大したことないな」で終わり、試乗が逆効果になる。
+
+     🚨設計の修正：「捏造しない」≠「骨だけ出す」。
+        ×「勤務時間：要確認」と出して終わり
+        ○ AIが1問ずつ聞いて、全部そろってから750字を書く
+        → 捏造せず完成品が出る。しかも質問に答えるだけなので、
+          AIが分かっていない人にはむしろ簡単。
+
+     🚨勝ち筋＝【4媒体への出し分け】。engage等の媒体内AI（カンタン入力）は
+        その媒体の中しか知らない。オーナーは4媒体に同じ内容を入れ直している。
+
+     ⚠️背景は【白】。印刷して配る前提（クリーム地はインクを食う）。
      ⚠️Claudeの【無料版】で動く内容にする。試乗に課金を要求したら試乗にならない。
-     ⚠️売り込みは最後の1行だけ。渡して終わりでいい。 */
+     ⚠️表記は「鈑金」。 */
   *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAPGothic','IPAGothic',sans-serif;-webkit-font-smoothing:antialiased;}
   body{background:#888;}
   .a4{
     width:1240px;height:1754px;background:#fff;color:#16283c;
-    margin:0 auto;padding:52px 72px 26px;position:relative;overflow:hidden;
+    margin:0 auto 24px;padding:46px 66px 24px;position:relative;overflow:hidden;
     display:flex;flex-direction:column;
   }
   .brand{display:flex;justify-content:space-between;align-items:flex-end;
-    border-bottom:4px solid #16283c;padding-bottom:16px;}
-  .brand .who{font-size:21px;color:#5b7089;line-height:1.5;}
-  .brand .who b{color:#16283c;font-size:24px;}
-  .tag{background:#f08a24;color:#fff;font-size:22px;font-weight:bold;
-    padding:9px 20px;border-radius:100px;}
+    border-bottom:4px solid #16283c;padding-bottom:14px;}
+  .brand .who{font-size:20px;color:#5b7089;line-height:1.5;}
+  .brand .who b{color:#16283c;font-size:23px;}
+  .tag{background:#f08a24;color:#fff;font-size:21px;font-weight:bold;
+    padding:8px 18px;border-radius:100px;}
 
-  h1{font-size:45px;font-weight:bold;line-height:1.32;margin-top:24px;}
+  h1{font-size:45px;font-weight:bold;line-height:1.3;margin-top:22px;}
   h1 .o{color:#f08a24;}
-  .sub{font-size:23px;color:#4a6180;line-height:1.6;margin-top:14px;}
+  .sub{font-size:23px;color:#4a6180;line-height:1.62;margin-top:14px;}
+  .sub b{color:#16283c;}
 
   .step{margin-top:20px;}
-  .step h2{font-size:27px;font-weight:bold;display:flex;align-items:center;gap:16px;}
-  .step h2 .n{background:#16283c;color:#fff;width:42px;height:42px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;font-size:26px;flex:none;}
-  .step p{font-size:22px;line-height:1.55;color:#3f5670;margin:8px 0 0 58px;}
+  .step h2{font-size:25px;font-weight:bold;display:flex;align-items:center;gap:14px;}
+  .step h2 .n{background:#16283c;color:#fff;width:39px;height:39px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:24px;flex:none;}
+  .step p{font-size:21px;line-height:1.55;color:#3f5670;margin:7px 0 0 53px;}
   .step p b{color:#16283c;}
 
   /* コピーする指示文 */
-  .box{margin:12px 0 0 58px;border:3px solid #16283c;border-radius:14px;
-    padding:18px 22px;background:#f7f9fb;font-size:19px;line-height:1.58;white-space:pre-line;}
+  .box{margin:10px 0 0 53px;border:3px solid #16283c;border-radius:12px;
+    padding:20px 24px;background:#f7f9fb;font-size:20.5px;line-height:1.72;white-space:pre-line;}
   .box .hl{color:#f08a24;font-weight:bold;}
 
-  /* Before → After */
-  .ba{margin-top:22px;display:flex;gap:20px;align-items:stretch;}
-  .ba .col{flex:1;border:3px solid #16283c;border-radius:14px;padding:16px 18px;}
-  .ba .col.b{background:#fff;}
-  .ba .col.a{background:#fff8ef;border-color:#f08a24;}
-  .ba .lbl{font-size:20px;font-weight:bold;padding:6px 16px;border-radius:100px;
-    display:inline-block;margin-bottom:12px;}
-  .ba .b .lbl{background:#e6ecf2;color:#3f5670;}
-  .ba .a .lbl{background:#f08a24;color:#fff;}
-  .ba .col div.t{font-size:18px;line-height:1.55;white-space:pre-line;}
-  .arrow{align-self:center;font-size:38px;color:#f08a24;font-weight:bold;}
-
-  .note{margin-top:20px;border-left:8px solid #f08a24;background:#fff8ef;
+  .note{margin-top:18px;border-left:8px solid #f08a24;background:#fff8ef;
     padding:16px 20px;font-size:20px;line-height:1.6;}
   .note b{color:#16283c;}
 
-  .foot{margin-top:auto;border-top:3px solid #e6ecf2;padding-top:16px;
-    font-size:19px;line-height:1.6;color:#5b7089;}
+  .foot{margin-top:auto;border-top:3px solid #e6ecf2;padding-top:14px;
+    font-size:18px;line-height:1.55;color:#5b7089;}
   .foot b{color:#16283c;}
+
+  /* ===== 裏面：出力サンプル ===== */
+  .qa{margin-top:16px;background:#f7f9fb;border:3px solid #16283c;border-radius:12px;
+    padding:16px 20px;font-size:18.5px;line-height:1.6;}
+  .qa .q{font-weight:bold;}
+  .qa .a{color:#f08a24;font-weight:bold;margin-bottom:8px;}
+  .qa .dots{color:#8a9bb0;font-size:17px;}
+
+  .outwrap{margin-top:16px;border:3px solid #f08a24;border-radius:12px;overflow:hidden;}
+  .outwrap .hd{background:#f08a24;color:#fff;font-size:21px;font-weight:bold;padding:10px 18px;
+    display:flex;justify-content:space-between;}
+  .out{padding:16px 20px;font-size:17px;line-height:1.55;white-space:pre-line;
+    column-count:2;column-gap:26px;column-rule:1px solid #e6ecf2;}
+
+  /* 4媒体の出し分け（勝ち筋なので紙面に置く） */
+  .multi{margin-top:18px;border:3px solid #16283c;border-radius:12px;padding:16px 20px;}
+  .multi h3{font-size:23px;font-weight:bold;margin-bottom:10px;}
+  .multi h3 .o{color:#f08a24;}
+  .multi p{font-size:19px;line-height:1.55;color:#3f5670;}
+  .multi .cmds{display:flex;gap:10px;margin:12px 0;flex-wrap:wrap;}
+  .multi .cmds span{background:#16283c;color:#fff;font-size:18px;font-weight:bold;
+    padding:9px 16px;border-radius:8px;}
+  .multi .why{font-size:19px;line-height:1.55;color:#16283c;font-weight:bold;}
 </style></head><body>
 
-<div class="a4">
+<!-- ============ 表（1枚目） ============ -->
+<div class="a4"><div style="display:flex;flex-direction:column;height:100%;">
 
   <div class="brand">
     <div class="who"><b>Lucent（ルーセント）</b><br>高年式・中古外装部品／埼玉・熊谷</div>
     <div class="tag">お礼にどうぞ</div>
   </div>
 
-  <h1>整備士・鈑金工の<span class="o">求人票</span>を<br>スマホで<span class="o">3分</span>で作る</h1>
+  <h1>整備士・鈑金工の<span class="o">求人原稿</span>を<br>スマホで作る（<span class="o">4媒体ぶん</span>）</h1>
   <div class="sub">
-    箇条書きを打つだけで、そのまま貼れる求人原稿が出てきます。<br>
+    <b>質問に答えていくだけ</b>で、engage の750字がぜんぶ埋まります。<br>
+    そのあと一言足せば、<b>Airwork・クラッチ求人・Indeed 用にも書き直してくれます。</b><br>
     <b>アプリは無料で使えます。パソコンは要りません。</b>
   </div>
 
@@ -77,57 +105,39 @@
   </div>
 
   <div class="step">
-    <h2><span class="n">2</span>この文をコピーして貼る</h2>
+    <h2><span class="n">2</span>この文をコピーして貼る（1回だけ）</h2>
     <div class="box">あなたは自動車整備・鈑金塗装の求人原稿を書くプロです。
-下の情報だけを使って、そのまま貼れる求人票の本文を作ってください。
+engage に載せる「仕事内容」の原稿を作ります。
 
-【店の情報】
-・店名：<span class="hl">〇〇自動車</span>
-・場所：<span class="hl">埼玉県〇〇市</span>
-・仕事内容：<span class="hl">車検・一般整備・鈑金の下地</span>
-・給与：<span class="hl">月〇〇万円〜</span>
-・休み：<span class="hl">日祝／隔週土曜</span>
-・欲しい人：<span class="hl">整備士3級以上、経験3年くらい</span>
+まず、足りない情報を<span class="hl">1問ずつ</span>聞いてください。まとめて聞かないでください。
+私が答えたら次の質問に進み、全部そろってから原稿を書いてください。
 
-【ルール】
-・書いていない条件を勝手に作らない。分からない項目は「要確認」と書く
-・「アットホームな職場」のような中身のない言葉は使わない
-・未経験可と書いていない場合は、未経験可と書かない</div>
+必ず聞いてほしいこと
+・1日の流れ（出勤から退勤まで、休憩も）
+・入庫の内容（保険と自費の割合、車種、輸入車の有無）
+・1台にかける時間の目安
+・見積や書類でPCを使うか（専用ソフトかどうか）
+・設備（塗装ブース、フレーム修正機、工具は個人持ちか）
+・いま働いている人（人数、年齢層）
+・未経験を採るかどうか
+・給与、賞与、昇給、社会保険、通勤
+・設立年と、会社として大事にしていること
+
+書くときのルール
+・<span class="hl">私が答えていないことは書かない</span>
+・抽象語だけで終わらせない（「働きやすい」なら理由を具体で書く）
+・未経験可と答えていない場合は、未経験可と書かない
+・<span class="hl">750字が上限。上限いっぱいまで使う</span></div>
   </div>
 
   <div class="step">
-    <h2><span class="n">3</span>オレンジの所を自分の店に書き換えて送信</h2>
-    <p>それだけです。<b>気に入らなければ「もっと硬く」「若い人向けに」と続けて打つだけで直ります。</b></p>
-  </div>
-
-  <div class="ba">
-    <div class="col b">
-      <span class="lbl">打ったもの</span>
-      <div class="t">・車検と一般整備
-・月28万〜
-・日祝休み
-・整備士3級以上
-・経験3年くらい</div>
-    </div>
-    <div class="arrow">▶</div>
-    <div class="col a">
-      <span class="lbl">出てきたもの</span>
-      <div class="t">【整備士募集｜車検・一般整備】
-
-車検・一般整備が中心です。
-
-・月給28万円〜（経験により相談）
-・日曜・祝日休み
-・整備士3級以上／実務3年程度
-
-工場設備・工具の詳細は要確認</div>
-    </div>
+    <h2><span class="n">3</span>聞かれたことに、ふつうに答えるだけ</h2>
+    <p>「8時半から18時、昼は12時から1時間」くらいの雑な答えで大丈夫です。<b>裏面が実際の出来上がりです。</b></p>
   </div>
 
   <div class="note">
-    <b>ここが大事なところ。</b>「書いていない条件を勝手に作らない」と入れてあるので、
-    <b>給与や資格を盛って書きません。</b>分からない所は「要確認」と出ます。
-    <b>そのまま出しても事故りません。</b>
+    <b>★他の媒体にも出すとき</b>は、原稿が出たあとに <b>「Airwork用に書き直して」</b>と打つだけ。
+    <b>1回答えれば4媒体ぶん出ます。</b>媒体の中にある文章作成ボタンでは、他の媒体用は作れません。
   </div>
 
   <div class="foot">
@@ -136,6 +146,102 @@
     <b>Lucent／Instagram・X：@lucent_autoparts ／ @hellolucent</b>
   </div>
 
-</div>
+</div></div>
+
+<!-- ============ 裏（2枚目）＝出力の実物 ============ -->
+<div class="a4"><div style="display:flex;flex-direction:column;height:100%;">
+
+  <div class="brand">
+    <div class="who"><b>裏面：実際にこうなります</b><br>質問に答えていった結果（例）</div>
+    <div class="tag">737 / 750文字</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">AI「1日の流れを教えてください。出勤から退勤まで」</div>
+    <div class="a">→ 8時半に朝礼して、12時から1時間昼。18時上がり</div>
+    <div class="q">AI「入庫は保険と自費、どのくらいの割合ですか？」</div>
+    <div class="a">→ 保険が7割くらい</div>
+    <div class="q">AI「工具は個人持ちですか？」</div>
+    <div class="a">→ うちで用意してる</div>
+    <div class="dots">…この調子で最後まで。ぜんぶ雑に答えて大丈夫です。</div>
+  </div>
+
+  <div class="outwrap">
+    <div class="hd"><span>出てきた原稿（そのまま貼れます）</span><span>engage 仕事内容欄</span></div>
+    <div class="out">＼鈑金塗装の腕を、ちゃんと評価する工場です／
+◎残業は月10時間程度（繁忙期以外は定時で上がれます）
+◎保険の仕事が7割なので、入庫が安定しています
+◎水性塗料の設備あり。新しい塗装にも対応できます
+
+＜仕事内容＞
+事故車の鈑金・下地・塗装をお願いします。
+■入庫割合／保険7割、自費3割
+■取り扱う車種／国産の乗用車が中心、輸入車は月2〜3台
+■1台にかける時間／小キズ1日、中破は3〜4日
+■他業務／見積は専用ソフトに入力する形なので、PCが苦手でも大丈夫です
+
+＜1日の仕事の流れ＞
+▼8:30 出勤・朝礼（当日の入庫と納車の確認）
+▼8:45 作業開始
+▼12:00〜13:00 昼休憩
+▼15:00 15分休憩
+▼17:30 片付け・清掃
+▼18:00 退勤
+
+＜設備＞
+塗装ブース2基、フレーム修正機あり。
+工具は個人持ちでなくて構いません。
+
+＜職場環境＞
+鈑金2名、塗装2名、フロント1名の5名です。
+30〜50代で、いちばん若いのが32歳。
+分からない所はすぐ聞ける距離でやっています。
+
+＜こんな方に来てほしい＞
+台数をこなすより、1台をきれいに直したい方。
+仕上がりに納得できるまで手を止めない方に向いています。
+
+＜応募資格＞
+・鈑金または塗装の実務経験3年以上
+・普通自動車免許（AT限定可）
+
+＜待遇＞
+月給28万円〜（経験・技能により相談）
+賞与年2回／昇給年1回
+社会保険完備、マイカー通勤可（駐車場あり）
+
+＜会社について＞
+1998年に父が始めた工場を、2015年から引き継ぎました。
+台数を追うより、1台をきれいに仕上げることを大事にしています。
+
+＜応募後の流れ＞
+まず工場を見に来てください。作業を見てから決めてもらって大丈夫です。</div>
+  </div>
+
+  <div class="multi">
+    <h3>そのあと、<span class="o">他の媒体用にも書き直してもらえます</span></h3>
+    <p>原稿が出たあとに、続けてこう打つだけです。<b>もう一度質問には答えません。</b></p>
+    <div class="cmds">
+      <span>Airwork用に書き直して</span>
+      <span>クラッチ求人用に、もう少し短く</span>
+      <span>Indeed用に、職種名を先頭に出して</span>
+    </div>
+    <div class="why">＝1回答えれば、4媒体ぶん出ます。<br>
+      媒体の中にある文章作成ボタンでは、その媒体用しか作れません。</div>
+  </div>
+
+  <div class="note">
+    <b>ここが大事なところ。</b>この原稿の中身は、<b>ぜんぶ答えた内容だけ</b>でできています。
+    <b>答えていない条件は勝手に足しません。</b>だから<b>そのまま出しても事故りません。</b>
+    「もっと若い人向けに」「もっと硬く」と続けて打てば、その場で直ります。<br>
+    <b>答えた内容はこのやりとりに残るので、来年また募集するときも同じ流れで作れます。</b>
+  </div>
+
+  <div class="foot">
+    ※この原稿は<b>架空の工場の例</b>です。実際はご自身の店の情報で出てきます。<br>
+    <b>Lucent／Instagram・X：@lucent_autoparts ／ @hellolucent</b>
+  </div>
+
+</div></div>
 
 </body></html>
