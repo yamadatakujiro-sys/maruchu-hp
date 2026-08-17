@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>無料配布：求人票をスマホで作る（A4・1枚）</title><style>
+  /* 無料配布物 A4 1枚（1240×1754＝150dpi／印刷可）
+     ⚠️目的は「集客」ではなく【試乗】＝AIを1回使ってもらうこと。
+        AIを分かっていない人が多いのが本当のボトルネック（オーナー実感・2026-08-17）。
+        車に乗ったことがない人に車は売れない → 試乗を作る。
+     ⚠️背景は【白】。クリーム地はインクを食うし印刷すると汚く見える（配達先で紙で渡す前提）。
+     ⚠️Claudeの【無料版】で動く内容にする。試乗に課金を要求したら試乗にならない。
+     ⚠️売り込みは最後の1行だけ。渡して終わりでいい。 */
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAPGothic','IPAGothic',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:#888;}
+  .a4{
+    width:1240px;height:1754px;background:#fff;color:#16283c;
+    margin:0 auto;padding:52px 72px 26px;position:relative;overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .brand{display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:4px solid #16283c;padding-bottom:16px;}
+  .brand .who{font-size:21px;color:#5b7089;line-height:1.5;}
+  .brand .who b{color:#16283c;font-size:24px;}
+  .tag{background:#f08a24;color:#fff;font-size:22px;font-weight:bold;
+    padding:9px 20px;border-radius:100px;}
+
+  h1{font-size:45px;font-weight:bold;line-height:1.32;margin-top:24px;}
+  h1 .o{color:#f08a24;}
+  .sub{font-size:23px;color:#4a6180;line-height:1.6;margin-top:14px;}
+
+  .step{margin-top:20px;}
+  .step h2{font-size:27px;font-weight:bold;display:flex;align-items:center;gap:16px;}
+  .step h2 .n{background:#16283c;color:#fff;width:42px;height:42px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:26px;flex:none;}
+  .step p{font-size:22px;line-height:1.55;color:#3f5670;margin:8px 0 0 58px;}
+  .step p b{color:#16283c;}
+
+  /* コピーする指示文 */
+  .box{margin:12px 0 0 58px;border:3px solid #16283c;border-radius:14px;
+    padding:18px 22px;background:#f7f9fb;font-size:19px;line-height:1.58;white-space:pre-line;}
+  .box .hl{color:#f08a24;font-weight:bold;}
+
+  /* Before → After */
+  .ba{margin-top:22px;display:flex;gap:20px;align-items:stretch;}
+  .ba .col{flex:1;border:3px solid #16283c;border-radius:14px;padding:16px 18px;}
+  .ba .col.b{background:#fff;}
+  .ba .col.a{background:#fff8ef;border-color:#f08a24;}
+  .ba .lbl{font-size:20px;font-weight:bold;padding:6px 16px;border-radius:100px;
+    display:inline-block;margin-bottom:12px;}
+  .ba .b .lbl{background:#e6ecf2;color:#3f5670;}
+  .ba .a .lbl{background:#f08a24;color:#fff;}
+  .ba .col div.t{font-size:18px;line-height:1.55;white-space:pre-line;}
+  .arrow{align-self:center;font-size:38px;color:#f08a24;font-weight:bold;}
+
+  .note{margin-top:20px;border-left:8px solid #f08a24;background:#fff8ef;
+    padding:16px 20px;font-size:20px;line-height:1.6;}
+  .note b{color:#16283c;}
+
+  .foot{margin-top:auto;border-top:3px solid #e6ecf2;padding-top:16px;
+    font-size:19px;line-height:1.6;color:#5b7089;}
+  .foot b{color:#16283c;}
+</style></head><body>
+
+<div class="a4">
+
+  <div class="brand">
+    <div class="who"><b>Lucent（ルーセント）</b><br>高年式・中古外装部品／埼玉・熊谷</div>
+    <div class="tag">お礼にどうぞ</div>
+  </div>
+
+  <h1>整備士・鈑金工の<span class="o">求人票</span>を<br>スマホで<span class="o">3分</span>で作る</h1>
+  <div class="sub">
+    箇条書きを打つだけで、そのまま貼れる求人原稿が出てきます。<br>
+    <b>アプリは無料で使えます。パソコンは要りません。</b>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">1</span>スマホに「Claude」を入れる</h2>
+    <p>App Store／Google Play で <b>Claude（クロード）</b> と検索。<b>無料のままで大丈夫です。</b></p>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">2</span>この文をコピーして貼る</h2>
+    <div class="box">あなたは自動車整備・鈑金塗装の求人原稿を書くプロです。
+下の情報だけを使って、そのまま貼れる求人票の本文を作ってください。
+
+【店の情報】
+・店名：<span class="hl">〇〇自動車</span>
+・場所：<span class="hl">埼玉県〇〇市</span>
+・仕事内容：<span class="hl">車検・一般整備・鈑金の下地</span>
+・給与：<span class="hl">月〇〇万円〜</span>
+・休み：<span class="hl">日祝／隔週土曜</span>
+・欲しい人：<span class="hl">整備士3級以上、経験3年くらい</span>
+
+【ルール】
+・書いていない条件を勝手に作らない。分からない項目は「要確認」と書く
+・「アットホームな職場」のような中身のない言葉は使わない
+・未経験可と書いていない場合は、未経験可と書かない</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="n">3</span>オレンジの所を自分の店に書き換えて送信</h2>
+    <p>それだけです。<b>気に入らなければ「もっと硬く」「若い人向けに」と続けて打つだけで直ります。</b></p>
+  </div>
+
+  <div class="ba">
+    <div class="col b">
+      <span class="lbl">打ったもの</span>
+      <div class="t">・車検と一般整備
+・月28万〜
+・日祝休み
+・整備士3級以上
+・経験3年くらい</div>
+    </div>
+    <div class="arrow">▶</div>
+    <div class="col a">
+      <span class="lbl">出てきたもの</span>
+      <div class="t">【整備士募集｜車検・一般整備】
+
+車検・一般整備が中心です。
+
+・月給28万円〜（経験により相談）
+・日曜・祝日休み
+・整備士3級以上／実務3年程度
+
+工場設備・工具の詳細は要確認</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>ここが大事なところ。</b>「書いていない条件を勝手に作らない」と入れてあるので、
+    <b>給与や資格を盛って書きません。</b>分からない所は「要確認」と出ます。
+    <b>そのまま出しても事故りません。</b>
+  </div>
+
+  <div class="foot">
+    <b>同じやり方で、部品の説明文・入荷の案内・お客さんへの連絡文も作れます。</b><br>
+    うまくいかなかったら聞いてください。うちも自分の店で毎日使っています。<br>
+    <b>Lucent／Instagram・X：@lucent_autoparts ／ @hellolucent</b>
+  </div>
+
+</div>
+
+</body></html>
