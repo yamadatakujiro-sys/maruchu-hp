@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__addness__resolve_context",
+      "mcp__addness__create_goal",
+      "mcp__addness__update_goal",
+      "mcp__addness__write_goal_detail",
+      "mcp__addness__edit_goal_detail",
+      "mcp__addness__append_goal_memory",
+      "mcp__addness__bind_context"
+    ]
+  }
+}
