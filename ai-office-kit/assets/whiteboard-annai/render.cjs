@@ -1,10 +1,11 @@
-// 案内PDFを書き出す（A4縦・6ページ／1240×1754＝150dpi）
-// ⚠️deviceScaleFactor 2 で 2480×3508＝300dpi 相当。印刷しても粗くならない。
-// 各 .a4 を1枚ずつPNGにし、まとめて A4 のPDF(annai.pdf)も出す。
+// 提案資料を書き出す（16:9・1280×720／スライド1枚=PDF1ページ）
+// ⚠️deviceScaleFactor 2 で 2560×1440 相当。画面でもきれい。
+// 各 .slide を1枚ずつPNGにし、まとめてPDF(annai.pdf)も出す。
+// ★PDFは format ではなく width/height をスライドに合わせる（＝余白ページが出ない）。
 const { chromium } = require('playwright');
 
 const jobs = [
-  { html: 'annai.html', sel: '.a4', out: 'annai', w: 1240, h: 1754 },
+  { html: 'annai.html', sel: '.slide', out: 'annai', w: 1280, h: 720 },
 ];
 
 (async () => {
@@ -21,8 +22,12 @@ const jobs = [
       await els[i].screenshot({ path: dir + name });
       console.log('wrote ' + name);
     }
-    // 送付・印刷用のPDF（A4・背景色ごと）
-    await page.pdf({ path: dir + j.out + '.pdf', format: 'A4', printBackground: true });
+    // スライド寸法にぴったり合わせたPDF（1スライド=1ページ・余白なし）
+    await page.pdf({
+      path: dir + j.out + '.pdf',
+      width: j.w + 'px', height: j.h + 'px',
+      printBackground: true, pageRanges: '1-' + els.length,
+    });
     console.log('wrote ' + j.out + '.pdf');
     await page.close();
   }
