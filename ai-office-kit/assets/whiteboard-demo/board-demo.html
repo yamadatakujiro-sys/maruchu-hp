@@ -1,0 +1,466 @@
+<title>みんなの工程ボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=M+PLUS+Rounded+1c:wght@700;800&display=swap">
+<style>
+  :root{
+    --ground:#e9edf1; --stage:#f6f8fb;
+    --surface:#ffffff; --surface-2:#f4f7fa;
+    --ink:#1a2230; --ink-soft:#5b6675; --ink-faint:#8b95a3;
+    --line:#dbe2ea; --line-strong:#c6cfda;
+    --brand:#e2641f; --brand-ink:#b04b12; --brand-wash:#fbeadd;
+    --line-green:#06c755; --line-green-ink:#049446;
+    --good:#1f9d57; --good-wash:#e4f5eb;
+    --warn:#dc8a12; --warn-wash:#fbeed2;
+    --crit:#d63b2b; --crit-wash:#fbe2de;
+    --info:#2f6fd8; --info-wash:#e2ecfb;
+    /* 工程フェーズの色 */
+    --ph-recv:#5a7794;  --ph-work:#e2641f;  --ph-fin:#1f9b8f;  --ph-done:#1f9d57;
+    --shadow:0 1px 2px rgba(24,36,54,.06),0 6px 18px rgba(24,36,54,.08);
+    --shadow-lift:0 8px 30px rgba(24,36,54,.16);
+  }
+  :root:not([data-theme="light"]){ }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1219; --stage:#151d27;
+      --surface:#1a2230; --surface-2:#212b3a;
+      --ink:#e9eef4; --ink-soft:#9aa6b5; --ink-faint:#6f7c8c;
+      --line:#2b3644; --line-strong:#3a4859;
+      --brand:#ff7c3f; --brand-ink:#ffb28c; --brand-wash:#3a2417;
+      --line-green:#06c755; --line-green-ink:#5be49a;
+      --good:#3bc47c; --good-wash:#16311f;
+      --warn:#f0a63a; --warn-wash:#382712;
+      --crit:#f26857; --crit-wash:#3a1a15;
+      --info:#5b93ec; --info-wash:#152539;
+      --ph-recv:#7d99b5; --ph-work:#ff7c3f; --ph-fin:#3bc0b2; --ph-done:#3bc47c;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.35);
+      --shadow-lift:0 10px 34px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1219; --stage:#151d27;
+    --surface:#1a2230; --surface-2:#212b3a;
+    --ink:#e9eef4; --ink-soft:#9aa6b5; --ink-faint:#6f7c8c;
+    --line:#2b3644; --line-strong:#3a4859;
+    --brand:#ff7c3f; --brand-ink:#ffb28c; --brand-wash:#3a2417;
+    --line-green:#06c755; --line-green-ink:#5be49a;
+    --good:#3bc47c; --good-wash:#16311f;
+    --warn:#f0a63a; --warn-wash:#382712;
+    --crit:#f26857; --crit-wash:#3a1a15;
+    --info:#5b93ec; --info-wash:#152539;
+    --ph-recv:#7d99b5; --ph-work:#ff7c3f; --ph-fin:#3bc0b2; --ph-done:#3bc47c;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.35);
+    --shadow-lift:0 10px 34px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);
+    font-family:"Zen Kaku Gothic New",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+    padding:0;}
+  @media(min-width:520px){ .wrap{padding:28px 16px;align-items:center} }
+
+  /* 端末フレーム */
+  .phone{width:100%;max-width:430px;background:var(--surface);
+    display:flex;flex-direction:column;min-height:100vh;position:relative;overflow:hidden}
+  @media(min-width:520px){
+    .phone{min-height:auto;height:min(880px,94vh);border-radius:30px;
+      box-shadow:var(--shadow-lift);border:1px solid var(--line)}
+  }
+
+  /* ヘッダー */
+  header{background:var(--surface);border-bottom:1px solid var(--line);
+    padding:14px 16px 10px;display:flex;flex-direction:column;gap:10px;flex:none}
+  .brandrow{display:flex;align-items:center;gap:10px}
+  .logo{width:34px;height:34px;border-radius:10px;flex:none;
+    background:linear-gradient(135deg,var(--brand),var(--brand-ink));
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;
+    font-family:"M PLUS Rounded 1c",sans-serif;box-shadow:0 2px 8px rgba(226,100,31,.4)}
+  .brandtext{display:flex;flex-direction:column;line-height:1.15}
+  .brandtext b{font-family:"M PLUS Rounded 1c",sans-serif;font-size:16px;font-weight:800;letter-spacing:.01em}
+  .brandtext span{font-size:11px;color:var(--ink-faint)}
+  .today{margin-left:auto;text-align:right;line-height:1.15}
+  .today b{font-size:13px;font-variant-numeric:tabular-nums}
+  .today span{display:block;font-size:10px;color:var(--ink-faint);letter-spacing:.04em}
+  .reset{margin-left:6px;border:1px solid var(--line-strong);background:var(--surface-2);
+    color:var(--ink-soft);font-size:11px;padding:5px 9px;border-radius:8px;cursor:pointer;
+    font-family:inherit;flex:none}
+  .reset:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+  /* 先回り通知 */
+  .alert{border:1px solid var(--warn);background:var(--warn-wash);border-radius:12px;
+    overflow:hidden;transition:box-shadow .2s}
+  .alert-head{display:flex;align-items:center;gap:8px;padding:9px 11px;cursor:pointer;
+    width:100%;border:0;background:transparent;font-family:inherit;color:var(--ink);text-align:left}
+  .alert-dot{width:8px;height:8px;border-radius:50%;background:var(--warn);flex:none;
+    box-shadow:0 0 0 4px var(--warn-wash);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media(prefers-reduced-motion:reduce){.alert-dot{animation:none}}
+  .alert-head b{font-size:12.5px;font-weight:700}
+  .alert-head .cnt{background:var(--warn);color:#fff;font-size:11px;font-weight:700;
+    border-radius:20px;padding:1px 8px;font-variant-numeric:tabular-nums}
+  .alert-head .chev{margin-left:auto;color:var(--ink-soft);font-size:12px;transition:transform .2s}
+  .alert.open .chev{transform:rotate(180deg)}
+  .alert-body{display:none;flex-direction:column;gap:7px;padding:0 11px 11px}
+  .alert.open .alert-body{display:flex}
+  .note{display:flex;gap:9px;align-items:flex-start;background:var(--surface);
+    border-radius:9px;padding:8px 10px;border-left:3px solid var(--warn)}
+  .note.crit{border-left-color:var(--crit)}
+  .note.info{border-left-color:var(--info)}
+  .note .ic{font-size:14px;line-height:1.3;flex:none}
+  .note p{font-size:12px;margin:0;color:var(--ink)}
+  .note p .sub{display:block;color:var(--ink-soft);font-size:11px;margin-top:1px}
+
+  /* カンバン */
+  .board{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;gap:0;
+    padding:12px 4px 14px;background:var(--stage);
+    scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .col{flex:none;width:158px;padding:0 8px;display:flex;flex-direction:column;gap:8px;
+    scroll-snap-align:start;border-right:1px dashed var(--line)}
+  .col:last-child{border-right:0}
+  .col-head{display:flex;align-items:center;gap:6px;position:sticky;top:0;padding:2px 2px 4px}
+  .col-head .sdot{width:7px;height:7px;border-radius:2px;flex:none}
+  .col-head b{font-size:12.5px;font-weight:700}
+  .col-head .n{margin-left:auto;font-size:11px;color:var(--ink-faint);
+    font-variant-numeric:tabular-nums;background:var(--surface);border:1px solid var(--line);
+    border-radius:20px;min-width:19px;text-align:center;padding:0 5px}
+  .cards{display:flex;flex-direction:column;gap:7px;min-height:20px}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+    padding:9px 10px 8px;box-shadow:var(--shadow);position:relative;
+    border-left:4px solid var(--phc,var(--line-strong))}
+  .card .cust{font-size:13px;font-weight:700;line-height:1.25}
+  .card .car{font-size:11.5px;color:var(--ink-soft);margin-top:1px}
+  .card .due{display:inline-flex;align-items:center;gap:4px;margin-top:6px;
+    font-size:11px;font-variant-numeric:tabular-nums;color:var(--ink-soft);
+    background:var(--surface-2);border-radius:6px;padding:2px 6px}
+  .card .due.warn{color:var(--warn);background:var(--warn-wash);font-weight:700}
+  .card .due.today{color:var(--info);background:var(--info-wash);font-weight:700}
+  .card .flag{position:absolute;top:-7px;right:8px;font-size:10px;font-weight:700;
+    color:#fff;background:var(--crit);border-radius:20px;padding:1px 7px;box-shadow:var(--shadow)}
+  .card .flag.warn{background:var(--warn)}
+  .empty{font-size:11px;color:var(--ink-faint);text-align:center;padding:8px 0;
+    border:1px dashed var(--line);border-radius:9px}
+
+  @keyframes pop{0%{transform:scale(.9);opacity:.3}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+  .card.moved{animation:pop .45s ease;box-shadow:0 0 0 2px var(--brand),var(--shadow-lift);z-index:2}
+  @media(prefers-reduced-motion:reduce){.card.moved{animation:none}}
+
+  /* チャット（LINE） */
+  .chat{flex:none;background:var(--surface);border-top:1px solid var(--line)}
+  .chat-log{display:flex;flex-direction:column;gap:7px;padding:10px 12px 4px;max-height:160px;overflow-y:auto}
+  .msg{display:flex;gap:7px;align-items:flex-end;max-width:88%}
+  .msg.me{align-self:flex-end;flex-direction:row-reverse}
+  .msg .av{width:24px;height:24px;border-radius:50%;flex:none;display:grid;place-items:center;
+    font-size:11px;font-weight:800;color:#fff;font-family:"M PLUS Rounded 1c",sans-serif}
+  .msg.ai .av{background:linear-gradient(135deg,var(--brand),var(--brand-ink))}
+  .bubble{font-size:12.5px;padding:7px 11px;border-radius:14px;line-height:1.45}
+  .msg.me .bubble{background:var(--line-green);color:#06331c;border-bottom-right-radius:4px;font-weight:500}
+  .msg.ai .bubble{background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .msg.ai .bubble .mv{color:var(--brand-ink);font-weight:700}
+  :root[data-theme="dark"] .msg.me .bubble,
+  :root:not([data-theme="light"]) .msg.me .bubble{color:#eafff2}
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .msg.me .bubble{color:#eafff2}}
+
+  .chips{display:flex;gap:6px;padding:6px 12px 2px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .chip{flex:none;border:1px solid var(--line-strong);background:var(--surface-2);
+    color:var(--ink-soft);font-size:11.5px;padding:6px 11px;border-radius:20px;cursor:pointer;
+    font-family:inherit;white-space:nowrap}
+  .chip:hover{color:var(--brand-ink);border-color:var(--brand)}
+  .chip:active{transform:scale(.96)}
+
+  .dock{display:flex;align-items:center;gap:8px;padding:9px 12px 12px}
+  .linetag{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;
+    color:var(--line-green-ink);flex:none}
+  .linetag .lg{width:16px;height:16px;border-radius:5px;background:var(--line-green);
+    color:#fff;display:grid;place-items:center;font-size:9px;font-weight:800}
+  .dock input{flex:1;border:1px solid var(--line-strong);background:var(--surface-2);
+    border-radius:20px;padding:9px 13px;font-family:inherit;font-size:13px;color:var(--ink);min-width:0}
+  .dock input:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+  .dock input::placeholder{color:var(--ink-faint)}
+  .send{flex:none;width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;
+    background:linear-gradient(135deg,var(--brand),var(--brand-ink));color:#fff;
+    font-size:16px;display:grid;place-items:center;box-shadow:0 2px 8px rgba(226,100,31,.45)}
+  .send:active{transform:scale(.93)}
+
+  .demoribbon{font-size:10.5px;color:var(--ink-faint);text-align:center;
+    padding:0 12px 10px;line-height:1.4}
+  .demoribbon b{color:var(--ink-soft)}
+</style>
+
+<div class="wrap">
+  <div class="phone" role="application" aria-label="工程ボードの体験デモ">
+    <header>
+      <div class="brandrow">
+        <div class="logo">車</div>
+        <div class="brandtext">
+          <b>みんなの工程ボード</b>
+          <span>入庫〜納車をスマホで共有</span>
+        </div>
+        <div class="today">
+          <b id="todayNum">8/13</b>
+          <span>きょう（木）</span>
+        </div>
+        <button class="reset" id="resetBtn" title="最初の状態に戻す">リセット</button>
+      </div>
+
+      <div class="alert" id="alertBox">
+        <button class="alert-head" id="alertHead" aria-expanded="false">
+          <span class="alert-dot"></span>
+          <b>先回り通知</b>
+          <span class="cnt" id="alertCnt">0</span>
+          <span class="chev">▾</span>
+        </button>
+        <div class="alert-body" id="alertBody"></div>
+      </div>
+    </header>
+
+    <div class="board" id="board" aria-label="工程ごとの車一覧（横スクロール）"></div>
+
+    <div class="chat">
+      <div class="chat-log" id="chatLog" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+      <div class="dock">
+        <span class="linetag" aria-hidden="true"><span class="lg">L</span>LINE</span>
+        <input id="input" type="text" autocomplete="off"
+          placeholder="例：田中さんのハイエース 塗装終わった" aria-label="現場からのメッセージ">
+        <button class="send" id="sendBtn" aria-label="送信">➤</button>
+      </div>
+      <p class="demoribbon">
+        体験デモ｜本番は<b>いつものLINE</b>で打つ／喋るだけ。表は<b>Googleスプレッドシート</b>で全員のスマホに自動反映。
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 工程（列）定義：フェーズで色分け ===== */
+const STAGES = [
+  {key:"入庫",   phase:"recv"},
+  {key:"分解",   phase:"recv"},
+  {key:"板金",   phase:"work"},
+  {key:"塗装",   phase:"work"},
+  {key:"組付け", phase:"fin"},
+  {key:"検査",   phase:"fin"},
+  {key:"納車待ち",phase:"done"},
+  {key:"納車済", phase:"done"},
+];
+const PHC = {recv:"var(--ph-recv)", work:"var(--ph-work)", fin:"var(--ph-fin)", done:"var(--ph-done)"};
+
+/* ===== デモの「きょう」= 8/13（曜日計算のため2026年で固定） ===== */
+const TODAY = new Date(2026,7,13); // 月は0始まり → 7=8月
+const WD = ["日","月","火","水","木","金","土"];
+
+/* ===== 車データ（初期状態） ===== */
+function seed(){ return [
+  {id:1, cust:"渡辺", car:"プリウス",     stage:0, m:8, d:16},
+  {id:2, cust:"鈴木", car:"N-BOX",        stage:1, m:8, d:20},
+  {id:3, cust:"佐藤", car:"フィット",     stage:2, m:8, d:14},
+  {id:4, cust:"田中", car:"ハイエース",   stage:3, m:8, d:16},
+  {id:5, cust:"山本", car:"アルファード", stage:4, m:8, d:16},
+  {id:6, cust:"中村", car:"タント",       stage:5, m:8, d:18},
+  {id:7, cust:"小林", car:"ノート",       stage:6, m:8, d:13},
+  {id:8, cust:"加藤", car:"ヴォクシー",   stage:7, m:8, d:11},
+];}
+let cars = seed();
+let lastMoved = null;
+
+/* ===== 日付ヘルパ ===== */
+function due(c){ return new Date(2026, c.m-1, c.d); }
+function daysTo(c){ return Math.round((due(c)-TODAY)/86400000); }
+function dueLabel(c){ return `${c.m}/${c.d}(${WD[due(c).getDay()]})`; }
+
+/* ===== 描画：ボード ===== */
+const board = document.getElementById("board");
+function render(){
+  board.innerHTML = "";
+  STAGES.forEach((st,si)=>{
+    const col = document.createElement("div");
+    col.className = "col";
+    const list = cars.filter(c=>c.stage===si);
+    col.innerHTML = `<div class="col-head">
+        <span class="sdot" style="background:${PHC[st.phase]}"></span>
+        <b>${st.key}</b><span class="n">${list.length}</span>
+      </div>`;
+    const cards = document.createElement("div");
+    cards.className = "cards";
+    if(list.length===0){
+      cards.innerHTML = `<div class="empty">—</div>`;
+    } else {
+      list.forEach(c=>{
+        const dt = daysTo(c);
+        const active = c.stage < 7;
+        let dueCls = "", flag = "";
+        if(active && dt===0){ dueCls="today"; flag=`<span class="flag warn">本日納車</span>`; }
+        else if(active && dt>0 && dt<=1 && c.stage<6){ dueCls="warn"; flag=`<span class="flag">納期迫る</span>`; }
+        const el = document.createElement("div");
+        el.className = "card" + (c.id===lastMoved ? " moved":"");
+        el.style.setProperty("--phc", PHC[STAGES[c.stage].phase]);
+        el.innerHTML = `${flag}
+          <div class="cust">${c.cust}様</div>
+          <div class="car">${c.car}</div>
+          ${active ? `<div class="due ${dueCls}">🚗 納車 ${dueLabel(c)}${dt>=0?`・あと${dt}日`:""}</div>`
+                   : `<div class="due">✅ 納車済</div>`}`;
+        cards.appendChild(el);
+      });
+    }
+    col.appendChild(cards);
+    board.appendChild(col);
+  });
+  renderAlerts();
+}
+
+/* ===== 先回り通知（データから動的に算出） ===== */
+const alertBody = document.getElementById("alertBody");
+const alertCnt = document.getElementById("alertCnt");
+const alertBox = document.getElementById("alertBox");
+function renderAlerts(){
+  const notes = [];
+  // 1) 納期の重なり
+  const byDate = {};
+  cars.filter(c=>c.stage<7).forEach(c=>{ (byDate[`${c.m}/${c.d}`] ||= []).push(c); });
+  Object.entries(byDate).forEach(([k,arr])=>{
+    if(arr.length>=2){
+      const names = arr.map(c=>c.cust+"様").join("・");
+      notes.push({lv:"crit", ic:"📅",
+        t:`${k}(${WD[due(arr[0]).getDay()]}) は納車予定が${arr.length}台重なっています`,
+        sub:names});
+    }
+  });
+  // 2) 納期が迫っているのに工程が遅れている
+  cars.filter(c=>c.stage<6).forEach(c=>{
+    const dt = daysTo(c);
+    if(dt>=0 && dt<=1){
+      notes.push({lv:"warn", ic:"⚠️",
+        t:`${c.cust}様の${c.car}：納車まであと${dt}日（${dueLabel(c)}）`,
+        sub:`まだ〈${STAGES[c.stage].key}〉です。急ぎましょう`});
+    }
+  });
+  // 3) 本日納車の案内
+  cars.filter(c=>c.stage<7 && daysTo(c)===0).forEach(c=>{
+    notes.push({lv:"info", ic:"🔔",
+      t:`本日納車：${c.cust}様の${c.car}`,
+      sub:`いまの工程は〈${STAGES[c.stage].key}〉`});
+  });
+
+  alertCnt.textContent = notes.length;
+  alertBox.style.display = notes.length? "" : "none";
+  alertBody.innerHTML = notes.map(n=>`
+    <div class="note ${n.lv}">
+      <span class="ic">${n.ic}</span>
+      <p>${n.t}<span class="sub">${n.sub}</span></p>
+    </div>`).join("");
+}
+document.getElementById("alertHead").addEventListener("click",()=>{
+  const open = alertBox.classList.toggle("open");
+  document.getElementById("alertHead").setAttribute("aria-expanded", open);
+});
+
+/* ===== チャット ===== */
+const chatLog = document.getElementById("chatLog");
+function addMsg(who, html){
+  const m = document.createElement("div");
+  m.className = "msg "+who;
+  m.innerHTML = (who==="ai"?`<span class="av">AI</span>`:"") + `<div class="bubble">${html}</div>`;
+  chatLog.appendChild(m);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+/* ===== 入力を解釈して車を動かす（本番はここをClaudeが担当） ===== */
+const DONE_WORDS = ["終わ","おわ","完了","できた","出来た","上が","あが","済","おわり","終り","ok","OK","オッケー","おっけー"];
+function parseAndMove(text){
+  const t = text.trim();
+  if(!t) return;
+  addMsg("me", t.replace(/</g,"&lt;"));
+
+  // 車を特定：客名 or 車種 を含むか
+  const hit = cars.find(c=> t.includes(c.cust) || t.includes(c.car)
+                        || t.includes(c.car.replace(/[- ]/g,"")) );
+  if(!hit){
+    setTimeout(()=>addMsg("ai","すみません、どの車か分かりませんでした🙏 <b>お名前</b>か<b>車種</b>を入れてみてください。"),350);
+    return;
+  }
+  const hasDone = DONE_WORDS.some(w=> t.includes(w));
+
+  // 工程キーワードを検出（後ろの工程を優先）
+  const kw = [
+    {re:/納車/, idx:7, done:6},   // 「納車した/済」→ 納車済
+    {re:/検査/, idx:5},
+    {re:/組(み)?付|くみつけ/, idx:4},
+    {re:/塗装|塗り|ぬり/, idx:3},
+    {re:/板金|ばんきん/, idx:2},
+    {re:/(ばらし|分解)/, idx:1},
+    {re:/(入庫|預か|あずか|入った)/, idx:0},
+  ];
+  let target = null, matchedStage = null;
+  for(const k of kw){
+    if(k.re.test(t)){ matchedStage = k.idx; break; }
+  }
+
+  if(matchedStage===null){
+    // 工程語が無い → 「終わった」だけなら今の工程の次へ
+    if(hasDone){ target = Math.min(hit.stage+1,7); }
+    else{
+      setTimeout(()=>addMsg("ai",`${hit.cust}様の${hit.car}ですね。どの工程が終わりましたか？（例：塗装 終わった）`),350);
+      return;
+    }
+  } else if(matchedStage===7){
+    target = 7;                       // 納車＝完了
+  } else {
+    // 「〈工程〉終わった」→ その次の工程へ。工程名だけなら その工程へ移動
+    target = hasDone ? Math.min(matchedStage+1,7) : matchedStage;
+  }
+
+  if(target===hit.stage){
+    setTimeout(()=>addMsg("ai",`${hit.cust}様の${hit.car}は、すでに〈${STAGES[hit.stage].key}〉です👍`),350);
+    return;
+  }
+  const from = hit.stage;
+  hit.stage = target;
+  lastMoved = hit.id;
+  render();
+  // 対象の列を画面内へ
+  const cols = board.querySelectorAll(".col");
+  cols[target] && cols[target].scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
+  setTimeout(()=>{
+    addMsg("ai",`${hit.cust}様の<b>${hit.car}</b>を <span class="mv">〈${STAGES[from].key}〉→〈${STAGES[target].key}〉</span> に動かしました ✅`);
+  },350);
+}
+
+/* ===== 入力まわり ===== */
+const input = document.getElementById("input");
+function submit(){ const v=input.value; input.value=""; parseAndMove(v); }
+document.getElementById("sendBtn").addEventListener("click", submit);
+input.addEventListener("keydown", e=>{ if(e.key==="Enter") submit(); });
+
+/* クイック例文 */
+const CHIPS = [
+  "佐藤さんのフィット 板金終わった",
+  "田中さんのハイエース 塗装上がった",
+  "山本さんのアルファード 組付け完了",
+  "中村さんのタント 検査OK",
+  "小林さんのノート 納車しました",
+];
+const chipsEl = document.getElementById("chips");
+CHIPS.forEach(txt=>{
+  const b=document.createElement("button");
+  b.className="chip"; b.textContent=txt;
+  b.addEventListener("click",()=>{ parseAndMove(txt); });
+  chipsEl.appendChild(b);
+});
+
+/* リセット */
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  cars = seed(); lastMoved=null; chatLog.innerHTML="";
+  render();
+  addMsg("ai","最初の状態に戻しました。下の例文をタップするか、自由に打ってみてください👇");
+});
+
+/* 起動 */
+document.getElementById("todayNum").textContent = `${TODAY.getMonth()+1}/${TODAY.getDate()}`;
+render();
+alertBox.classList.add("open");
+document.getElementById("alertHead").setAttribute("aria-expanded","true");
+addMsg("ai","現場から「◯◯さんの△△、□□終わった」と送ると、表が自動で動きます。例文をタップしてお試しください👇");
+</script>

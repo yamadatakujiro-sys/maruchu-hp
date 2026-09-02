@@ -31,6 +31,10 @@
 - 技術裏側（タツ用メモ・PDFには載せない）：LINE Messaging API → Webhook → Claude → Google Sheets API。オーナーが既に持つ「Claude＋LINE」の応用でゼロから新技術ではない。
 
 ## 成果物（完成済み）
+- **体験デモ「みんなの工程ボード」**：`ai-office-kit/assets/whiteboard-demo/board-demo.html`（設定ゼロ・スマホでURLを開くだけで動く単一HTML）。
+  - 公開Artifact：https://claude.ai/code/artifact/6fafa788-76eb-499d-9b3f-e382408f8628
+  - 1画面で🅐共有ボード＋🅑喋ると動く＋🅒先回り通知を体感できる。**訪問時に社長のスマホで触ってもらう用**／オーナーが事前に試す用。
+  - 割り切り：車を動かす判断はデモでは端末内キーワード解釈（本番はClaude）。「きょう」＝8/13固定。詳細は同フォルダ `README.md`。
 - **提案PDF**：`ai-office-kit/assets/whiteboard-annai/annai.pdf`（16:9・9スライドのプレゼン資料）。各PNGも同フォルダ。
   - 元データ＝`annai.html`、書き出し＝`render.cjs`（`NODE_PATH="$(npm root -g)" node render.cjs`）。詳細は同フォルダ `README.md`。
 - **PDF方針（確定）**：**会社名・氏名・金額は入れない**（「こんなことができます」の案内だけ）。専門用語（API等）を出さない。LINEの緑はLINEを描くときだけ。フォントはIPAPゴシック。
