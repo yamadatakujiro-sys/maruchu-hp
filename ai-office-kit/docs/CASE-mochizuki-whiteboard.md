@@ -39,6 +39,17 @@
   - 元データ＝`annai.html`、書き出し＝`render.cjs`（`NODE_PATH="$(npm root -g)" node render.cjs`）。詳細は同フォルダ `README.md`。
 - **PDF方針（確定）**：**会社名・氏名・金額は入れない**（「こんなことができます」の案内だけ）。専門用語（API等）を出さない。LINEの緑はLINEを描くときだけ。フォントはIPAPゴシック。
 
+## 本番Bot（★仕事として制作開始・2026-09）
+- オーナー方針：**無料テストではなく「仕事」として本番構成で作る**（クライアントもLINEでやりたい意向・有償依頼）。
+- 実装：`ai-office-kit/products/mochizuki-board-bot/`（**依存ゼロのNode独立Bot**。既存のoffice-bridge/line-harnessには乗せない＝相手名義で売り切れる形）。
+  - 構成：LINE Messaging API → Webhook(このBot) → **Claude(Haiku)が意味を解釈** → **Google Sheets API**で工程ボード更新 → 返信。先回り通知は `bin/notify.mjs`（cron）でLINE push。
+  - AIは「どの車をどの工程へ」の**判断だけ**、シート更新はコードが確定的に実行（暴走防止）。
+  - 工程名は `config/board.config.json` の `stages` に集約＝**訪問で実際の呼び方が分かったら差し替えるだけ**。
+  - セルフテスト（鍵不要）：`node scripts/selftest.mjs`（現状 全14件パス）。
+- 立ち上げ方針（オーナー決定）：**①まずMac＋cloudflaredトンネル ②まずオーナー名義**で動かす → OKなら本番はクラウド＋クライアント名義へ。
+  - 手順書＝`products/mochizuki-board-bot/SETUP.md`（Google/LINE/Anthropicの取得から検証・テスト・通知cron・本番移行まで）。
+- ⏳ 次：オーナーがSETUP.md通りに鍵を発行して1:1テスト → 来週の訪問で社長のスマホから実演。
+
 ## 守ること（盛らない）
 - 写真からの見積もりは**「目安（正確は現車確認後）」**まで。保険は**「文面作成の支援」**であって保険会社と自動連携する話ではない。**精度・自動連携を約束しない。**
 

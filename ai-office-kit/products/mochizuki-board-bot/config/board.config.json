@@ -1,0 +1,29 @@
+{
+  "_comment": "工程ボードの設定。訪問で実際の工程名・呼び方が分かったら stages を差し替えるだけでOK。",
+  "stages": ["入庫", "分解", "板金", "塗装", "組付け", "検査", "納車待ち", "納車済"],
+  "doneStage": "納車済",
+  "sheet": {
+    "tabName": "工程ボード",
+    "headerRow": 1,
+    "firstDataRow": 2,
+    "lastColumn": "I",
+    "columns": {
+      "id": "A",
+      "cust": "B",
+      "car": "C",
+      "number": "D",
+      "stage": "E",
+      "due": "F",
+      "staff": "G",
+      "updated": "H",
+      "memo": "I"
+    },
+    "header": ["ID", "お客様", "車種", "ナンバー", "工程", "納車予定", "担当", "更新日時", "メモ"]
+  },
+  "notify": {
+    "_comment": "先回り通知のルール。日付は納車予定(F列)を YYYY-MM-DD か M/D 形式で読む。",
+    "delayWithinDays": 1,
+    "warnBeforeStageIndex": 6,
+    "sameDayCollisionMin": 2
+  }
+}
