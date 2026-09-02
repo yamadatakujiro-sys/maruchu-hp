@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>Lucent アンケート ストーリーズ（明るい版）</title><style>
+  /* ストーリーズ 1080×1920（9:16）／明るい・ポップ版
+     ⚠️フィードと配色を統一（クリーム地＋濃紺＋オレンジ）。
+        暗い配色だと「答えたくない」空気になる（オーナー指摘・2026-08-16）
+     ⚠️アンケート／質問スタンプは"アプリ側で貼る"ので、
+        画像は上1/3に質問だけ置き、中央〜下は空けておく（スタンプ置き場） */
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAPGothic','IPAGothic',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:#333;}
+  .st{
+    width:1080px;height:1920px;position:relative;overflow:hidden;
+    background:#fdf6e9;color:#16283c;
+    margin:0 auto 26px;padding:230px 80px 130px;display:flex;flex-direction:column;
+  }
+  /* 角の飾り */
+  .st::before{content:"";position:absolute;width:620px;height:620px;border-radius:50%;
+    background:#ffd9a0;opacity:.55;top:-200px;right:-180px;}
+  .st::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;
+    background:#bfe3ff;opacity:.5;bottom:-190px;left:-170px;}
+  .in{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;}
+
+  .series{display:inline-block;align-self:center;background:#16283c;color:#fff;
+    font-size:27px;font-weight:bold;padding:15px 32px;border-radius:100px;
+    letter-spacing:.04em;margin-bottom:64px;}
+  .emoji{font-size:104px;line-height:1;text-align:center;margin-bottom:34px;}
+  h1{font-size:74px;font-weight:bold;line-height:1.5;text-align:center;}
+  h1 .o{color:#f08a24;}
+  .sub{font-size:34px;color:#3f5670;text-align:center;margin-top:40px;line-height:1.7;}
+  .space{flex:1;}
+  .foot2{text-align:center;font-size:31px;color:#3f5670;line-height:1.7;font-weight:bold;}
+  .foot2 b{color:#f08a24;}
+</style></head><body>
+
+<!-- S1: 投票① 現場 vs それ以外 -->
+<div class="st"><div class="in">
+  <div class="series">部品屋から、聞かせてください</div>
+  <div class="emoji">🙋‍♂️</div>
+  <h1>時間を取られるのは<br><span class="o">どっち</span>ですか？</h1>
+  <div class="sub">鈑金屋さん・整備士さんに聞いてます</div>
+  <div class="space"></div>
+  <div class="foot2">↓ タップで答えられます</div>
+</div></div>
+
+<!-- S2: 投票② 書類 vs 連絡 -->
+<div class="st"><div class="in">
+  <div class="series">部品屋から、聞かせてください</div>
+  <div class="emoji">🤔</div>
+  <h1>現場作業以外だと<br><span class="o">どっちが重い</span>ですか？</h1>
+  <div class="sub">正解はないので、感覚でどうぞ</div>
+  <div class="space"></div>
+  <div class="foot2">↓ タップで答えられます</div>
+</div></div>
+
+<!-- S3: 投票③ 人手 -->
+<div class="st"><div class="in">
+  <div class="series">部品屋から、聞かせてください</div>
+  <div class="emoji">👷</div>
+  <h1>人手、<br><span class="o">足りてますか？</span></h1>
+  <div class="sub">募集の文章づくりも<br>地味に時間かかりますよね</div>
+  <div class="space"></div>
+  <div class="foot2">↓ タップで答えられます</div>
+</div></div>
+
+<!-- S4: 質問スタンプ（自由記述） -->
+<div class="st"><div class="in">
+  <div class="series">部品屋から、聞かせてください</div>
+  <div class="emoji">🙏</div>
+  <h1>「これ、<span class="o">なくなったら楽</span>」<br>って作業、ありますか？</h1>
+  <div class="sub">一言で大丈夫です。<br>あとで役に立てたいので、教えてください。</div>
+  <div class="space"></div>
+  <div class="foot2">↓ ここに書いて送れます<br><b>売り込みではないです</b></div>
+</div></div>
+
+</body></html>

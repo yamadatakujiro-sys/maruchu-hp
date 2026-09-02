@@ -1,5 +1,14 @@
 # APIキー（公開しない）
 config.js
+# 画像生成APIキー（Replicate等。絶対にコミットしない）
+.image-api-key
+**/.image-api-key
+
+# LINE画像送信の秘密情報（絶対にコミットしない）
+.line-channel-token
+**/.line-channel-token
+.imgbb-api-key
+**/.imgbb-api-key
 
 # macOS
 .DS_Store

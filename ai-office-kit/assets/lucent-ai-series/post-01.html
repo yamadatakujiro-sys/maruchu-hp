@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>Lucent向けAI活用カルーセル</title><style>
+  /* Lucent（@lucent_autoparts）用 1080×1350
+     ⚠️既存の「部品屋のリアルなAI活用」スライドの見た目に合わせる
+        ＝濃紺〜黒／オレンジの細見出し／白の太字・中央寄せ
+     ⚠️相手は鈑金屋・整備屋・部品商。売り込まない。「うちはこうしてる」の共有 */
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAPGothic','IPAGothic',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:#111;}
+  .slide{
+    width:1080px;height:1350px;position:relative;overflow:hidden;color:#fff;
+    background:linear-gradient(170deg,#0e1b2c 0%,#0a1420 55%,#080f18 100%);
+    margin:0 auto 26px;display:flex;flex-direction:column;
+    padding:96px 84px;
+  }
+  .slide::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(700px 520px at 50% 0%,rgba(224,138,60,.10),transparent 70%);}
+  .in{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;}
+
+  .series{text-align:center;font-size:27px;color:#e08a3c;font-weight:bold;letter-spacing:.08em;margin-bottom:auto;}
+  .center{margin:auto 0;text-align:center;}
+  h1{font-size:70px;font-weight:bold;line-height:1.5;}
+  h1 .o{color:#e08a3c;}
+  h2{font-size:52px;font-weight:bold;line-height:1.5;text-align:center;}
+  .lead{font-size:34px;line-height:1.75;color:#c8d6e5;margin-top:40px;}
+  .page{text-align:center;font-size:24px;color:#6b8299;margin-top:auto;letter-spacing:.1em;}
+
+  /* 比較 */
+  .box{border-radius:22px;padding:40px 40px;margin-top:34px;text-align:left;}
+  .bad{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.14);}
+  .good{background:rgba(224,138,60,.10);border:2px solid #e08a3c;}
+  .tag{display:inline-block;font-size:25px;font-weight:bold;padding:8px 20px;border-radius:100px;margin-bottom:22px;}
+  .tag.b{background:rgba(255,255,255,.14);color:#cfe0f2;}
+  .tag.g{background:#e08a3c;color:#12202f;}
+  .box p{font-size:33px;line-height:1.7;}
+  .box p.small{font-size:29px;color:#c8d6e5;margin-top:16px;}
+  .arrow{text-align:center;font-size:46px;color:#e08a3c;margin:26px 0 0;}
+
+  /* 手順 */
+  .bubble{background:#fff;color:#12202f;border-radius:24px;padding:34px 38px;font-size:38px;
+    font-weight:bold;line-height:1.5;margin-top:40px;text-align:left;box-shadow:0 14px 34px rgba(0,0,0,.4);}
+  .note{margin-top:38px;background:rgba(255,255,255,.06);border-left:8px solid #e08a3c;
+    border-radius:12px;padding:30px 32px;font-size:28px;line-height:1.7;color:#dbe6f2;text-align:left;}
+  .cta{font-size:40px;font-weight:bold;line-height:1.6;}
+  .cta .o{color:#e08a3c;}
+</style></head><body>
+
+<!-- 1 表紙 -->
+<div class="slide"><div class="in">
+  <div class="series">― 部品屋のリアルなAI活用 ―</div>
+  <div class="center">
+    <h1>「ブレンド塗装」って<br><span class="o">お客さんに伝わってますか？</span></h1>
+    <div class="lead">見積は正しい。<br>でも"高い"と言われる。</div>
+  </div>
+  <div class="page">スワイプ →</div>
+</div></div>
+
+<!-- 2 問題 -->
+<div class="slide"><div class="in">
+  <div class="series">― 部品屋のリアルなAI活用 ―</div>
+  <div class="center">
+    <h2>値切られる原因は<br>金額じゃなくて<span class="o">言葉</span></h2>
+    <div class="lead">
+      毎日使ってる言葉だから、<br>
+      つい、そのまま渡してしまう。<br><br>
+      でもお客さんは<br>「何にお金がかかってるか」が<br>分からないまま見てる。
+    </div>
+  </div>
+  <div class="page">2 / 5</div>
+</div></div>
+
+<!-- 3 Before / After -->
+<div class="slide"><div class="in">
+  <div class="series">― 部品屋のリアルなAI活用 ―</div>
+  <div class="center">
+    <div class="box bad">
+      <span class="tag b">そのまま渡すと</span>
+      <p>バンパー脱着<br>ブレンド塗装</p>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="box good">
+      <span class="tag g">こう書くと</span>
+      <p>ぶつけた所だけ塗ると、<br>隣のドアと色が変わって見えます。</p>
+      <p class="small">なので少し広めに塗って、<br>色の境目が分からないように仕上げます。</p>
+    </div>
+  </div>
+  <div class="page">3 / 5</div>
+</div></div>
+
+<!-- 4 やり方 -->
+<div class="slide"><div class="in">
+  <div class="series">― 部品屋のリアルなAI活用 ―</div>
+  <div class="center">
+    <h2>うちは、これを<br><span class="o">スマホで作ってます</span></h2>
+    <div class="bubble">この見積、<br>お客さんに分かる言葉で<br>説明文にして</div>
+    <div class="note">
+      金額・車検の可否・保険の話は<br>
+      <b>勝手に書かないよう止めてあります。</b><br>
+      分からない所は「要確認」と出るので、<br>そのまま出しても事故りません。
+    </div>
+  </div>
+  <div class="page">4 / 5</div>
+</div></div>
+
+<!-- 5 締め -->
+<div class="slide"><div class="in">
+  <div class="series">― 部品屋のリアルなAI活用 ―</div>
+  <div class="center">
+    <h2>説明が伝われば、<br><span class="o">値切られない</span></h2>
+    <div class="lead">
+      現場20年やってきて、<br>
+      ここが一番もったいないと思ってました。<br><br>
+      車検の案内文、求人票、<br>ビフォーアフターの投稿文も<br>同じやり方で作ってます。
+    </div>
+    <div class="note" style="text-align:center;">
+      <span class="cta">気になる方は<span class="o">DM</span>ください。<br>実際の画面をお見せします。</span>
+    </div>
+  </div>
+  <div class="page">5 / 5</div>
+</div></div>
+
+</body></html>

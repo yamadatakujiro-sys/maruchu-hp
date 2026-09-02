@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>ご提案：ホワイトボードを、スマホへ。</title><style>
+  /* ============================================================
+     静岡の社長（望月オート）向け プレゼン資料 ／ 16:9・1280×720・9スライド
+     ・render.cjs で 300dpi 相当のPNG＋スライド1枚=1ページのPDFに書き出す
+     ・目的＝「AIでこんなことができます」の【ご提案資料】（社長へのプレゼン用）
+     ・トーン＝しっかりしたビジネス資料。だが分かりやすく。
+     ・主役＝ホワイトボード→スマホ共有ボード（課題がそこ）
+     ・会社名/氏名/金額は入れない。専門用語(API等)は出さない。
+     ・盛らない：写真は「目安（正確は現車確認後）」／保険は「文面作成の支援」
+     ・フォントは IPAPゴシック（環境にある標準ゴシック。中国語フォント化けを防ぐ）
+     ・LINEの緑(#06C755)はLINEを描くときだけ
+     ============================================================ */
+  :root{
+    --ink:#1B2A4A;      /* 見出し・濃い */
+    --body:#33404F;     /* 本文 */
+    --muted:#7A8899;    /* 補助 */
+    --teal:#0F8B7E;     /* アクセント */
+    --teal-d:#0B6B60;
+    --teal-bg:#E7F3F1;
+    --amber:#C9701C;    /* 強調（控えめ） */
+    --amber-bg:#FBEEDF;
+    --line:#E3E8EE;
+    --panel:#F5F8FA;
+    --green:#06C755;    /* LINE */
+  }
+  *{margin:0;padding:0;box-sizing:border-box;
+    font-family:'IPAPGothic','IPAGothic','Noto Sans CJK JP',sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  body{background:#c8ccd2;}
+  .slide{
+    width:1280px;height:720px;background:#fff;color:var(--body);
+    margin:0 auto 20px;position:relative;overflow:hidden;
+    padding:52px 64px 64px;display:flex;flex-direction:column;
+  }
+  @page{size:1280px 720px;margin:0;}
+  @media print{ body{background:#fff;} .slide{margin:0;page-break-after:always;} }
+
+  /* 見出し帯 */
+  .head{display:flex;flex-direction:column;gap:12px;flex:none;}
+  .kick{display:inline-flex;align-self:flex-start;background:var(--teal-bg);color:var(--teal-d);
+    font-size:19px;font-weight:bold;letter-spacing:2px;padding:7px 18px;border-radius:6px;}
+  .head h2{font-size:40px;color:var(--ink);font-weight:bold;line-height:1.25;letter-spacing:.5px;}
+  .head h2 .ac{color:var(--teal-d);}
+  .rule{height:4px;width:74px;background:var(--teal);border-radius:2px;margin-top:2px;}
+
+  .body{flex:1;display:flex;margin-top:30px;min-height:0;}
+
+  /* フッター */
+  .foot{position:absolute;left:64px;right:64px;bottom:24px;display:flex;justify-content:space-between;
+    align-items:center;font-size:16px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;}
+  .foot .brand{font-weight:bold;color:var(--teal-d);letter-spacing:1px;}
+
+  /* 箇条書き */
+  ul.pts{list-style:none;display:flex;flex-direction:column;gap:20px;}
+  ul.pts li{display:flex;gap:16px;align-items:flex-start;font-size:23px;line-height:1.55;color:var(--body);}
+  ul.pts li .dot{flex:none;width:30px;height:30px;border-radius:8px;background:var(--teal);color:#fff;
+    font-size:17px;font-weight:bold;display:flex;align-items:center;justify-content:center;margin-top:3px;}
+  ul.pts li b{color:var(--ink);}
+  ul.pts li .sub{display:block;font-size:18px;color:var(--muted);margin-top:4px;line-height:1.5;}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;}
+
+  /* 3ステップ横並び */
+  .steps{display:flex;gap:22px;width:100%;align-items:stretch;}
+  .step{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:30px 26px;
+    display:flex;flex-direction:column;gap:14px;position:relative;}
+  .step .no{width:46px;height:46px;border-radius:50%;background:var(--teal);color:#fff;
+    font-size:24px;font-weight:bold;display:flex;align-items:center;justify-content:center;}
+  .step h3{font-size:25px;color:var(--ink);font-weight:bold;line-height:1.35;}
+  .step p{font-size:18.5px;line-height:1.6;color:var(--body);}
+  .step .tagn{position:absolute;top:26px;right:24px;font-size:15px;color:var(--muted);}
+  .arrowc{display:flex;align-items:center;color:var(--teal);font-size:34px;}
+
+  /* スプレッドシート風ボード */
+  table.board{border-collapse:collapse;width:100%;font-size:18px;background:#fff;border-radius:12px;overflow:hidden;}
+  table.board th,table.board td{border:1px solid var(--line);padding:12px 8px;text-align:center;}
+  table.board thead th{background:var(--ink);color:#fff;font-weight:bold;font-size:17px;}
+  table.board tbody th{background:var(--panel);color:var(--ink);font-weight:bold;text-align:left;padding-left:16px;font-size:19px;white-space:nowrap;}
+  table.board td.done{background:#EAF2F1;color:var(--teal-d);font-weight:bold;}
+  table.board td.now{background:var(--teal);color:#fff;font-weight:bold;}
+
+  /* 汎用カード列 */
+  .cards{display:flex;flex-direction:column;gap:16px;width:100%;}
+  .rowcard{display:flex;align-items:center;gap:20px;background:#fff;border:1.5px solid var(--line);
+    border-radius:14px;padding:20px 26px;}
+  .rowcard .ic{flex:none;width:52px;height:52px;border-radius:12px;background:var(--teal-bg);
+    display:flex;align-items:center;justify-content:center;}
+  .rowcard .tx{font-size:21px;line-height:1.5;color:var(--body);}
+  .rowcard .tx b{color:var(--ink);font-size:22px;}
+  .rowcard .tx small{color:var(--muted);font-size:17px;}
+
+  .note{background:var(--amber-bg);border-left:5px solid var(--amber);border-radius:0 10px 10px 0;
+    padding:16px 22px;font-size:20px;color:#7a4a13;line-height:1.55;}
+  .note b{color:var(--amber);}
+</style></head><body>
+
+<!-- =================== S1 表紙 =================== -->
+<div class="slide" style="background:var(--ink);color:#fff;justify-content:center;padding:0 96px;">
+  <div style="position:absolute;top:0;right:0;width:520px;height:720px;
+    background:linear-gradient(135deg,rgba(15,139,126,.0),rgba(15,139,126,.35));"></div>
+  <div style="position:absolute;top:120px;right:120px;width:300px;height:300px;border:2px solid rgba(255,255,255,.12);border-radius:24px;transform:rotate(12deg);"></div>
+  <div style="position:relative;z-index:1;">
+    <div style="display:inline-block;background:var(--teal);color:#fff;font-size:20px;font-weight:bold;
+      letter-spacing:2px;padding:9px 22px;border-radius:8px;">AIを活用した業務効率化のご提案</div>
+    <h1 style="font-size:74px;font-weight:bold;line-height:1.22;margin-top:34px;letter-spacing:1px;">
+      ホワイトボードを、<br><span style="color:#7FD8CC;">スマホへ。</span></h1>
+    <p style="font-size:28px;line-height:1.6;margin-top:26px;color:#C3CEDC;">
+      現場の進捗を、<span style="color:#fff;font-weight:bold;">外からでも全員でリアルタイムに共有</span>する仕組み。</p>
+  </div>
+</div>
+
+<!-- =================== S2 現状の課題 =================== -->
+<div class="slide">
+  <div class="head">
+    <span class="kick">現状の課題</span>
+    <h2>いまは、<span class="ac">事務所に来ないと</span>進捗が分からない。</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="body" style="gap:44px;align-items:center;">
+    <ul class="pts" style="flex:1.15;">
+      <li><span class="dot">1</span><div>納車や工程の予定を <b>ホワイトボードで管理</b>している。
+        <span class="sub">情報が事務所内だけにあり、外からは確認できない。</span></div></li>
+      <li><span class="dot">2</span><div>外出すると <b>今どの車がどの工程か分からない</b>。
+        <span class="sub">そのたびに事務所へ電話・帰社して確認 ＝ 時間のロス。</span></div></li>
+      <li><span class="dot">3</span><div>人数が増えるほど <b>伝達ミス・予定の重複</b>が起きやすい。
+        <span class="sub">「言った／聞いてない」や、同じ日に納車が重なる など。</span></div></li>
+    </ul>
+    <!-- 概念図：社内(ボード) | 見えない壁 | 社外(スマホ×) -->
+    <div class="panel" style="flex:1;padding:28px;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <div style="text-align:center;">
+        <div style="font-size:16px;color:var(--muted);margin-bottom:10px;font-weight:bold;">社内</div>
+        <div style="width:190px;height:150px;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:16px;text-align:left;">
+          <div style="height:14px;background:var(--teal-bg);border-radius:4px;margin-bottom:10px;width:70%;"></div>
+          <div style="height:14px;background:#EDEFF3;border-radius:4px;margin-bottom:10px;"></div>
+          <div style="height:14px;background:#EDEFF3;border-radius:4px;margin-bottom:10px;width:85%;"></div>
+          <div style="height:14px;background:#EDEFF3;border-radius:4px;width:60%;"></div>
+        </div>
+        <div style="font-size:15px;color:var(--muted);margin-top:8px;">ホワイトボード</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;color:#C0563E;">
+        <div style="width:0;height:150px;border-left:3px dashed #C9CFD8;"></div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:16px;color:var(--muted);margin-bottom:10px;font-weight:bold;">社外</div>
+        <div style="width:100px;height:150px;background:#fff;border:2px solid #C9CFD8;border-radius:16px;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:44px;color:#C0563E;font-weight:bold;">?</span>
+        </div>
+        <div style="font-size:15px;color:var(--muted);margin-top:8px;">見えない</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span class="brand">AI業務効率化のご提案</span><span>1</span></div>
+</div>
+
+<!-- =================== S3 解決の全体像 =================== -->
+<div class="slide">
+  <div class="head">
+    <span class="kick">解決の全体像</span>
+    <h2>3つのステップで、<span class="ac">段階的に</span>解決します。</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="body" style="align-items:center;">
+    <div class="steps">
+      <div class="step">
+        <div class="no">1</div>
+        <h3>スマホで見られる<br>共有ボード</h3>
+        <p>工程と車両を一覧化し、リンク1つで全員のスマホに同じ画面を共有。</p>
+        <div style="margin-top:auto;font-size:15px;color:var(--teal-d);font-weight:bold;">まずはここから</div>
+      </div>
+      <div class="arrowc">▶</div>
+      <div class="step">
+        <div class="no">2</div>
+        <h3>話しかけるだけで<br>更新（LINE）</h3>
+        <p>LINEに一言送るだけで、AIが内容を判断してボードを自動更新。</p>
+        <div style="margin-top:auto;font-size:15px;color:var(--muted);">慣れてきたら</div>
+      </div>
+      <div class="arrowc">▶</div>
+      <div class="step">
+        <div class="no">3</div>
+        <h3>AIが<br>先回りで通知</h3>
+        <p>納期遅れや納車の重複などのリスクを、AIが事前に検知して通知。</p>
+        <div style="margin-top:auto;font-size:15px;color:var(--muted);">さらに安心</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span class="brand">AI業務効率化のご提案</span><span>2</span></div>
+</div>
+
+<!-- =================== S4 STEP1 共有ボード =================== -->
+<div class="slide">
+  <div class="head">
+    <span class="kick">STEP 1 ／ 共有ボード</span>
+    <h2>進捗を、<span class="ac">全員のスマホ</span>へ。</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="body" style="gap:40px;">
+    <ul class="pts" style="flex:1;align-self:center;">
+      <li><span class="dot">✓</span><div><b>Googleスプレッドシート</b>を使用。
+        <span class="sub">普段のExcelに近く、新しいアプリの習得が不要。導入の負担が小さい。</span></div></li>
+      <li><span class="dot">✓</span><div>工程を<b>列</b>、車両を<b>行</b>で一覧化。
+        <span class="sub">「今どの車がどの工程か」が一目で分かる。</span></div></li>
+      <li><span class="dot">✓</span><div><b>リンク1つで全員に共有</b>。外出先でも同じ画面。
+        <span class="sub">更新はその場で全員に反映 ＝ 電話・帰社での確認が不要に。</span></div></li>
+    </ul>
+    <div style="flex:1.25;align-self:center;">
+      <table class="board">
+        <thead><tr><th>車両</th><th>入庫</th><th>板金</th><th>塗装</th><th>組付</th><th>検査</th><th>納車</th></tr></thead>
+        <tbody>
+          <tr><th>ハイエース</th><td class="done">済</td><td class="done">済</td><td class="now">作業中</td><td></td><td></td><td></td></tr>
+          <tr><th>ヴィッツ</th><td class="done">済</td><td class="now">作業中</td><td></td><td></td><td></td><td></td></tr>
+          <tr><th>セレナ</th><td class="done">済</td><td class="done">済</td><td class="done">済</td><td class="done">済</td><td class="now">作業中</td><td></td></tr>
+          <tr><th>タント</th><td class="done">済</td><td class="done">済</td><td class="done">済</td><td class="done">済</td><td class="done">済</td><td class="now">待ち</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:16px;color:var(--muted);margin-top:12px;text-align:center;">※ 工程名・列は、御社の実際の流れに合わせて設定します。</p>
+    </div>
+  </div>
+  <div class="foot"><span class="brand">AI業務効率化のご提案</span><span>3</span></div>
+</div>
+
+<!-- =================== S5 STEP2 LINEで更新 =================== -->
+<div class="slide">
+  <div class="head">
+    <span class="kick">STEP 2 ／ 入力</span>
+    <h2>入力は、<span class="ac">話しかけるだけ</span>。</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="body" style="flex-direction:column;gap:22px;justify-content:center;">
+    <!-- 横フロー：LINE入力 → AI判断 → ボード自動更新 -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:26px;">
+      <div style="width:340px;">
+        <div style="font-size:16px;color:var(--muted);margin-bottom:8px;font-weight:bold;">① 現場からLINEで一言</div>
+        <div style="background:var(--green);color:#fff;border-radius:16px 16px 16px 4px;padding:20px 24px;
+          font-size:23px;line-height:1.5;font-weight:bold;">田中さんのハイエース、<br>塗装おわりました</div>
+        <div style="font-size:15px;color:var(--muted);margin-top:8px;">音声入力でもOK（話した内容を文字に）</div>
+      </div>
+      <div style="font-size:34px;color:var(--teal);">▶</div>
+      <div class="panel" style="padding:22px 26px;text-align:center;width:210px;">
+        <div style="font-size:17px;color:var(--teal-d);font-weight:bold;margin-bottom:8px;">② AIが判断</div>
+        <div style="font-size:19px;line-height:1.6;color:var(--body);">「ハイエース」<br>「塗装 → 完了」<br>と読み取り</div>
+      </div>
+      <div style="font-size:34px;color:var(--teal);">▶</div>
+      <div style="width:250px;">
+        <div style="font-size:16px;color:var(--muted);margin-bottom:8px;font-weight:bold;">③ ボードを自動更新</div>
+        <table class="board" style="font-size:15px;">
+          <thead><tr><th>塗装</th><th>組付</th></tr></thead>
+          <tbody><tr><td style="height:56px;"></td><td class="now">ハイエース</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="note" style="max-width:900px;margin:6px auto 0;">
+      覚えることは <b>「LINEで報告する」だけ</b>。表計算の操作や、新しいアプリの習得は必要ありません。
+    </div>
+  </div>
+  <div class="foot"><span class="brand">AI業務効率化のご提案</span><span>4</span></div>
+</div>
+
+<!-- =================== S6 STEP3 先回り通知 =================== -->
+<div class="slide">
+  <div class="head">
+    <span class="kick">STEP 3 ／ 通知</span>
+    <h2>AIが、<span class="ac">リスクを事前に</span>検知して通知。</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="body" style="gap:40px;align-items:center;">
+    <div class="cards" style="flex:1.3;">
+      <div class="rowcard">
+        <div class="ic"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 4v11l7 4" stroke="#0F8B7E" stroke-width="2.6" stroke-linecap="round" fill="none"/><circle cx="14" cy="14" r="11" stroke="#0F8B7E" stroke-width="2.6" fill="none"/></svg></div>
+        <div class="tx"><b>納期遅れの兆候</b><br>「この車は納車まであと1日ですが、まだ塗装で止まっています」</div>
+      </div>
+      <div class="rowcard">
+        <div class="ic"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="18" rx="3" stroke="#0F8B7E" stroke-width="2.6" fill="none"/><path d="M4 11h20M9 4v4M19 4v4" stroke="#0F8B7E" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+        <div class="tx"><b>予定の重複</b><br>「明日は納車が3台重なっています。確認してください」</div>
+      </div>
+      <div class="rowcard">
+        <div class="ic"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 12a8 8 0 0 1 16 0c0 6 3 7 3 7H3s3-1 3-7Z" stroke="#0F8B7E" stroke-width="2.6" fill="none" stroke-linejoin="round"/><path d="M11 23a3 3 0 0 0 6 0" stroke="#0F8B7E" stroke-width="2.6"/></svg></div>
+        <div class="tx"><b>通知はLINEへ</b><br>気づいてほしいことだけを、普段のLINEにそっとお知らせ。</div>
+      </div>
+    </div>
+    <div class="panel" style="flex:1;align-self:stretch;display:flex;flex-direction:column;justify-content:center;padding:34px;">
+      <div style="font-size:22px;color:var(--ink);font-weight:bold;line-height:1.5;margin-bottom:14px;">ホワイトボードは<br>「今」しか映しません。</div>
+      <div style="font-size:22px;color:var(--teal-d);font-weight:bold;line-height:1.5;">AIは、その先を見て<br>先回りで気づけます。</div>
+      <div style="font-size:18px;color:var(--muted);line-height:1.6;margin-top:16px;">人の見落としを、仕組みで防ぐ。<br>ここが「ただの共有ボード」との違いです。</div>
+    </div>
+  </div>
+  <div class="foot"><span class="brand">AI業務効率化のご提案</span><span>5</span></div>
+</div>
+
+<!-- =================== S7 その他の活用例 =================== -->
+<div class="slide">
+  <div class="head">
+    <span class="kick">その他の活用例</span>
+    <h2>同じ仕組みで、<span class="ac">こんな業務も</span>効率化できます。</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="body" style="align-items:center;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px 22px;width:100%;">
+      <div class="rowcard"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="3" y="7" width="20" height="14" rx="3" stroke="#0F8B7E" stroke-width="2.4" fill="none"/><circle cx="13" cy="14" r="4" stroke="#0F8B7E" stroke-width="2.4" fill="none"/><path d="M9 7l2-3h4l2 3" stroke="#0F8B7E" stroke-width="2.4" fill="none"/></svg></div><div class="tx"><b>写真から概算の目安</b><br><small>お客様への「だいたいの目安」を素早く。正確な金額は現車確認後。</small></div></div>
+      <div class="rowcard"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="5" y="3" width="16" height="20" rx="2.5" stroke="#0F8B7E" stroke-width="2.4" fill="none"/><path d="M9 9h8M9 13h8M9 17h5" stroke="#0F8B7E" stroke-width="2.4" stroke-linecap="round"/></svg></div><div class="tx"><b>保険会社とのやり取りの文面作成</b><br><small>連絡・報告の文章づくりを支援します。</small></div></div>
+      <div class="rowcard"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M6 4h9l5 5v13H6z" stroke="#0F8B7E" stroke-width="2.4" fill="none" stroke-linejoin="round"/><path d="M10 14h6M10 18h4" stroke="#0F8B7E" stroke-width="2.4" stroke-linecap="round"/></svg></div><div class="tx"><b>日報・作業報告の自動文章化</b><br><small>話した内容から、報告文を自動で作成。</small></div></div>
+      <div class="rowcard"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="4" y="5" width="18" height="17" rx="3" stroke="#0F8B7E" stroke-width="2.4" fill="none"/><path d="M4 10h18M9 3v4M17 3v4" stroke="#0F8B7E" stroke-width="2.4" stroke-linecap="round"/><path d="M12 15v3h3" stroke="#0F8B7E" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg></div><div class="tx"><b>納車予定の前日リマインド</b><br><small>「明日は納車です」を前日にLINEでお知らせ。</small></div></div>
+      <div class="rowcard" style="grid-column:1 / -1;"><div class="ic"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="4" y="9" width="18" height="13" rx="2" stroke="#0F8B7E" stroke-width="2.4" fill="none"/><path d="M4 9l3-5h12l3 5M13 9v13M4 15h18" stroke="#0F8B7E" stroke-width="2.4" stroke-linejoin="round"/></svg></div><div class="tx"><b>部品の発注・入荷管理の通知</b><br><small>発注忘れ・入荷待ちを検知してリマインド。</small></div></div>
+    </div>
+  </div>
+  <div class="foot"><span class="brand">AI業務効率化のご提案</span><span>6</span></div>
+</div>
+
+<!-- =================== S8 導入ステップ =================== -->
+<div class="slide">
+  <div class="head">
+    <span class="kick">導入イメージ</span>
+    <h2><span class="ac">小さく始めて</span>、効果を見ながら広げられます。</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="body" style="align-items:center;">
+    <div style="width:100%;display:flex;align-items:stretch;gap:0;">
+      <div style="flex:1;text-align:center;padding:0 14px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--teal);color:#fff;font-size:28px;font-weight:bold;display:flex;align-items:center;justify-content:center;margin:0 auto;">1</div>
+        <div style="font-size:23px;color:var(--ink);font-weight:bold;margin-top:16px;">共有ボード</div>
+        <div style="font-size:18px;color:var(--body);line-height:1.55;margin-top:8px;">まずスマホで進捗を共有。<br>ここだけでも大きく変わる。</div>
+        <div style="display:inline-block;font-size:15px;color:var(--teal-d);font-weight:bold;margin-top:12px;background:var(--teal-bg);padding:5px 14px;border-radius:6px;">まずここから</div>
+      </div>
+      <div style="display:flex;align-items:center;color:var(--line);font-size:30px;">──▶</div>
+      <div style="flex:1;text-align:center;padding:0 14px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:#fff;border:2.5px solid var(--teal);color:var(--teal-d);font-size:28px;font-weight:bold;display:flex;align-items:center;justify-content:center;margin:0 auto;">2</div>
+        <div style="font-size:23px;color:var(--ink);font-weight:bold;margin-top:16px;">LINEで更新</div>
+        <div style="font-size:18px;color:var(--body);line-height:1.55;margin-top:8px;">話しかけるだけで<br>ボードが自動で動く。</div>
+      </div>
+      <div style="display:flex;align-items:center;color:var(--line);font-size:30px;">──▶</div>
+      <div style="flex:1;text-align:center;padding:0 14px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:#fff;border:2.5px solid var(--teal);color:var(--teal-d);font-size:28px;font-weight:bold;display:flex;align-items:center;justify-content:center;margin:0 auto;">3</div>
+        <div style="font-size:23px;color:var(--ink);font-weight:bold;margin-top:16px;">先回り通知</div>
+        <div style="font-size:18px;color:var(--body);line-height:1.55;margin-top:8px;">遅れや重複を<br>AIが自動でお知らせ。</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span class="brand">AI業務効率化のご提案</span><span>7</span></div>
+</div>
+
+<!-- =================== S9 まとめ =================== -->
+<div class="slide" style="background:var(--ink);color:#fff;">
+  <div style="position:absolute;top:150px;right:-60px;width:320px;height:320px;border:2px solid rgba(255,255,255,.10);border-radius:30px;transform:rotate(15deg);"></div>
+  <div class="head">
+    <span class="kick" style="background:rgba(127,216,204,.18);color:#7FD8CC;">まとめ</span>
+    <h2 style="color:#fff;">まずは、<span style="color:#7FD8CC;">スマホで共有ボード</span>から。</h2>
+    <div class="rule" style="background:#7FD8CC;"></div>
+  </div>
+  <div class="body" style="flex-direction:column;gap:20px;justify-content:center;">
+    <div style="display:flex;gap:20px;">
+      <div style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:24px;">
+        <div style="color:#7FD8CC;font-size:19px;font-weight:bold;">① 見える</div>
+        <div style="font-size:20px;line-height:1.55;margin-top:8px;color:#E4EAF1;">外からでも全員が進捗を確認。電話・帰社が減る。</div>
+      </div>
+      <div style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:24px;">
+        <div style="color:#7FD8CC;font-size:19px;font-weight:bold;">② ラクになる</div>
+        <div style="font-size:20px;line-height:1.55;margin-top:8px;color:#E4EAF1;">LINEで話すだけ。入力の手間がなくなる。</div>
+      </div>
+      <div style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:24px;">
+        <div style="color:#7FD8CC;font-size:19px;font-weight:bold;">③ 見落とさない</div>
+        <div style="font-size:20px;line-height:1.55;margin-top:8px;color:#E4EAF1;">遅れや重複をAIが先回りで通知。</div>
+      </div>
+    </div>
+    <p style="font-size:24px;line-height:1.6;color:#fff;margin-top:8px;">
+      いきなり全部ではなく、<b style="color:#7FD8CC;">御社の流れに合わせて一つずつ</b>。<br>
+      ご不明な点や「こんなことはできる？」があれば、お気軽にご相談ください。</p>
+  </div>
+  <div class="foot" style="border-color:rgba(255,255,255,.15);color:#9FB0C4;"><span class="brand" style="color:#7FD8CC;">AI業務効率化のご提案</span><span>8</span></div>
+</div>
+
+</body></html>

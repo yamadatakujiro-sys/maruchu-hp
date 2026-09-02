@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAGothic','IPAPGothic',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:#333;}
+  .slide{
+    width:1080px;height:1350px;position:relative;overflow:hidden;color:#fff;
+    background:radial-gradient(900px 700px at 82% -8%,rgba(6,199,85,.20),transparent 60%),
+      linear-gradient(150deg,#0a1e39 0%,#123056 52%,#0d2444 100%);
+    margin:0 auto 28px;
+  }
+  .slide::after{content:"";position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1.6px,transparent 1.6px);background-size:30px 30px;opacity:.5;}
+  .inner{position:relative;z-index:2;padding:70px 68px;height:100%;display:flex;flex-direction:column;}
+  .kick{display:inline-flex;align-items:center;gap:14px;margin-bottom:22px;}
+  .kick .logo{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,#06C755,#00a648);
+    display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 20px rgba(6,199,85,.42);}
+  .kick .bn{font-size:22px;font-weight:bold;letter-spacing:1px;}
+  .kick .bn small{display:block;font-size:14px;color:#9db8d6;font-weight:normal;letter-spacing:1.5px;margin-top:2px;}
+  h1{font-size:56px;font-weight:bold;line-height:1.2;letter-spacing:.5px;}
+  h1 .g{color:#3ee27f;}
+  .g{color:#3ee27f;}
+  .say{font-size:29px;color:#cfe0f2;font-weight:bold;margin:20px 0 10px;line-height:1.5;}
+
+  /* overview 3ブロック */
+  .flow{margin-top:auto;margin-bottom:auto;display:flex;flex-direction:column;gap:26px;}
+  .fb{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.16);border-radius:22px;padding:34px 38px;display:flex;gap:26px;align-items:center;}
+  .fb.hl{border-color:#3ee27f;background:rgba(62,226,127,.10);}
+  .fb .n{width:70px;height:70px;flex:none;border-radius:18px;background:linear-gradient(135deg,#06C755,#00a648);
+    display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 8px 18px rgba(6,199,85,.4);}
+  .fb .t{font-size:34px;font-weight:bold;line-height:1.3;}
+  .fb .d{font-size:22px;color:#c2d5ea;margin-top:6px;line-height:1.5;}
+  .down{align-self:center;font-size:40px;color:#3ee27f;margin:-8px 0;}
+
+  /* mock browser */
+  .win{margin-top:26px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.18);border-radius:18px;overflow:hidden;}
+  .bar{background:rgba(255,255,255,.10);padding:14px 20px;display:flex;align-items:center;gap:12px;}
+  .dot{width:15px;height:15px;border-radius:50%;}
+  .url{margin-left:14px;background:rgba(0,0,0,.35);border-radius:10px;padding:9px 20px;font-size:21px;color:#cfe0f2;letter-spacing:.5px;}
+  .win .body{padding:34px 36px;}
+  .field{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.16);border-radius:12px;padding:20px 24px;font-size:24px;color:#e7f0fb;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
+  .field .ph{color:#8ba7c6;}
+  .btn{display:inline-block;background:linear-gradient(135deg,#06C755,#00a648);color:#fff;font-size:26px;font-weight:bold;
+    padding:18px 40px;border-radius:14px;box-shadow:0 8px 20px rgba(6,199,85,.4);}
+  .btnrow{display:flex;justify-content:flex-end;margin-top:8px;}
+  .tag{display:inline-flex;align-items:center;gap:10px;background:rgba(62,226,127,.14);border:1.5px solid #3ee27f;border-radius:100px;padding:12px 26px;font-size:23px;font-weight:bold;color:#3ee27f;margin-bottom:22px;}
+
+  .steplist{margin-top:8px;display:flex;flex-direction:column;gap:22px;}
+  .sl{display:flex;gap:24px;align-items:flex-start;}
+  .sl .no{width:58px;height:58px;flex:none;border-radius:50%;background:linear-gradient(135deg,#06C755,#00a648);
+    display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;box-shadow:0 6px 16px rgba(6,199,85,.4);}
+  .sl .tx{font-size:29px;font-weight:bold;line-height:1.4;padding-top:4px;}
+  .sl .tx small{display:block;font-size:22px;color:#b9cde3;font-weight:normal;margin-top:5px;line-height:1.5;}
+  .sl .tx code{background:rgba(255,255,255,.12);border-radius:7px;padding:2px 12px;font-size:20px;color:#8fe9b3;}
+  .note{margin-top:auto;font-size:22px;color:#9db8d6;line-height:1.6;background:rgba(255,255,255,.05);border-radius:14px;padding:22px 26px;}
+  .note b{color:#3ee27f;}
+  .foot{position:absolute;bottom:34px;right:56px;font-size:19px;color:#7d97b6;z-index:3;}
+</style></head>
+<body>
+
+  <!-- Slide 1: 全体像 -->
+  <div class="slide"><div class="inner">
+    <div class="kick"><div class="logo">💬</div><div class="bn">お客さん専用 公式LINE の作り方<small>ぜんぶ あなたが代行 ・ 無料 ・ 30分ほど</small></div></div>
+    <h1>やることは、<br><span class="g">3ステップ</span>だけ</h1>
+    <div class="say">お客さん1社ごとに、この3つをやるだけ。</div>
+    <div class="flow">
+      <div class="fb"><div class="n">1️⃣</div><div><div class="t">お客さん専用の公式LINEを作る</div><div class="d">お客さんの名義で1個。無料・数分。</div></div></div>
+      <div class="down">▼</div>
+      <div class="fb"><div class="n">2️⃣</div><div><div class="t">「鍵」（トークン）を取り出す</div><div class="d">そのLINEを自動化するための鍵を発行。</div></div></div>
+      <div class="down">▼</div>
+      <div class="fb hl"><div class="n">3️⃣</div><div><div class="t">あなたのMacに繋ぐ</div><div class="d">鍵をMacに入れる→AIチームが応答開始。</div></div></div>
+    </div>
+    <div class="foot">STEP 0 / 全体像</div>
+  </div></div>
+
+  <!-- Slide 2: STEP1 公式アカウント作成 -->
+  <div class="slide"><div class="inner">
+    <div class="kick"><div class="logo">💬</div><div class="bn">STEP 1 ・ 公式LINEを作る<small>manager.line.biz でアカウント開設</small></div></div>
+    <div class="tag">🌐 パソコンのブラウザで</div>
+    <h1><span class="g">お客さん専用</span>の<br>公式LINEを作る</h1>
+    <div class="win">
+      <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="url">manager.line.biz</span></div>
+      <div class="body">
+        <div class="field"><span class="ph">アカウント名</span><span>例）○○美容室</span></div>
+        <div class="field"><span class="ph">業種</span><span>例）美容・サロン ▾</span></div>
+        <div class="field"><span class="ph">会社・店舗の情報</span><span class="ph">お客さんの情報を入力</span></div>
+        <div class="btnrow"><span class="btn">作成する</span></div>
+      </div>
+    </div>
+    <div class="note">💡 まず <b>LINEビジネスID</b>（メールアドレスでOK）を作ってログイン→上の画面で開設。<br><b>名義はお客さん</b>。あなたは画面共有で入力を代行するだけ。<br>※お客さんが既にLINE公式を持ってる場合は、この STEP は<b>飛ばしてOK</b>（STEP2へ）。</div>
+    <div class="foot">STEP 1 / 3</div>
+  </div></div>
+
+  <!-- Slide 3: STEP2 API有効化＋トークン＋Webhook -->
+  <div class="slide"><div class="inner">
+    <div class="kick"><div class="logo">🔑</div><div class="bn">STEP 2 ・ 「鍵」を取り出す<small>Messaging API を有効化してトークン発行</small></div></div>
+    <div class="tag">🔑 鍵＝トークンを発行</div>
+    <h1>自動化の<br><span class="g">「鍵」</span>を取り出す</h1>
+    <div class="steplist">
+      <div class="sl"><div class="no">1</div><div class="tx"><code>manager.line.biz</code> → 設定 → Messaging API<small>「Messaging APIを利用する」を押す（→プロバイダー名＝会社名を入力）</small></div></div>
+      <div class="sl"><div class="no">2</div><div class="tx"><code>developers.line.biz</code> を開く<small>作成されたチャネルを選ぶ</small></div></div>
+      <div class="sl"><div class="no">3</div><div class="tx">「Messaging API設定」タブ<small>➡ <b style="color:#3ee27f">チャネルアクセストークン（長期）</b>を発行してコピー ＝これが鍵🔑</small></div></div>
+      <div class="sl"><div class="no">4</div><div class="tx">Webhook URL を入れる<small>あなたのCloudflareのURLを貼る ➡「Webhookの利用」を <b style="color:#3ee27f">ON</b></small></div></div>
+      <div class="sl"><div class="no">5</div><div class="tx">応答設定<small>「応答メッセージ」<b>OFF</b> ／「Webhook」<b>ON</b>（AIが返すため）</small></div></div>
+    </div>
+    <div class="note">💡 <b>チャネルアクセストークン</b>＝「このLINEに自動で返信していい鍵」。<br>これを次の STEP であなたのMacに預けます。</div>
+    <div class="foot">STEP 2 / 3</div>
+  </div></div>
+
+  <!-- Slide 4: STEP3 Macに繋ぐ -->
+  <div class="slide"><div class="inner">
+    <div class="kick"><div class="logo">🤖</div><div class="bn">STEP 3 ・ あなたのMacに繋ぐ<small>鍵を入れて AIチーム稼働</small></div></div>
+    <div class="tag">🖥 あなたのMacで</div>
+    <h1>鍵をMacに入れて<br><span class="g">稼働スタート</span></h1>
+    <div class="steplist">
+      <div class="sl"><div class="no">1</div><div class="tx">お客さん専用の個室を作る<small><code>office.conf</code> に <code>OFFICE_HOME</code>／<code>PORT</code>／社員構成を書く</small></div></div>
+      <div class="sl"><div class="no">2</div><div class="tx">さっきの「鍵」を入れる<small>チャネルアクセストークンを設定＝Macがこの公式LINEとして返せるように</small></div></div>
+      <div class="sl"><div class="no">3</div><div class="tx"><code>./install.sh</code> を実行<small>リーダー＋専門社員のチームを自動生成（ゼロから作らない）</small></div></div>
+      <div class="sl"><div class="no">4</div><div class="tx">LINEに1通テスト送信<small>「テスト」と送って返事が来れば✅ 完成・お客さんに渡せる</small></div></div>
+    </div>
+    <div class="note">🎉 これで <b>「AIチーム付きの公式LINE 1本」</b>がお客さんの物として完成。<br>お客さんはLINEでリーダーに話すだけ。中身の管理はあなた。<br>⚠️ 鍵（トークン）を預かる同意は<b>契約書で取る</b>（弁護士相談の論点）。</div>
+    <div class="foot">STEP 3 / 3 ・ 完成</div>
+  </div></div>
+
+</body></html>

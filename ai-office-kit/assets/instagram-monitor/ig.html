@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'IPAGothic','IPAPGothic',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{background:#333;}
+  /* Instagram 縦長 1080×1350 */
+  .slide{
+    width:1080px;height:1350px;position:relative;overflow:hidden;color:#fff;
+    background:radial-gradient(900px 700px at 82% -8%,rgba(6,199,85,.22),transparent 60%),
+      linear-gradient(150deg,#0a1e39 0%,#123056 52%,#0d2444 100%);
+    margin:0 auto 28px;
+  }
+  .slide::after{content:"";position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1.6px,transparent 1.6px);background-size:30px 30px;opacity:.55;}
+  .inner{position:relative;z-index:2;padding:78px 72px;height:100%;display:flex;flex-direction:column;}
+
+  /* 共通ヘッダー */
+  .kick{display:inline-flex;align-items:center;gap:14px;margin-bottom:10px;}
+  .kick .logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#06C755,#00a648);
+    display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 8px 20px rgba(6,199,85,.42);}
+  .kick .bn{font-size:24px;font-weight:bold;letter-spacing:1px;}
+  .kick .bn small{display:block;font-size:15px;color:#9db8d6;font-weight:normal;letter-spacing:2px;margin-top:2px;}
+
+  h1{font-size:70px;font-weight:bold;line-height:1.18;letter-spacing:.5px;}
+  h1 .g{color:#3ee27f;}
+  .g{color:#3ee27f;}
+
+  /* Slide 1 = 表紙 */
+  .badge{display:inline-block;align-self:flex-start;background:linear-gradient(135deg,#06C755,#00a648);
+    color:#fff;font-size:30px;font-weight:bold;padding:16px 34px;border-radius:100px;
+    box-shadow:0 10px 26px rgba(6,199,85,.42);letter-spacing:1px;margin-bottom:8px;}
+  .lead{font-size:38px;color:#cfe0f2;font-weight:bold;line-height:1.5;margin-top:30px;}
+  .free{margin-top:auto;background:rgba(62,226,127,.12);border:2px solid #3ee27f;border-radius:26px;padding:44px 46px;}
+  .free .big{font-size:62px;font-weight:bold;color:#3ee27f;line-height:1.15;}
+  .free .sub{font-size:28px;color:#e7f0fb;margin-top:14px;line-height:1.5;}
+  .swipe{align-self:center;margin-top:38px;font-size:26px;color:#9db8d6;font-weight:bold;letter-spacing:1px;}
+
+  /* Slide 2 = 悩み→解決 */
+  .pains{margin-top:auto;display:flex;flex-direction:column;gap:22px;}
+  .pain{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.16);border-radius:20px;
+    padding:30px 34px;font-size:33px;font-weight:bold;line-height:1.45;display:flex;gap:18px;align-items:flex-start;}
+  .pain .q{color:#3ee27f;font-size:36px;flex:none;}
+  .arrow{align-self:center;font-size:52px;color:#3ee27f;margin:26px 0 4px;}
+  .solve{margin-bottom:auto;background:rgba(62,226,127,.10);border:2px solid #3ee27f;border-radius:22px;padding:36px 38px;text-align:center;}
+  .solve .t{font-size:40px;font-weight:bold;line-height:1.4;}
+  .solve .t b{color:#3ee27f;}
+
+  /* Slide 3 = 8職種 */
+  .say{font-size:32px;color:#cfe0f2;font-weight:bold;margin:24px 0 8px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 24px;margin-top:26px;}
+  .role{display:flex;align-items:center;gap:18px;background:rgba(255,255,255,.06);
+    border:1.5px solid rgba(255,255,255,.15);border-radius:18px;padding:24px 24px;}
+  .role .e{font-size:44px;flex:none;width:56px;text-align:center;}
+  .role .rt{font-size:30px;font-weight:bold;}
+
+  /* Slide 4 = 応募方法 */
+  .steps{margin-top:40px;display:flex;flex-direction:column;gap:28px;}
+  .st{display:flex;align-items:center;gap:28px;}
+  .st .no{width:78px;height:78px;flex:none;border-radius:50%;background:linear-gradient(135deg,#06C755,#00a648);
+    display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:bold;box-shadow:0 8px 20px rgba(6,199,85,.42);}
+  .st .tx{font-size:38px;font-weight:bold;line-height:1.35;}
+  .st .tx small{display:block;font-size:26px;color:#b9cde3;font-weight:normal;margin-top:6px;}
+  .cta{margin-top:auto;background:linear-gradient(135deg,#06C755,#00a648);color:#fff;text-align:center;
+    font-size:44px;font-weight:bold;padding:40px;border-radius:24px;box-shadow:0 12px 30px rgba(6,199,85,.42);line-height:1.4;}
+  .foot{margin-top:26px;font-size:22px;color:#9db8d6;text-align:center;line-height:1.6;}
+</style></head>
+<body>
+
+  <!-- Slide 1: 表紙 -->
+  <div class="slide"><div class="inner">
+    <div class="kick"><div class="logo">🤖</div><div class="bn">AIオフィス<small>LINE で動く AI チーム</small></div></div>
+    <div style="margin-top:34px;"></div>
+    <div class="badge">＼ 立ち上げ記念 ／</div>
+    <h1>AIチームを<br><span class="g">1週間 無料</span>で<br>お試しできます</h1>
+    <div class="lead">「作るもの」が多すぎる、<br>あなたの会社のために。</div>
+    <div class="free">
+      <div class="big">🎁 先着2社さま限定</div>
+      <div class="sub">1週間 無料トライアル。<br>Claudeなどの契約・費用はいっさい不要です。</div>
+    </div>
+    <div class="swipe">スワイプで詳しく →</div>
+  </div></div>
+
+  <!-- Slide 2: 悩み → 解決 -->
+  <div class="slide"><div class="inner">
+    <div class="kick"><div class="logo">🤖</div><div class="bn">AIオフィス<small>LINE で動く AI チーム</small></div></div>
+    <h1 style="font-size:56px;margin-top:20px;">こんな悩み、<br><span class="g">ありませんか？</span></h1>
+    <div class="pains">
+      <div class="pain"><span class="q">“</span>インスタの投稿、作るのが追いつかない</div>
+      <div class="pain"><span class="q">“</span>チラシもLPも、外注するほどじゃない…でも手が回らない</div>
+    </div>
+    <div class="arrow">▼</div>
+    <div class="solve"><div class="t">その"作りもの"を、<br><b>LINEで指示するだけ</b>で<br>AIチームが作ります。</div></div>
+  </div></div>
+
+  <!-- Slide 3: 8職種 -->
+  <div class="slide"><div class="inner">
+    <div class="kick"><div class="logo">🤖</div><div class="bn">AIオフィス<small>LINE で動く AI チーム</small></div></div>
+    <h1 style="font-size:56px;margin-top:20px;">あなたの会社に<br><span class="g">8人のAI社員</span></h1>
+    <div class="say">制作・比較・修正提案・納品まで、ぜんぶLINEで。</div>
+    <div class="grid">
+      <div class="role"><div class="e">🧭</div><div class="rt">リーダー</div></div>
+      <div class="role"><div class="e">🖥</div><div class="rt">LP担当</div></div>
+      <div class="role"><div class="e">🎨</div><div class="rt">デザイナー</div></div>
+      <div class="role"><div class="e">✍️</div><div class="rt">ライター</div></div>
+      <div class="role"><div class="e">🎬</div><div class="rt">動画制作</div></div>
+      <div class="role"><div class="e">📱</div><div class="rt">SNS担当</div></div>
+      <div class="role"><div class="e">🔎</div><div class="rt">リサーチャー</div></div>
+      <div class="role"><div class="e">📊</div><div class="rt">アナリスト</div></div>
+    </div>
+    <div class="say" style="margin-top:auto;font-size:28px;color:#3ee27f;">📱 使うのは、いつものLINEだけ（パソコン不要）</div>
+  </div></div>
+
+  <!-- Slide 4: 応募方法 -->
+  <div class="slide"><div class="inner">
+    <div class="kick"><div class="logo">🤖</div><div class="bn">AIオフィス<small>LINE で動く AI チーム</small></div></div>
+    <h1 style="font-size:56px;margin-top:20px;">応募は<br><span class="g">かんたん3ステップ</span></h1>
+    <div class="steps">
+      <div class="st"><div class="no">1</div><div class="tx">「モニター希望」<small>コメント or DM をください</small></div></div>
+      <div class="st"><div class="no">2</div><div class="tx">作りたいものを相談<small>投稿・チラシ・LPなど何でも</small></div></div>
+      <div class="st"><div class="no">3</div><div class="tx">1週間 無料でお試し<small>使った感想をいただくのが条件です</small></div></div>
+    </div>
+    <div class="cta">💬 「モニター希望」と<br>コメント・DM してください</div>
+    <div class="foot">先着2社さま限定／Claude等の契約・費用は不要。準備はこちらで全部やります。<br>※効果を保証するものではありません。</div>
+  </div></div>
+
+</body></html>

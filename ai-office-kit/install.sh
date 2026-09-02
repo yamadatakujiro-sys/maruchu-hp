@@ -30,6 +30,45 @@ die()  { err "$*"; exit 1; }
 source "$CONF"
 log "設定を読み込みました: $CONF"
 
+# --- 1.5. 秘密情報の読み込み（鍵ファイル）------------------
+#   秘密情報は office.conf にコミットせず、$OFFICE_HOME 配下の鍵ファイルに置く。
+#
+#   $OFFICE_HOME/.line-harness-key  … R2画像送信に必要な認証情報
+#     書式（KEY=VALUE 形式、#コメント可）:
+#       LINE_HARNESS_API_URL=https://line-harness.yourname.workers.dev
+#       LINE_HARNESS_API_KEY=XXXXXXXXXXXXXXXX
+#     ない場合: bridge plist への LINE_HARNESS_* 注入はスキップ
+#              （send-line-media.mjs は起動時に .line-harness-key を直接読めるため動作は継続する）
+#
+#   $OFFICE_HOME/.tunnel-cmd        … TUNNEL_CMD の上書き（office.conf が空の場合のフォールバック）
+#     書式: コマンド文字列を1行で記述
+#       例: ngrok http --url=xxxxx.ngrok-free.dev 18789
+#     ない場合: office.conf の TUNNEL_CMD をそのまま使う（空なら tunnel 常駐しない）
+LINE_HARNESS_API_URL=""
+LINE_HARNESS_API_KEY=""
+if [ -f "${OFFICE_HOME}/.line-harness-key" ]; then
+  while IFS='=' read -r _lhk _lhv || [ -n "$_lhk" ]; do
+    # コメント行・空行をスキップ
+    [[ "$_lhk" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "${_lhk// }" ]] && continue
+    _lhv="${_lhv%%#*}"   # インラインコメントを除去
+    case "${_lhk// }" in
+      LINE_HARNESS_API_URL) LINE_HARNESS_API_URL="${_lhv}" ;;
+      LINE_HARNESS_API_KEY) LINE_HARNESS_API_KEY="${_lhv}" ;;
+    esac
+  done < "${OFFICE_HOME}/.line-harness-key"
+  ok "R2認証情報を読み込みました: .line-harness-key"
+else
+  err "警告: ${OFFICE_HOME}/.line-harness-key が未作成です。send-line-media.mjs による画像/動画LINE送信が機能しません。"
+  err "       作成例: printf 'LINE_HARNESS_API_URL=...\nLINE_HARNESS_API_KEY=...\n' > ${OFFICE_HOME}/.line-harness-key && chmod 600 ${OFFICE_HOME}/.line-harness-key"
+fi
+
+# TUNNEL_CMD フォールバック: office.conf が空でも .tunnel-cmd があれば使う
+if [ -z "${TUNNEL_CMD:-}" ] && [ -f "${OFFICE_HOME}/.tunnel-cmd" ]; then
+  TUNNEL_CMD="$(head -1 "${OFFICE_HOME}/.tunnel-cmd")"
+  ok "TUNNEL_CMD を .tunnel-cmd から読み込みました: $TUNNEL_CMD"
+fi
+
 # --- 2. 事前チェック -----------------------------------------
 log "事前チェック"
 [ -n "${OFFICE_HOME:-}" ] || die "OFFICE_HOME が未設定です"
@@ -48,10 +87,35 @@ LEADER_ID="${first_member%%:*}"
 MODE="${MODE:-push}"
 ok "事前チェック完了 (leader=$LEADER_ID, mode=$MODE)"
 
+# --- 2.5. PDF→画像 変換ツール（poppler / pdftoppm）の確認・自動導入 --------
+# 成果物がPDF（プレゼン資料・チラシ等）の時、各ページを画像化して顧客のLINEに送るのに使う。
+# LINE公式アカウントAPIはPDFを実体で送れないため画像化が必要（send-line-media.mjs が使用）。
+if command -v pdftoppm >/dev/null 2>&1; then
+  ok "PDF変換ツール pdftoppm を確認（PDF成果物を画像でLINE納品できます）"
+elif command -v brew >/dev/null 2>&1; then
+  log "PDF変換ツール(poppler)が未導入 → brew install poppler を実行します"
+  if brew install poppler >/dev/null 2>&1; then
+    ok "poppler を導入しました（pdftoppm 利用可能）"
+  else
+    err "poppler の自動導入に失敗。手動で 'brew install poppler' を実行してください（PDFの画像納品に必要）"
+  fi
+else
+  err "PDF変換に必要な poppler が未導入で brew もありません。'brew install poppler' 実行推奨（PDF成果物を画像でLINE納品する場合）"
+fi
+
 # --- 3. フォルダ構成の作成 -----------------------------------
 log "フォルダ構成を作成: $OFFICE_HOME"
-mkdir -p "$OFFICE_HOME/members" "$OFFICE_HOME/logs"
-ok "members/ logs/ を用意"
+mkdir -p "$OFFICE_HOME/members" "$OFFICE_HOME/logs" "$OFFICE_HOME/納品"
+ok "members/ logs/ 納品/ を用意"
+
+# --- 納品ボックスをデスクトップから1クリックで開けるようにする（成果物の迷子防止）----
+# 全社員の完成成果物は $OFFICE_HOME/納品/ に集約される（共通層ルール）。
+# デスクトップに「AI成果物」ショートカット（シンボリックリンク）を張り、オーナーが常に1か所で開ける状態にする。
+if [ -d "$HOME/Desktop" ]; then
+  ln -sfn "$OFFICE_HOME/納品" "$HOME/Desktop/AI成果物" 2>/dev/null \
+    && ok "デスクトップに「AI成果物」ショートカットを作成（→ $OFFICE_HOME/納品）" \
+    || err "デスクトップのショートカット作成をスキップ（手動作成可: ln -sfn \"$OFFICE_HOME/納品\" \"$HOME/Desktop/AI成果物\"）"
+fi
 
 # --- 4. 社員の組み立て（このキットの中核）--------------------
 #   各社員 = 役割層(roles/<tpl>) + 共通層(SESSION-MODE-TEMPLATE)
@@ -97,14 +161,16 @@ else
 fi
 
 # --- 5. 部品配置（キットの bin/ → $OFFICE_HOME/bin/）----------
-log "7部品と共通層テンプレを配置: $OFFICE_HOME/bin, $OFFICE_HOME/templates"
+log "各部品と共通層テンプレを配置: $OFFICE_HOME/bin, $OFFICE_HOME/templates"
 mkdir -p "$OFFICE_HOME/bin" "$OFFICE_HOME/templates"
 cp "$BIN_DIR"/office-bridge.mjs "$BIN_DIR"/spawn-watcher.mjs "$BIN_DIR"/leader-poll.sh \
    "$BIN_DIR"/watchdog.sh "$BIN_DIR"/session-start-hook.sh "$BIN_DIR"/cwd-changed-hook.sh \
-   "$BIN_DIR"/inject-session-mode.sh "$OFFICE_HOME/bin/"
-chmod +x "$OFFICE_HOME"/bin/*.sh
+   "$BIN_DIR"/inject-session-mode.sh "$BIN_DIR"/gen-image.mjs "$BIN_DIR"/send-line-media.mjs \
+   "$BIN_DIR"/tunnel-run.sh "$BIN_DIR"/line-notify.mjs "$BIN_DIR"/authwatch.sh \
+   "$OFFICE_HOME/bin/"
+chmod +x "$OFFICE_HOME"/bin/*.sh "$OFFICE_HOME"/bin/*.mjs
 cp "$COMMON_LAYER" "$OFFICE_HOME/templates/"
-ok "bin/（7部品）と templates/SESSION-MODE-TEMPLATE.md を配置"
+ok "bin/（各部品）と templates/SESSION-MODE-TEMPLATE.md を配置"
 
 # 各部品へ流し込む共通の環境変数（office.conf 由来）
 read -r -d '' COMMON_ENV <<EOF || true
@@ -114,20 +180,22 @@ EOF
 # --- 6. launchd 常駐登録（bridge / watcher / leader-poll）-----
 LA_DIR="$HOME/Library/LaunchAgents"
 if command -v launchctl >/dev/null 2>&1; then
-  log "launchd 常駐を登録（bridge / watcher / leader-poll）"
+  log "launchd 常駐を登録（bridge / watcher / leader-poll / tunnel / caffeinate）"
   mkdir -p "$LA_DIR"
   NODE_BIN="$(command -v node)"
   BIN_PATH_DIR="$(dirname "$CLAUDE_BIN")"
 
   # plist を1本生成して load し直すヘルパ
   #   $1=ラベル接尾 $2=ProgramArguments(XML断片) $3=常駐方式(keepalive|interval)
+  #   $4=追加 EnvironmentVariables XML断片（省略可。<key>K</key><string>V</string>… の形式）
+  #   $5=interval秒数（$3=interval のときのみ有効。省略時 30秒）
   register_agent() {
-    local suffix="$1" prog_xml="$2" mode="$3"
+    local suffix="$1" prog_xml="$2" mode="$3" extra_env_xml="${4:-}" interval_sec="${5:-30}"
     local label="com.lineaioffice.$suffix"
     local plist="$LA_DIR/$label.plist"
     local run_xml
     if [ "$mode" = "interval" ]; then
-      run_xml="    <key>StartInterval</key><integer>30</integer>"
+      run_xml="    <key>StartInterval</key><integer>$interval_sec</integer>"
     else
       run_xml="    <key>KeepAlive</key><true/>
     <key>RunAtLoad</key><true/>"
@@ -153,7 +221,14 @@ $prog_xml
         <key>POLL_MS</key><string>$POLL_MS</string>
         <key>MAX_CONCURRENT</key><string>$MAX_CONCURRENT</string>
         <key>THRESHOLD_MIN</key><string>$THRESHOLD_MIN</string>
+        <key>TUNNEL_CMD</key><string>${TUNNEL_CMD:-}</string>
+        <key>SPAWN_TIMEOUT_MIN</key><string>${SPAWN_TIMEOUT_MIN:-8}</string>
+        <key>STALE_DOING_MIN</key><string>${STALE_DOING_MIN:-10}</string>
+        <key>MAX_TASK_RETRY</key><string>${MAX_TASK_RETRY:-2}</string>
+        <key>MAPPING_REFRESH_MIN</key><string>${MAPPING_REFRESH_MIN:-10}</string>
+        <key>LOG_MAX_MB</key><string>${LOG_MAX_MB:-5}</string>
         <key>PATH</key><string>$BIN_PATH_DIR:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+$extra_env_xml
     </dict>
 $run_xml
     <key>StandardOutPath</key><string>$OFFICE_HOME/logs/$suffix.log</string>
@@ -166,12 +241,18 @@ PLIST
     ok "launchd: $label"
   }
 
+  # bridge には R2画像送信用の認証情報を追加注入する（.line-harness-key から読み込んだ値）
+  lh_env_xml=""
+  if [ -n "$LINE_HARNESS_API_URL" ] && [ -n "$LINE_HARNESS_API_KEY" ]; then
+    lh_env_xml="        <key>LINE_HARNESS_API_URL</key><string>${LINE_HARNESS_API_URL}</string>
+        <key>LINE_HARNESS_API_KEY</key><string>${LINE_HARNESS_API_KEY}</string>"
+  fi
   register_agent "bridge" \
 "        <string>$NODE_BIN</string>
-        <string>$OFFICE_HOME/bin/office-bridge.mjs</string>" keepalive
+        <string>$OFFICE_HOME/bin/office-bridge.mjs</string>" keepalive "$lh_env_xml"
   register_agent "watcher" \
 "        <string>$NODE_BIN</string>
-        <string>$OFFICE_HOME/bin/spawn-watcher.mjs</string>" keepalive
+        <string>$OFFICE_HOME/bin/spawn-watcher.mjs</string>" keepalive "$lh_env_xml"
   # leader-poll は poll運用時のみ常駐（push運用では待機トークンを消費しないため登録しない）
   if [ "$MODE" = "poll" ]; then
     register_agent "leaderpoll" \
@@ -184,6 +265,49 @@ PLIST
       rm -f "$LA_DIR/com.lineaioffice.leaderpoll.plist"
     fi
     ok "push運用: leader-poll は常駐させません（省トークン）"
+  fi
+  # cloudflaredトンネル：TUNNEL_CMD 設定時のみ keepalive 常駐（Mac再起動でも自動復帰＝無反応の恒久対策）
+  if [ -n "${TUNNEL_CMD:-}" ]; then
+    register_agent "tunnel" \
+"        <string>/bin/bash</string>
+        <string>$OFFICE_HOME/bin/tunnel-run.sh</string>" keepalive
+  else
+    # 未設定なら当キット由来のトンネル常駐が残っていても解除しておく（設定を消した時の後始末）
+    if [ -f "$LA_DIR/com.lineaioffice.tunnel.plist" ]; then
+      launchctl unload "$LA_DIR/com.lineaioffice.tunnel.plist" 2>/dev/null || true
+      rm -f "$LA_DIR/com.lineaioffice.tunnel.plist"
+    fi
+    err "警告: TUNNEL_CMD が未設定＝cloudflaredトンネルは自動復帰しません（Mac再起動でLINE無反応の恐れ。office.conf 参照）"
+  fi
+  # スリープ恒久防止：PREVENT_SLEEP=true なら caffeinate を常駐（Macが寝てAI・トンネルが止まるのを防ぐ）
+  if [ "${PREVENT_SLEEP:-true}" = "true" ]; then
+    register_agent "caffeinate" \
+"        <string>/usr/bin/caffeinate</string>
+        <string>-s</string>
+        <string>-i</string>" keepalive
+  else
+    if [ -f "$LA_DIR/com.lineaioffice.caffeinate.plist" ]; then
+      launchctl unload "$LA_DIR/com.lineaioffice.caffeinate.plist" 2>/dev/null || true
+      rm -f "$LA_DIR/com.lineaioffice.caffeinate.plist"
+    fi
+    ok "PREVENT_SLEEP=false: スリープ防止(caffeinate)は登録しません"
+  fi
+  # watchdog：死活監視を15分おきに常駐（トンネル/bridge停止・タスク滞留を検知しLINE通知）。
+  # bash+curlのみでClaudeは起動しない＝待機トークンゼロ。line-notify用に LINE_HARNESS_* も注入。
+  register_agent "watchdog" \
+"        <string>/bin/bash</string>
+        <string>$OFFICE_HOME/bin/watchdog.sh</string>" interval "$lh_env_xml" 900
+  # authwatch：Claudeログイン切れの"先回り"点検（既定6時間おき）。AUTH_WATCH=false で無効化。
+  if [ "${AUTH_WATCH:-true}" = "true" ]; then
+    register_agent "authwatch" \
+"        <string>/bin/bash</string>
+        <string>$OFFICE_HOME/bin/authwatch.sh</string>" interval "$lh_env_xml" 21600
+  else
+    if [ -f "$LA_DIR/com.lineaioffice.authwatch.plist" ]; then
+      launchctl unload "$LA_DIR/com.lineaioffice.authwatch.plist" 2>/dev/null || true
+      rm -f "$LA_DIR/com.lineaioffice.authwatch.plist"
+    fi
+    ok "AUTH_WATCH=false: ログイン切れの定期点検(authwatch)は登録しません"
   fi
 else
   err "launchctl が無いため常駐登録をスキップ（macOS以外。Macで再実行すると登録されます）"
@@ -228,7 +352,8 @@ for entry in "${MEMBERS[@]}"; do
 done
 # 部品が配置されているか
 for b in office-bridge.mjs spawn-watcher.mjs leader-poll.sh watchdog.sh \
-         session-start-hook.sh cwd-changed-hook.sh inject-session-mode.sh; do
+         session-start-hook.sh cwd-changed-hook.sh inject-session-mode.sh tunnel-run.sh \
+         line-notify.mjs authwatch.sh; do
   [ -s "$OFFICE_HOME/bin/$b" ] || { err "部品が未配置: bin/$b"; fail=1; }
 done
 # ブリッジ稼働確認（launchd 登録時のみ。起動の猶予を見て health を叩く）

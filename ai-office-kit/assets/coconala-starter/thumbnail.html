@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'IPAGothic','IPAPGothic',sans-serif; -webkit-font-smoothing:antialiased; }
+  html,body { width:1200px; height:800px; }
+  .stage {
+    width:1200px; height:800px; position:relative; overflow:hidden;
+    background:
+      radial-gradient(1100px 700px at 78% -8%, rgba(6,199,85,.20), transparent 60%),
+      linear-gradient(135deg, #0a1e39 0%, #123056 52%, #0d2444 100%);
+    color:#fff;
+  }
+  /* 装飾ドット */
+  .stage::after{
+    content:""; position:absolute; inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1.5px, transparent 1.5px);
+    background-size:26px 26px; opacity:.6;
+  }
+
+  /* 左カラム */
+  .left { position:absolute; left:64px; top:60px; width:640px; z-index:3; }
+  .brand { display:flex; align-items:center; gap:14px; margin-bottom:30px; }
+  .brand .logo {
+    width:56px; height:56px; border-radius:16px;
+    background:linear-gradient(135deg,#06C755,#00a648);
+    display:flex; align-items:center; justify-content:center; font-size:30px;
+    box-shadow:0 8px 22px rgba(6,199,85,.45);
+  }
+  .brand .name { font-size:26px; font-weight:bold; letter-spacing:1px; }
+  .brand .name small{ display:block; font-size:14px; color:#9db8d6; font-weight:normal; letter-spacing:2px; margin-top:2px;}
+
+  .head { font-size:66px; font-weight:bold; line-height:1.2; letter-spacing:0.5px; white-space:nowrap; }
+  .head .g { color:#3ee27f; }
+  .head .u { position:relative; }
+  .head .u::after{ content:""; position:absolute; left:0; right:0; bottom:2px; height:14px; background:rgba(62,226,127,.28); z-index:-1; border-radius:4px;}
+
+  .sub { margin-top:26px; font-size:29px; line-height:1.5; color:#e7f0fb; font-weight:bold; }
+  .sub .hl{ color:#3ee27f; }
+
+  /* 職種バッジ */
+  .roles { margin-top:26px; display:flex; flex-wrap:wrap; gap:9px; width:620px;}
+  .role {
+    font-size:17px; padding:8px 13px; border-radius:999px;
+    background:rgba(255,255,255,.09); border:1.5px solid rgba(255,255,255,.22);
+    color:#eaf2fb; font-weight:bold; white-space:nowrap;
+  }
+
+  /* 下帯 */
+  .band {
+    position:absolute; left:64px; bottom:52px; z-index:3;
+    display:flex; align-items:center; gap:16px;
+  }
+  .band .chip {
+    background:linear-gradient(135deg,#06C755,#00a648); color:#fff;
+    font-size:23px; font-weight:bold; padding:15px 26px; border-radius:14px;
+    box-shadow:0 10px 26px rgba(6,199,85,.4);
+  }
+  .band .note { font-size:20px; color:#bcd2ec; font-weight:bold; }
+
+  /* 右：スマホ LINEトーク */
+  .phone {
+    position:absolute; right:70px; top:96px; width:352px; height:614px; z-index:4;
+    background:#7c98b6; border-radius:46px; padding:13px;
+    box-shadow:0 30px 70px rgba(0,0,0,.5), 0 0 0 2px rgba(255,255,255,.08) inset;
+  }
+  .screen { width:100%; height:100%; background:#f7f6f2; border-radius:34px; overflow:hidden; display:flex; flex-direction:column;}
+  .lhead {
+    background:linear-gradient(135deg,#123056,#0a1e39); color:#fff; padding:16px 18px 14px; display:flex; align-items:center; gap:11px;
+  }
+  .lhead .av{ width:38px;height:38px;border-radius:50%; background:#fff; display:flex;align-items:center;justify-content:center; font-size:22px;}
+  .lhead .t{ font-size:19px; font-weight:bold;}
+  .lhead .t small{ display:block; font-size:12px; opacity:.9; font-weight:normal;}
+  .chat { flex:1; background:#f7f6f2; padding:16px 14px; display:flex; flex-direction:column; gap:14px;}
+
+  .row{ display:flex; gap:8px; align-items:flex-end;}
+  .row.me{ justify-content:flex-end;}
+  .ava{ width:34px;height:34px;border-radius:50%; background:#fff; flex:none; display:flex;align-items:center;justify-content:center;font-size:19px; box-shadow:0 2px 5px rgba(0,0,0,.15);}
+  .bub{ max-width:210px; font-size:16.5px; line-height:1.42; padding:11px 14px; border-radius:16px; font-weight:bold;}
+  .bub.you{ background:#fff; color:#1a2b3c; border:1px solid #e6e3db; border-top-left-radius:5px;}
+  .bub.me{ background:#e9e7e1; color:#2a2a28; border-top-right-radius:5px;}
+  .bub .nm{ display:block; font-size:12.5px; color:#123056; margin-bottom:3px;}
+
+  /* 納品カード（バブル内） */
+  .deliver{ background:#fff; border-radius:16px; border-top-left-radius:5px; padding:8px; max-width:214px; box-shadow:0 3px 8px rgba(0,0,0,.12);}
+  .poster{ width:100%; height:118px; border-radius:10px; position:relative; overflow:hidden;
+    background:linear-gradient(150deg,#123056,#1d64c7 55%,#3ee27f); display:flex; align-items:flex-end;}
+  .poster .pt{ padding:10px 12px; }
+  .poster .pt b{ display:block; color:#fff; font-size:17px; letter-spacing:2px;}
+  .poster .pt span{ display:block; color:#d7ffe8; font-size:10px; letter-spacing:3px;}
+  .poster .badge{ position:absolute; top:8px; right:8px; background:#06C755; color:#fff; font-size:11px; font-weight:bold; padding:4px 8px; border-radius:8px;}
+  .deliver .cap{ font-size:14.5px; color:#1a2b3c; font-weight:bold; padding:8px 4px 3px; }
+
+  .time{ font-size:11px; color:#5a728e; align-self:flex-end; margin:0 2px;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <!-- 左 -->
+    <div class="left">
+      <div class="brand">
+        <div class="logo">🤖</div>
+        <div class="name">AIオフィス<small>スマホで動く AI チーム</small></div>
+      </div>
+
+      <div class="head">
+        <span class="u">人を雇わずに</span>、<span class="g">9人。</span><br>
+        スマホで頼むだけ。
+      </div>
+
+      <div class="sub">
+        パソコン不要・月額なし。<br>
+        あなたは<span class="hl">話しかけるだけ</span>。
+      </div>
+
+      <div class="roles">
+        <span class="role">👤 リーダー</span>
+        <span class="role">🎨 デザイナー</span>
+        <span class="role">✍️ ライター</span>
+        <span class="role">🎬 動画</span>
+        <span class="role">📱 SNS</span>
+        <span class="role">🖥 LP制作</span>
+        <span class="role">🔎 リサーチ</span>
+        <span class="role">📊 分析</span>
+        <span class="role">💬 LINE配信文</span>
+      </div>
+    </div>
+
+    <div class="band">
+      <div class="chip">買い切り ¥5,000 から</div>
+      <div class="note">＝月額ゼロ・スマホだけ</div>
+    </div>
+
+    <!-- 右：スマホ -->
+    <div class="phone">
+      <div class="screen">
+        <div class="lhead">
+          <div class="av">🤖</div>
+          <div class="t">リーダー<small>Claudeアプリの画面／AI社員9名</small></div>
+        </div>
+        <div class="chat">
+          <div class="row me">
+            <div class="bub me">ポスター作って</div>
+          </div>
+          <div class="row">
+            <div class="ava">👤</div>
+            <div class="bub you"><span class="nm">リーダー</span>承知しました！担当に振ります📩</div>
+          </div>
+          <div class="row">
+            <div class="ava">🎨</div>
+            <div class="bub you"><span class="nm">デザイナー</span>了解！すぐ着手します🔥</div>
+          </div>
+          <div class="row">
+            <div class="ava">🎨</div>
+            <div class="deliver">
+              <div class="poster">
+                <div class="badge">✅ 完成</div>
+                <div class="pt"><b>LUCENT</b><span>NEVER ALONE</span></div>
+              </div>
+              <div class="cap">完成しました！ご確認ください✨</div>
+            </div>
+          </div>
+          <div class="time">17:51</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

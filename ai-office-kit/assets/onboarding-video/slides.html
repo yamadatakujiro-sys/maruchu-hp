@@ -1,0 +1,237 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>使い方ガイド スライド</title>
+<style>
+  /* 使い方動画（字幕版）用スライド 1920×1080 */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #202020; font-family: 'IPAPGothic','IPAGothic',sans-serif; }
+
+  .slide {
+    width: 1920px; height: 1080px; position: relative; overflow: hidden;
+    background: #0d2440; color: #fff;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 140px; margin-bottom: 24px;
+  }
+  /* 明るい面（本文スライド） */
+  .slide.light { background: #f5f7fa; color: #0d2440; }
+
+  .kicker { font-size: 40px; letter-spacing: .12em; color: #7fb2e5; margin-bottom: 36px; }
+  .light .kicker { color: #2a6db0; }
+
+  h1 { font-size: 132px; line-height: 1.25; letter-spacing: .02em; }
+  h2 { font-size: 92px; line-height: 1.35; letter-spacing: .02em; }
+  .sub { font-size: 52px; line-height: 1.7; margin-top: 48px; color: #cfe0f2; }
+  .light .sub { color: #37506b; }
+
+  .big { font-size: 108px; line-height: 1.4; font-weight: bold; }
+
+  /* ステップ番号の丸 */
+  .stepno {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 150px; height: 150px; border-radius: 50%;
+    background: #2a6db0; color: #fff; font-size: 84px; margin-bottom: 44px;
+  }
+
+  /* 3つ並べる */
+  .three { display: flex; gap: 40px; margin-top: 70px; }
+  .card {
+    flex: 1; background: rgba(255,255,255,.1); border-radius: 24px;
+    padding: 56px 44px; text-align: center;
+  }
+  .card .n { font-size: 52px; color: #7fb2e5; margin-bottom: 24px; }
+  .card .t { font-size: 56px; line-height: 1.4; }
+
+  /* 打ち込む文の吹き出し */
+  .bubble {
+    background: #fff; color: #0d2440; border-radius: 32px;
+    padding: 60px 72px; font-size: 84px; font-weight: bold;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25); margin-top: 56px;
+    display: inline-block;
+  }
+  .light .bubble { border: 4px solid #2a6db0; }
+
+  /* 振り分けの図 */
+  .flow { display: flex; align-items: center; gap: 44px; margin-top: 72px; }
+  .node {
+    background: #fff; color: #0d2440; border-radius: 24px;
+    padding: 44px 40px; font-size: 46px; text-align: center; min-width: 300px;
+    line-height: 1.4;
+  }
+  .node.lead { background: #2a6db0; color: #fff; }
+  .arrow { font-size: 72px; color: #7fb2e5; }
+
+  /* 注意の帯 */
+  .note {
+    margin-top: 60px; background: #fff3cd; color: #6b4b00;
+    border-left: 16px solid #e0a800; border-radius: 12px;
+    padding: 44px 52px; font-size: 46px; line-height: 1.6;
+  }
+  .warn {
+    margin-top: 60px; background: #2a6db0; color: #fff;
+    border-radius: 20px; padding: 48px 56px; font-size: 52px; line-height: 1.6;
+  }
+  ul { margin-top: 52px; }
+  li { font-size: 56px; line-height: 1.9; list-style: none; }
+  li:before { content: "・"; }
+
+  .foot { position: absolute; bottom: 56px; left: 140px; font-size: 34px; color: #7fb2e5; }
+  .light .foot { color: #6b8299; }
+  .page { position: absolute; bottom: 56px; right: 140px; font-size: 34px; color: #7fb2e5; }
+  .light .page { color: #6b8299; }
+</style>
+
+<!-- 01 タイトル -->
+<div class="slide">
+  <div class="kicker">AI OFFICE｜スタートキット</div>
+  <h1>使い方ガイド</h1>
+  <div class="sub">これを見れば、今日から使えます。<br>やることは3つだけです。</div>
+  <div class="page">1</div>
+</div>
+
+<!-- 02 3つだけ -->
+<div class="slide">
+  <h2>やることは、3つだけ</h2>
+  <div class="three">
+    <div class="card"><div class="n">STEP 1</div><div class="t">アプリを<br>入れる</div></div>
+    <div class="card"><div class="n">STEP 2</div><div class="t">フォルダを<br>開く</div></div>
+    <div class="card"><div class="n">STEP 3</div><div class="t">話しかける</div></div>
+  </div>
+  <div class="page">2</div>
+</div>
+
+<!-- 03 STEP1 見出し -->
+<div class="slide">
+  <div class="stepno">1</div>
+  <h1>アプリを入れる</h1>
+  <div class="page">3</div>
+</div>
+
+<!-- 04 検索する -->
+<div class="slide light">
+  <div class="kicker">STEP 1</div>
+  <h2>「Claude」で検索してインストール</h2>
+  <div class="sub">iPhoneの方は <b>App Store</b><br>Androidの方は <b>Google Play</b></div>
+  <div class="bubble">Claude（クロード）</div>
+  <div class="page">4</div>
+</div>
+
+<!-- 05 契約 -->
+<div class="slide light">
+  <div class="kicker">STEP 1</div>
+  <h2>Claudeの有料プランをご契約ください</h2>
+  <div class="sub">これは<b>AIの頭脳</b>にあたる部分です。</div>
+  <div class="note">お客様ご自身の名義でのご契約になります。<br>
+  提供元（Anthropic社）へのお支払いで、<b>弊社の料金とは別</b>です。<br>
+  ご契約の方法が分からない場合は、ご遠慮なくご連絡ください。</div>
+  <div class="page">5</div>
+</div>
+
+<!-- 06 STEP2 見出し -->
+<div class="slide">
+  <div class="stepno">2</div>
+  <h1>フォルダを開く</h1>
+  <div class="sub">お渡しした、あなた専用のAIチームです</div>
+  <div class="page">6</div>
+</div>
+
+<!-- 07 コード -->
+<div class="slide light">
+  <div class="kicker">STEP 2</div>
+  <h2>アプリのメニューから<br>「コード」を選ぶ</h2>
+  <div class="bubble">メニュー ▶ コード</div>
+  <div class="page">7</div>
+</div>
+
+<!-- 08 リポジトリ選択 -->
+<div class="slide light">
+  <div class="kicker">STEP 2</div>
+  <h2>一覧から、あなたの会社名が<br>入っているものを選ぶ</h2>
+  <div class="sub">「リポジトリを選ぶ」ボタンを押すと一覧が出ます。</div>
+  <div class="warn">一度選べば、次からは覚えています。<br><b>この操作は最初だけです。</b></div>
+  <div class="page">8</div>
+</div>
+
+<!-- 09 STEP3 見出し -->
+<div class="slide">
+  <div class="stepno">3</div>
+  <h1>話しかける</h1>
+  <div class="sub">ここからが本番です</div>
+  <div class="page">9</div>
+</div>
+
+<!-- 10 打ち込む -->
+<div class="slide light">
+  <div class="kicker">STEP 3</div>
+  <h2>試しに、こう打ってみてください</h2>
+  <div class="bubble">インスタの投稿を3本つくって</div>
+  <div class="page">10</div>
+</div>
+
+<!-- 11 振り分け -->
+<div class="slide">
+  <div class="kicker">STEP 3</div>
+  <h2>リーダーが、担当のAI社員に振り分けます</h2>
+  <div class="flow">
+    <div class="node lead">リーダー</div>
+    <div class="arrow">▶</div>
+    <div class="node">SNS担当</div>
+    <div class="arrow">▶</div>
+    <div class="node">投稿文が<br>できあがる</div>
+  </div>
+  <div class="page">11</div>
+</div>
+
+<!-- 12 コピーして使える -->
+<div class="slide light">
+  <div class="kicker">STEP 3</div>
+  <h2>できた文章は、画面にそのまま出ます</h2>
+  <div class="big" style="margin-top:56px;">コピーして貼るだけ</div>
+  <div class="sub">Instagramでも、チラシでも、そのままお使いいただけます。</div>
+  <div class="page">12</div>
+</div>
+
+<!-- 13 依頼文サンプル -->
+<div class="slide light">
+  <div class="kicker">便利な使い方</div>
+  <h2>頼み方に迷ったら<br>「依頼文サンプル」</h2>
+  <div class="sub">コピペで使える頼み方の例をまとめてあります。<br>慣れるまでは、こちらをお使いください。</div>
+  <div class="page">13</div>
+</div>
+
+<!-- 14 会社情報 -->
+<div class="slide">
+  <div class="kicker">精度を上げるコツ</div>
+  <h2>「会社情報」を埋めると、精度が上がります</h2>
+  <ul>
+    <li>あなたの会社の商品のこと</li>
+    <li>お客様のこと</li>
+    <li>使ってほしくない言葉</li>
+  </ul>
+  <div class="sub">書き換えれば、<b>次の依頼から反映</b>されます。</div>
+  <div class="page">14</div>
+</div>
+
+<!-- 15 困ったとき -->
+<div class="slide light">
+  <div class="kicker">困ったときは</div>
+  <h2>その画面に、こう書いて送ってください</h2>
+  <div class="bubble">動きません</div>
+  <div class="sub">AIが対処の方法を案内します。<br>それでも解決しない場合は、ご遠慮なくご連絡ください。</div>
+  <div class="page">15</div>
+</div>
+
+<!-- 16 大事なお願い -->
+<div class="slide">
+  <div class="kicker">最後に、大事なお願い</div>
+  <h2>公開する前に、必ずご自身で<br>内容をご確認ください</h2>
+  <div class="note">価格や実績などは、AIが勝手に作らないよう設定しています。<br>
+  わからない箇所は「要確認」と表示されますので、事実をご確認ください。</div>
+  <div class="page">16</div>
+</div>
+
+<!-- 17 締め -->
+<div class="slide">
+  <h1>さっそく<br>使ってみてください</h1>
+  <div class="sub">ありがとうございました。</div>
+  <div class="page">17</div>
+</div>
