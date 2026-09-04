@@ -2,6 +2,9 @@
 .env
 .env.*
 !.env.example
+secret/
+*.pem
+*service-account*.json
 .state/
 node_modules/
 *.log

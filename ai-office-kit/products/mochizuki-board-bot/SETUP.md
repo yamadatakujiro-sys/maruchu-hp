@@ -71,14 +71,17 @@ node scripts/selftest.mjs   # ✅ 全件パス と出ればコードは正常
 ```bash
 cp .env.example .env
 ```
+まず、手順2でダウンロードしたJSONキーを `secret/` に置く（秘密鍵のコピペ不要・事故ゼロ）：
+```bash
+mkdir -p secret
+mv ~/Downloads/＜ダウンロードしたJSON＞.json secret/service-account.json
+```
 `.env` を開いて、ここまでで控えた値を貼る：
 - `LINE_CHANNEL_SECRET` / `LINE_CHANNEL_ACCESS_TOKEN`
 - `ANTHROPIC_API_KEY`
 - `GOOGLE_SHEET_ID`（手順1）
-- `GOOGLE_CLIENT_EMAIL`（手順2の `client_email`）
-- `GOOGLE_PRIVATE_KEY`（手順2の `private_key` を**そのまま**ダブルクォートで囲んで貼る）
-  - JSON内の `private_key` は既に `\n` 入りの1行なので、**その1行をコピーして** `"..."` で囲むだけ。
-  - 例：`GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n"`
+- `GOOGLE_KEY_FILE=secret/service-account.json`（↑で置いたパス。これだけでOK）
+  - ※JSONを置きたくない場合のみ、代わりに `GOOGLE_CLIENT_EMAIL` と `GOOGLE_PRIVATE_KEY` を直接入れる（`.env.example` の別法参照）。
 
 ## 6. シートに枠とサンプルを入れる
 ```bash

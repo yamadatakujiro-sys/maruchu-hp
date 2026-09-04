@@ -47,6 +47,36 @@ function req(name) {
 export const ROOT_DIR = ROOT;
 export const BOARD = boardConfig;
 
+// Google サービスアカウント認証情報の解決
+// 優先: GOOGLE_KEY_FILE（ダウンロードしたJSONキーのパス）→ 無ければ個別env(GOOGLE_CLIENT_EMAIL/GOOGLE_PRIVATE_KEY)
+let _googleCreds = null;
+function resolveGoogleCreds() {
+  if (_googleCreds) return _googleCreds;
+  const keyFile = (process.env.GOOGLE_KEY_FILE || '').trim();
+  if (keyFile) {
+    const p = path.isAbsolute(keyFile) ? keyFile : path.join(ROOT, keyFile);
+    let json;
+    try {
+      json = JSON.parse(fs.readFileSync(p, 'utf8'));
+    } catch (e) {
+      throw new Error(`GOOGLE_KEY_FILE を読めません（${p}）: ${e.message}。パスが正しいか確認してください。`);
+    }
+    if (!json.client_email || !json.private_key) {
+      throw new Error('GOOGLE_KEY_FILE のJSONに client_email / private_key がありません。サービスアカウントのJSONキーを指定してください。');
+    }
+    _googleCreds = { client_email: json.client_email, private_key: json.private_key };
+    return _googleCreds;
+  }
+  // フォールバック: 個別env（秘密鍵は \n エスケープを実改行へ戻す）
+  const email = (process.env.GOOGLE_CLIENT_EMAIL || '').trim();
+  const key = (process.env.GOOGLE_PRIVATE_KEY || '').trim();
+  if (!email || !key) {
+    throw new Error('Google認証情報が未設定です。GOOGLE_KEY_FILE（JSONキーのパス）か、GOOGLE_CLIENT_EMAIL＋GOOGLE_PRIVATE_KEY を .env に設定してください。');
+  }
+  _googleCreds = { client_email: email, private_key: key.replace(/\\n/g, '\n') };
+  return _googleCreds;
+}
+
 export const CONFIG = {
   port: parseInt(process.env.PORT || '18790', 10),
 
@@ -63,9 +93,8 @@ export const CONFIG = {
 
   // Google Sheets（サービスアカウント）
   sheetId: () => req('GOOGLE_SHEET_ID'),
-  googleClientEmail: () => req('GOOGLE_CLIENT_EMAIL'),
-  // 秘密鍵は .env に \n エスケープで入る想定なので実改行へ戻す
-  googlePrivateKey: () => req('GOOGLE_PRIVATE_KEY').replace(/\\n/g, '\n'),
+  googleClientEmail: () => resolveGoogleCreds().client_email,
+  googlePrivateKey: () => resolveGoogleCreds().private_key,
 
   // シートのタブ名（環境変数で上書き可）
   sheetTab: process.env.SHEET_TAB || boardConfig.sheet.tabName,
