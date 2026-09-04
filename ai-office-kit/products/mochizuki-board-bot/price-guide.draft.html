@@ -1,0 +1,194 @@
+<title>AI工程ボード 料金と流れ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=M+PLUS+Rounded+1c:wght@700;800&display=swap">
+<style>
+  :root{
+    --ground:#eef1f4; --surface:#ffffff; --surface-2:#f5f8fb;
+    --ink:#1a2230; --ink-soft:#586477; --ink-faint:#8b95a3;
+    --line:#dde3ea; --line-strong:#c8d0db;
+    --brand:#e2641f; --brand-ink:#b04b12; --brand-wash:#fbeadd;
+    --steel:#43617f; --steel-wash:#e7eef4;
+    --good:#1f9d57; --good-wash:#e4f5eb;
+    --shadow:0 1px 2px rgba(24,36,54,.05),0 8px 24px rgba(24,36,54,.09);
+    --radius:16px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0e131a; --surface:#171f29; --surface-2:#1f2а35; --surface-2:#1f2a37;
+      --ink:#e9eef4; --ink-soft:#a3afbe; --ink-faint:#71808f;
+      --line:#2a3543; --line-strong:#3a4859;
+      --brand:#ff7c3f; --brand-ink:#ffb28c; --brand-wash:#38230f;
+      --steel:#8aa6c2; --steel-wash:#182430;
+      --good:#3bc47c; --good-wash:#153021;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0e131a; --surface:#171f29; --surface-2:#1f2a37;
+    --ink:#e9eef4; --ink-soft:#a3afbe; --ink-faint:#71808f;
+    --line:#2a3543; --line-strong:#3a4859;
+    --brand:#ff7c3f; --brand-ink:#ffb28c; --brand-wash:#38230f;
+    --steel:#8aa6c2; --steel-wash:#182430;
+    --good:#3bc47c; --good-wash:#153021;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);margin:0;
+    font-family:"Zen Kaku Gothic New",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 18px 56px}
+  @media(min-width:600px){ .wrap{padding:40px 28px 64px} }
+
+  /* ヘッダー */
+  .hero{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px 24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+    background:linear-gradient(180deg,var(--brand),var(--brand-ink))}
+  .eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;
+    color:var(--brand-ink);background:var(--brand-wash);padding:4px 11px;border-radius:20px}
+  h1{font-family:"M PLUS Rounded 1c",sans-serif;font-weight:800;
+    font-size:clamp(26px,6vw,36px);margin:12px 0 6px;letter-spacing:.01em;text-wrap:balance}
+  .lead{font-size:15px;color:var(--ink-soft);margin:0}
+  .flowline{margin:16px 0 0;padding:13px 15px;background:var(--steel-wash);border-radius:12px;
+    font-size:14px;font-weight:500;color:var(--ink);line-height:1.7}
+  .flowline b{color:var(--brand-ink)}
+
+  section{margin-top:30px}
+  .sec-head{display:flex;align-items:baseline;gap:10px;margin:0 2px 14px}
+  .sec-head h2{font-family:"M PLUS Rounded 1c",sans-serif;font-weight:800;font-size:19px;margin:0}
+  .sec-head .num{font-family:"M PLUS Rounded 1c",sans-serif;font-weight:800;color:var(--brand);
+    font-size:15px;background:var(--brand-wash);width:26px;height:26px;border-radius:8px;
+    display:grid;place-items:center;flex:none}
+
+  /* 料金カード */
+  .prices{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:600px){ .prices{grid-template-columns:1fr 1fr 1fr} }
+  .pcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:18px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px}
+  .pcard .plabel{font-size:13px;font-weight:700;color:var(--ink-soft)}
+  .pcard .pamt{font-family:"M PLUS Rounded 1c",sans-serif;font-weight:800;font-size:26px;
+    line-height:1.2;color:var(--ink)}
+  .pcard .pamt small{font-size:14px;font-weight:700;color:var(--ink-soft)}
+  .pcard .pnote{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+  .pcard.hi{border-color:var(--brand);border-width:2px}
+  .pcard .tag{align-self:flex-start;font-size:11px;font-weight:700;color:#fff;background:var(--brand);
+    border-radius:20px;padding:2px 9px;margin-bottom:2px}
+  .pcard .tag.g{background:var(--steel)}
+  .totnote{margin-top:12px;font-size:13.5px;color:var(--ink-soft);
+    background:var(--good-wash);border-left:3px solid var(--good);border-radius:8px;padding:10px 13px}
+  .totnote b{color:var(--ink)}
+
+  /* 導入の流れ */
+  .lead2{font-size:14px;color:var(--ink-soft);margin:0 2px 14px}
+  .flow{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:600px){ .flow{grid-template-columns:1fr 1fr} }
+  .fcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:16px 16px;box-shadow:var(--shadow)}
+  .fcard h3{font-size:14.5px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+  .fcard h3 .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+    font-size:15px;flex:none}
+  .ic.me{background:var(--steel-wash)}
+  .ic.you{background:var(--brand-wash)}
+  .fcard ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-soft);line-height:1.75}
+  .fcard.wide{grid-column:1/-1;background:var(--brand-wash);border-color:var(--brand)}
+  .fcard.wide h3{color:var(--brand-ink);font-size:15.5px}
+  .fcard.wide p{margin:0;font-size:14px;color:var(--ink)}
+  .fcard.wide .big{font-family:"M PLUS Rounded 1c",sans-serif;font-weight:800;font-size:17px;color:var(--brand-ink)}
+
+  /* 安心 */
+  .re{display:grid;grid-template-columns:1fr;gap:9px}
+  @media(min-width:600px){ .re{grid-template-columns:1fr 1fr} }
+  .ritem{display:flex;gap:10px;align-items:flex-start;background:var(--surface);
+    border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .ritem .ck{color:var(--good);font-weight:800;flex:none}
+  .ritem p{margin:0;font-size:13.5px}
+  .ritem p b{font-weight:700}
+  .ritem p span{display:block;color:var(--ink-faint);font-size:12px;margin-top:1px}
+
+  footer{margin-top:32px;text-align:center;font-size:12.5px;color:var(--ink-faint);
+    border-top:1px solid var(--line);padding-top:18px}
+  @media print{ body{background:#fff} .hero,.pcard,.fcard,.ritem{box-shadow:none} }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <span class="eyebrow">板金塗装・整備工場向け</span>
+    <h1>AI工程ボード</h1>
+    <p class="lead">ホワイトボードの納車・工程管理を、そのまま全社員のスマホへ。</p>
+    <p class="flowline">
+      現場から<b>LINEでひとこと</b>「◯◯さんの△△、塗装終わった」
+      → <b>表が自動で動く</b> → 外出先でも<b>全員のスマホで今の状況が見られる</b>。
+      さらに「納期が近いのに遅れてる」「同じ日に納車が重なってる」を<b>先回りで通知</b>。
+    </p>
+  </header>
+
+  <section>
+    <div class="sec-head"><span class="num">¥</span><h2>ご料金</h2></div>
+    <div class="prices">
+      <div class="pcard hi">
+        <span class="tag">最初の1回だけ</span>
+        <span class="plabel">初期導入費</span>
+        <span class="pamt">¥50,000<small> 〜</small></span>
+        <span class="pnote">現地訪問・設定・使い方レクチャー・交通費まですべて込み。</span>
+      </div>
+      <div class="pcard">
+        <span class="tag g">毎月</span>
+        <span class="plabel">月額サポート</span>
+        <span class="pamt">¥5,000</span>
+        <span class="pnote">保守・調整・質問対応。合わなければいつでも止められます。</span>
+      </div>
+      <div class="pcard">
+        <span class="tag g">毎月・実費</span>
+        <span class="plabel">AI等の利用料</span>
+        <span class="pamt">約¥1,000<small>〜3,000</small></span>
+        <span class="pnote">御社名義で直接・使った分だけ。LINEは無料〜。規模により変動。</span>
+      </div>
+    </div>
+    <p class="totnote">
+      ✓ ぜんぶ合わせても <b>月1万円ほどで1工場を回せます</b>。まずは小さく始めて、良ければ続ける形でOKです。<span style="color:var(--ink-faint)">（表示は税別）</span>
+    </p>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">2</span><h2>導入の流れ</h2></div>
+    <p class="lead2">むずかしい設定は<b>すべてこちらで代行</b>します。御社の手間はほぼありません。</p>
+    <div class="flow">
+      <div class="fcard">
+        <h3><span class="ic you">🛠️</span>こちらがやること</h3>
+        <ul>
+          <li>ボードとAIの構築（訪問前にご用意）</li>
+          <li>LINE・共有表（スプレッドシート）の設定</li>
+          <li>動作確認・毎朝の通知設定</li>
+        </ul>
+      </div>
+      <div class="fcard">
+        <h3><span class="ic me">✍️</span>御社にお願いすること</h3>
+        <ul>
+          <li>お支払いカードの登録（最初に1回だけ）</li>
+          <li>訪問時に一緒に最終確認（30〜60分ほど）</li>
+          <li>あとはお任せでOK</li>
+        </ul>
+      </div>
+      <div class="fcard wide">
+        <h3><span class="ic" style="background:#06c75522">📱</span>現場のみなさんは、これだけ</h3>
+        <p class="big">QRコードを読む → いつものLINEで喋る（打つ）だけ。</p>
+        <p style="margin-top:4px">新しいアプリは一切入れません。表はスマホのブラウザでいつでも見られます。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="num">3</span><h2>ご安心ください</h2></div>
+    <div class="re">
+      <div class="ritem"><span class="ck">✓</span><p><b>会社のPCがWindowsでもOK</b><span>使うのはスマホとブラウザだけ。パソコンの種類は関係ありません。</span></p></div>
+      <div class="ritem"><span class="ck">✓</span><p><b>新しい操作を覚えなくていい</b><span>いつものLINEで話しかけるだけ。機械が苦手でも大丈夫。</span></p></div>
+      <div class="ritem"><span class="ck">✓</span><p><b>合わなければいつでも中止</b><span>長期契約の縛りなし。まず試せます。</span></p></div>
+      <div class="ritem"><span class="ck">✓</span><p><b>まず小さく試せる</b><span>数台・一部の工程から始めて、良ければ全体へ。</span></p></div>
+    </div>
+  </section>
+
+  <footer>
+    お見積り・ご相談はお気軽に。内容・規模に合わせて調整いたします。
+  </footer>
+</div>
