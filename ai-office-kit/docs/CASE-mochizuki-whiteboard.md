@@ -47,6 +47,7 @@
   - 工程名は `config/board.config.json` の `stages` に集約＝**訪問で実際の呼び方が分かったら差し替えるだけ**。
   - セルフテスト（鍵不要）：`node scripts/selftest.mjs`（現状 全14件パス）。
 - 立ち上げ方針（オーナー決定）：**①まずMac＋cloudflaredトンネル ②まずオーナー名義**で動かす → OKなら本番はクラウド＋クライアント名義へ。
+- ★**クライアントのPCはWindows**（2026-09-04判明）。ただしBot本体はクライアントPCで動かさない＝**本番はクラウド一択**。クライアントが触るのはLINE（スマホ）とGoogleスプレッドシート（ブラウザ）だけなのでOS無関係。今日のコード・鍵・シート・LINE設定は全部クラウドへそのまま流用可（変わるのは"動かす場所"のみ）。
   - 手順書＝`products/mochizuki-board-bot/SETUP.md`（Google/LINE/Anthropicの取得から検証・テスト・通知cron・本番移行まで）。
 - ✅ **2026-09-04：本番Bot 実機で開通（E2E成功）**。オーナー名義・Mac＋cloudflaredで、
   LINE「田中さんのハイエース塗装終わった」→ Claude解釈 → Googleスプレッドシートの工程が塗装→組付けに自動更新 → LINE返信、まで確認。
