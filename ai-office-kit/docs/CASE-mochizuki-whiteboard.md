@@ -48,7 +48,13 @@
   - セルフテスト（鍵不要）：`node scripts/selftest.mjs`（現状 全14件パス）。
 - 立ち上げ方針（オーナー決定）：**①まずMac＋cloudflaredトンネル ②まずオーナー名義**で動かす → OKなら本番はクラウド＋クライアント名義へ。
   - 手順書＝`products/mochizuki-board-bot/SETUP.md`（Google/LINE/Anthropicの取得から検証・テスト・通知cron・本番移行まで）。
-- ⏳ 次：オーナーがSETUP.md通りに鍵を発行して1:1テスト → 来週の訪問で社長のスマホから実演。
+- ✅ **2026-09-04：本番Bot 実機で開通（E2E成功）**。オーナー名義・Mac＋cloudflaredで、
+  LINE「田中さんのハイエース塗装終わった」→ Claude解釈 → Googleスプレッドシートの工程が塗装→組付けに自動更新 → LINE返信、まで確認。
+  - 使用アカウント（オーナー名義・テスト）：LINE公式「モチヅキオートボディー様 工程ボード」／GCPプロジェクト job-scout のサービスアカウント board-bot／Anthropic Haiku。
+  - スプレッドシート＝「望月オート様 工程ボード」（タブ名 工程ボード、サンプル7台投入済み）。
+  - 起動方法：`node src/server.mjs` ＋ `cloudflared tunnel --url http://localhost:18790`（クイックトンネルのURLは起動毎に変わる＝再起動時はLINE Webhook URLの貼り直しが必要）。
+  - 設定の勘所（ハマった点）：GOOGLE_KEY_FILE方式に改良／LINEは「応答メッセージ=オフ・Webhook利用=オン」が必須。
+- ⏳ 次：①先回り通知(bin/notify.mjs)のテスト（NOTIFY_TARGET設定）②表記ゆれ・状況確認の追加テスト ③来週の訪問で社長のスマホから実演 ④本番移行（固定URL・クライアント名義）。
 
 ## 守ること（盛らない）
 - 写真からの見積もりは**「目安（正確は現車確認後）」**まで。保険は**「文面作成の支援」**であって保険会社と自動連携する話ではない。**精度・自動連携を約束しない。**
