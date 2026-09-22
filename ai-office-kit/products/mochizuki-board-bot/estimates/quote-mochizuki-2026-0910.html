@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 14mm 15mm; }
+  * { box-sizing: border-box; }
+  html,body { margin:0; padding:0; }
+  body{
+    font-family:"IPAPGothic","IPAGothic",sans-serif;
+    color:#1c2430; font-size:11.2px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .doc{ width:100%; }
+
+  /* ヘッダー */
+  .title{ text-align:center; font-size:27px; font-weight:bold; letter-spacing:.6em;
+    padding-left:.6em; margin:2px 0 20px; }
+  .head{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; }
+  .to{ flex:1; }
+  .to .name{ font-size:17px; font-weight:bold; border-bottom:2px solid #1c2430;
+    padding-bottom:5px; display:inline-block; min-width:230px; }
+  .to .note{ margin-top:14px; font-size:11px; color:#3a4656; }
+  .meta{ width:210px; font-size:10.5px; color:#3a4656; }
+  .meta .row{ display:flex; justify-content:space-between; padding:1.5px 0; }
+  .meta .row .k{ color:#6b7686; }
+
+  .issuer{ margin-top:14px; border:1px solid #d3dae3; border-radius:6px; padding:11px 13px;
+    position:relative; }
+  .issuer .co{ font-size:13.5px; font-weight:bold; }
+  .issuer .co small{ font-size:10px; font-weight:normal; color:#6b7686; letter-spacing:.08em; }
+  .issuer .line{ font-size:10.5px; color:#3a4656; margin-top:2px; }
+  .issuer .blank{ color:#9aa4b1; }
+  .stamp{ position:absolute; right:12px; top:12px; width:52px; height:52px;
+    border:1px dashed #c2cbd6; border-radius:5px; color:#b3bcc7; font-size:9px;
+    display:flex; align-items:center; justify-content:center; text-align:center; }
+
+  /* 金額サマリ */
+  .sum{ margin:20px 0 4px; display:flex; align-items:stretch; }
+  .sum .lbl{ background:#1c2430; color:#fff; font-weight:bold; font-size:13px;
+    padding:12px 18px; display:flex; align-items:center; border-radius:6px 0 0 6px; letter-spacing:.05em;}
+  .sum .amt{ flex:1; border:2px solid #1c2430; border-left:none; border-radius:0 6px 6px 0;
+    font-size:22px; font-weight:bold; text-align:right; padding:8px 18px;
+    display:flex; align-items:center; justify-content:flex-end; }
+  .sum .amt small{ font-size:12px; font-weight:normal; margin-left:6px; color:#6b7686; }
+  .subject{ margin:2px 0 0; font-size:11px; color:#3a4656; }
+  .subject b{ color:#1c2430; }
+
+  /* 明細テーブル */
+  table{ width:100%; border-collapse:collapse; margin-top:16px; }
+  th,td{ border:1px solid #d3dae3; padding:8px 10px; }
+  th{ background:#eef2f6; font-weight:bold; font-size:10.5px; color:#3a4656; text-align:center; }
+  td.desc{ font-size:11px; }
+  td.desc .s{ display:block; color:#6b7686; font-size:9.8px; margin-top:2px; }
+  td.num{ text-align:center; white-space:nowrap; width:44px; }
+  td.unit{ text-align:right; white-space:nowrap; width:96px; }
+  td.amt{ text-align:right; white-space:nowrap; width:104px; font-weight:bold; }
+  tr.tot td{ background:#f7f9fb; }
+  tr.tot td.lbl{ text-align:right; font-weight:bold; color:#3a4656; }
+  tr.grand td.lbl{ font-size:12px; color:#1c2430; }
+  tr.grand td.amt{ font-size:14px; }
+  .empty td{ height:20px; }
+
+  /* 月額 参考 */
+  .h2{ margin:20px 0 6px; font-size:12px; font-weight:bold; color:#1c2430;
+    border-left:4px solid #1c2430; padding-left:8px; }
+  table.sub th, table.sub td{ padding:7px 10px; }
+  table.sub td.amt{ font-weight:bold; }
+
+  /* 備考 */
+  .remarks{ margin-top:18px; border:1px solid #d3dae3; border-radius:6px; padding:12px 14px; }
+  .remarks .rt{ font-weight:bold; font-size:10.5px; color:#3a4656; margin-bottom:5px; }
+  .remarks ul{ margin:0; padding-left:1.2em; font-size:10.3px; color:#3a4656; line-height:1.85; }
+  .foot{ margin-top:22px; text-align:center; font-size:10px; color:#8a93a0; }
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <div class="title">御見積書</div>
+
+  <div class="head">
+    <div class="to">
+      <div class="name">望月オート 御中</div>
+      <div class="note">下記のとおりお見積り申し上げます。ご検討のほどよろしくお願いいたします。</div>
+    </div>
+    <div class="meta">
+      <div class="row"><span class="k">見積番号</span><span>No. 2026-0910-01</span></div>
+      <div class="row"><span class="k">発行日</span><span>2026年9月10日</span></div>
+      <div class="row"><span class="k">有効期限</span><span>発行日より30日間</span></div>
+
+      <div class="issuer">
+        <div class="stamp">印</div>
+        <div class="co">ルーセント <small>LUCENT</small></div>
+        <div class="line">代表　飯岡 卓次郎</div>
+        <div class="line blank">住所：＿＿＿＿＿＿＿＿＿＿＿＿</div>
+        <div class="line blank">TEL：＿＿＿＿＿＿＿＿＿＿</div>
+        <div class="line">Mail：yamadatakujiro@gmail.com</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sum">
+    <div class="lbl">御見積金額</div>
+    <div class="amt">¥55,000<small>（税込）</small></div>
+  </div>
+  <p class="subject"><b>件名：</b>AI工程ボード 導入一式（ホワイトボードの納車・工程管理をスマホで全社員共有）</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:auto">品目・内容</th>
+        <th>数量</th>
+        <th>単価</th>
+        <th>金額</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="desc">AI工程ボード 初期導入費
+          <span class="s">現地訪問・初期設定・共有ボード（スプレッドシート）／LINE連携・使い方レクチャー・交通費まですべて込み</span>
+        </td>
+        <td class="num">1式</td>
+        <td class="unit">¥50,000</td>
+        <td class="amt">¥50,000</td>
+      </tr>
+      <tr class="empty"><td></td><td></td><td></td><td></td></tr>
+      <tr class="empty"><td></td><td></td><td></td><td></td></tr>
+      <tr class="tot"><td colspan="3" class="lbl">小計</td><td class="amt">¥50,000</td></tr>
+      <tr class="tot"><td colspan="3" class="lbl">消費税（10%）</td><td class="amt">¥5,000</td></tr>
+      <tr class="tot grand"><td colspan="3" class="lbl">合計金額</td><td class="amt">¥55,000</td></tr>
+    </tbody>
+  </table>
+
+  <div class="h2">月額の継続費用（ご参考／翌月以降）</div>
+  <table class="sub">
+    <thead>
+      <tr>
+        <th style="width:auto">品目・内容</th>
+        <th>金額（月額）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="desc">月額サポート費
+          <span class="s">保守・調整・質問対応。合わなければいつでも中止できます。</span>
+        </td>
+        <td class="amt">¥5,500<span style="font-weight:normal;color:#6b7686;font-size:9.5px">（税込）</span></td>
+      </tr>
+      <tr>
+        <td class="desc">AI等の利用料（実費）
+          <span class="s">御社名義で直接・使った分だけ。LINEは無料〜。規模により変動。</span>
+        </td>
+        <td class="amt">約¥1,000〜3,000<span style="font-weight:normal;color:#6b7686;font-size:9.5px">／目安</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="remarks">
+    <div class="rt">備考</div>
+    <ul>
+      <li>本見積は<b>初期導入費（1回のみ）</b>です。翌月以降は上記の月額サポート費＋AI等の実費がかかります。</li>
+      <li>現地訪問の<b>交通費は初期導入費に含みます</b>（追加請求はありません）。</li>
+      <li>お客様側の準備は「LINEの友だち追加」と「共有ボードの閲覧」のみ。パソコンの種類（Windows/Mac）は問いません。</li>
+      <li>長期契約の縛りはありません。合わない場合はいつでも中止いただけます。</li>
+      <li>金額はすべて日本円・税込表示です。</li>
+    </ul>
+  </div>
+
+  <div class="foot">ルーセント（LUCENT）　お見積り・ご相談はお気軽に</div>
+
+</div>
+</body>
+</html>
