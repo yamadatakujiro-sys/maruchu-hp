@@ -63,7 +63,8 @@
 - ⚠️**黒い影を重ねて極太の白文字＋黄色い帯**は、今どこでも見る広告テンプレ。**やらない。**
 - 3回目：写真主役＋日本語の一言（A案）→ デザインはA案でOK。ただし**コピーが「ダサい・弱い」**。
 - ✅4回目：**英語まじりのブランド型（オーナー選択）**＝`PARTS WANTED.`＋小さく「高年式の外装パーツ、買い取ります。」＋`LUCENT / SAITAMA, JAPAN`。
-  - 英字フォントは**AIデザインで使われすぎのもの（Bebas Neue・Montserrat等）を避ける**。A1＝Anton（推奨）／A2＝Big Shoulders。
+  - 英字フォントは**AIデザインで使われすぎのもの（Bebas Neue・Montserrat等）を避ける**。→ **A1＝Anton で確定**（A2 Big Shoulders は不採用）。
+  - ✅5回目：白だけだと「インパクトが足りない」（オーナー）→ **「WANTED.」の文字だけに差し色**（帯・飾りは付けない）。赤／黄／オレンジの3色で比較 → `buy-parts-A1-red/yellow/orange.png`。
 
 ### ✍️コピーでやってはいけないこと（オーナー指摘・ライター／アナリスト分析）
 - ❌**お願い口調**（「捨てる前に声かけてください」）＝下手に出ていてダサい。実際はタツヤが「欲しい」と取りに行く側。
@@ -73,10 +74,10 @@
 
 | ファイル | 用途 |
 |---|---|
-| `buy-parts.html` | サムネ本体（A1・A2、1080×1350） |
+| `buy-parts.html` | サムネ本体（A1の色違い3枚、1080×1350） |
 | `buy-photo.jpg` | オーナー提供の倉庫写真（部品棚の通路） |
 | `fetch-fonts.sh` | 使う文字だけをGoogle Fontsから切り出して `fonts/` に保存（**文言を変えたら再実行**） |
-| `render-buy.cjs` | 書き出し → `buy-parts-A1.png` / `buy-parts-A2.png` |
+| `render-buy.cjs` | 書き出し → `buy-parts-A1-red.png` / `-yellow.png` / `-orange.png` |
 
 ```bash
 cd ~/maruchu-hp/ai-office-kit/assets/lucent-ai-series

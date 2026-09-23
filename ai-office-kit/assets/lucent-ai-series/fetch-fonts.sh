@@ -12,4 +12,3 @@ get(){ # $1=family(:wght付き可) $2=出力名
 }
 get "Zen+Kaku+Gothic+New:wght@700" zkg-700.ttf
 get "Anton" anton.ttf
-get "Big+Shoulders:wght@900" bigshoulders-900.ttf
