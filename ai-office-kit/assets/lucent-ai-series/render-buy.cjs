@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
   await p.goto('file://' + dir + 'buy-parts.html');
   await p.evaluate(() => document.fonts.ready);
   await p.waitForTimeout(500);
-  const names = ['A', 'B'];
+  const names = ['A1', 'A2'];
   const slides = await p.$$('.slide');
   for (let i = 0; i < slides.length; i++) {
     await slides[i].screenshot({ path: dir + 'buy-parts-' + names[i] + '.png' });

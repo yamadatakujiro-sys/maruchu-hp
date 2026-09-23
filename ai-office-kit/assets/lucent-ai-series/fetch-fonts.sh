@@ -4,12 +4,12 @@
 set -e
 cd "$(dirname "$0")"
 mkdir -p fonts
-# HTMLのタグを除いた本文の文字を集める
-TEXT=$(sed -e 's/<[^>]*>//g' buy-parts.html | grep -v '^\s*$' | tr -d '\n' | python3 -c "import sys,urllib.parse;s=sys.stdin.read();print(urllib.parse.quote(''.join(sorted(set(s)))))")
-get(){ # $1=family $2=weight $3=出力名
-  url=$(curl -sS "https://fonts.googleapis.com/css2?family=$1:wght@$2&text=$TEXT" | grep -o 'https://[^)]*' | head -1)
-  curl -sS -o "fonts/$3" "$url"; echo "fonts/$3"
+# HTMLのタグを除いた本文の文字を集める（英字は大文字・小文字の両方を入れる）
+TEXT=$(sed -e 's/<[^>]*>//g' buy-parts.html | grep -v '^\s*$' | tr -d '\n' | python3 -c "import sys,urllib.parse;s=sys.stdin.read();s+=s.upper()+s.lower();print(urllib.parse.quote(''.join(sorted(set(s)))))")
+get(){ # $1=family(:wght付き可) $2=出力名
+  url=$(curl -sS "https://fonts.googleapis.com/css2?family=$1&text=$TEXT" | grep -o 'https://[^)]*' | head -1)
+  curl -sS -o "fonts/$2" "$url"; echo "fonts/$2"
 }
-get "Zen+Kaku+Gothic+New" 700 zkg-700.ttf
-get "Zen+Kaku+Gothic+New" 900 zkg-900.ttf
-get "Zen+Old+Mincho" 900 zom-900.ttf
+get "Zen+Kaku+Gothic+New:wght@700" zkg-700.ttf
+get "Anton" anton.ttf
+get "Big+Shoulders:wght@900" bigshoulders-900.ttf

@@ -2,50 +2,48 @@
 <html lang="ja"><head><meta charset="utf-8"><title>Lucent 部品買取サムネ</title><style>
   /* Lucent（@lucent_autoparts）部品買取の告知サムネ 1080×1350（4:5）
      ⚠️買取の実態＝鈑金屋が交換で外した部品は基本捨てる → その前に声をかけて取りに行く
-     ⚠️「余剰在庫」「処分予定」「車の買取はしていません」は書かない（README参照）
-     ⚠️広告テンプレ感を消す：黒グラデ＋極太＋黄色帯はやめ、写真を主役にして文字は静かに
+     ⚠️「割れていても」「余剰在庫」「処分予定」「車の買取はしていません」は書かない（README参照）
+     ⚠️方向＝英語まじりのブランド型（オーナー選択）。写真を主役に、左下に英字を大きく
      フォントは fonts/ に今回の文字だけ切り出して置いてある（fetch-fonts.sh で作り直せる） */
   @font-face{font-family:'ZKG';font-weight:700;src:url('fonts/zkg-700.ttf');}
-  @font-face{font-family:'ZKG';font-weight:900;src:url('fonts/zkg-900.ttf');}
-  @font-face{font-family:'ZOM';font-weight:900;src:url('fonts/zom-900.ttf');}
+  @font-face{font-family:'Anton';src:url('fonts/anton.ttf');}
+  @font-face{font-family:'BigSh';font-weight:900;src:url('fonts/bigshoulders-900.ttf');}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
   body{background:#111;}
-  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;}
-  .photo{background:url('buy-photo.jpg') center 40%/cover no-repeat;}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;color:#fff;}
+  .photo{position:absolute;inset:0;background:url('buy-photo.jpg') center 40%/cover no-repeat;}
+  .shade{position:absolute;left:0;right:0;bottom:0;height:52%;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.5) 50%,rgba(0,0,0,.7) 100%);}
+  .txt{position:absolute;left:66px;right:66px;bottom:62px;}
+  .en{text-transform:uppercase;line-height:.9;}
+  .jp{font-family:'ZKG',sans-serif;font-weight:700;font-size:32px;margin-top:30px;letter-spacing:.04em;}
+  .sign{display:flex;justify-content:space-between;margin-top:34px;padding-top:20px;
+    border-top:2px solid rgba(255,255,255,.5);font-size:26px;letter-spacing:.18em;color:rgba(255,255,255,.85);}
 
-  /* ── A案：写真ほぼそのまま＋左下に静かな一言 ── */
-  .a .photo{position:absolute;inset:0;}
-  .a .shade{position:absolute;left:0;right:0;bottom:0;height:46%;
-    background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.55) 55%,rgba(0,0,0,.72) 100%);}
-  .a .txt{position:absolute;left:68px;right:68px;bottom:64px;color:#fff;font-family:'ZKG',sans-serif;}
-  .a h1{font-weight:900;font-size:66px;line-height:1.38;letter-spacing:.01em;}
-  .a p{font-weight:700;font-size:30px;line-height:1.7;margin-top:22px;color:rgba(255,255,255,.88);}
-  .a .sign{margin-top:38px;font-weight:700;font-size:22px;letter-spacing:.24em;color:rgba(255,255,255,.75);}
-
-  /* ── B案：白フチのプリント風（写真＋下に明朝の一言） ── */
-  .b{background:#f2efe8;color:#1b1a18;}
-  .b .photo{position:absolute;left:56px;right:56px;top:56px;height:930px;}
-  .b .txt{position:absolute;left:64px;right:64px;top:1030px;}
-  .b h1{font-family:'ZOM',serif;font-weight:900;font-size:56px;line-height:1.45;letter-spacing:.02em;}
-  .b .row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px;}
-  .b p{font-family:'ZKG',sans-serif;font-weight:700;font-size:25px;color:#6d6860;}
-  .b .sign{font-family:'ZKG',sans-serif;font-weight:900;font-size:22px;letter-spacing:.3em;}
+  /* A1：Anton */
+  .a1 .en,.a1 .sign{font-family:'Anton',sans-serif;}
+  .a1 .en{font-size:230px;letter-spacing:.005em;}
+  /* A2：Big Shoulders */
+  .a2 .en,.a2 .sign{font-family:'BigSh',sans-serif;font-weight:900;}
+  .a2 .en{font-size:250px;letter-spacing:.01em;line-height:.86;}
+  .a2 .sign{font-size:30px;}
 </style></head><body>
 
-<!-- A案 -->
-<div class="slide a"><div class="photo"></div><div class="shade"></div>
+<!-- A1 -->
+<div class="slide a1"><div class="photo"></div><div class="shade"></div>
   <div class="txt">
-    <h1>外した部品、<br>捨てる前に声かけてください。</h1>
-    <p>割れていても、直して使えるものがあります。</p>
-    <div class="sign">LUCENT　高年式外装パーツ・埼玉</div>
+    <div class="en">Parts<br>Wanted.</div>
+    <div class="jp">高年式の外装パーツ、買い取ります。</div>
+    <div class="sign"><span>LUCENT</span><span>SAITAMA, JAPAN</span></div>
   </div>
 </div>
 
-<!-- B案 -->
-<div class="slide b"><div class="photo"></div>
+<!-- A2 -->
+<div class="slide a2"><div class="photo"></div><div class="shade"></div>
   <div class="txt">
-    <h1>外した部品、<br>捨てる前に声かけてください。</h1>
-    <div class="row"><p>割れていても、直して使えるものがあります。</p><div class="sign">LUCENT</div></div>
+    <div class="en">Parts<br>Wanted.</div>
+    <div class="jp">高年式の外装パーツ、買い取ります。</div>
+    <div class="sign"><span>LUCENT</span><span>SAITAMA, JAPAN</span></div>
   </div>
 </div>
 
