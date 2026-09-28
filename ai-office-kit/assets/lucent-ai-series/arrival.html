@@ -10,8 +10,11 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
   body{background:#111;}
   .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;color:#fff;}
-  .photo{position:absolute;inset:0;background:url('arrival-photo.webp') 62% center/cover no-repeat;}
-  .shade{position:absolute;left:0;right:0;bottom:0;height:52%;
+  /* 写真は1530×1466のほぼ正方形 → 4:5に敷くと横が約330px余る。x=80%で手前ライトのレンズ〜ベゼルを右端で切らずに収め、
+     奥のもう1灯のレンズも左上に残す（どちらのレンズも英字より上＝文字で隠れない） */
+  .photo{position:absolute;inset:0;background:url('arrival-photo.webp') 80% center/cover no-repeat;}
+  /* 影は買取告知と同じ薄さ（最大.72）。明るい棚板がJUSTの裏を横切るので、始まりだけ52%→60%に上げてJUSTの上半分にも少し効かせる */
+  .shade{position:absolute;left:0;right:0;bottom:0;height:60%;
     background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.5) 50%,rgba(0,0,0,.72) 100%);}
   .txt{position:absolute;left:66px;right:66px;bottom:62px;}
   .en{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.9;font-size:230px;letter-spacing:.005em;}
