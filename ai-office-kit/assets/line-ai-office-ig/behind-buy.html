@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>買取告知の裏側</title><style>
+  /* @line_ai_office インスタ用カルーセル「買取告知の裏側」1080×1350（4:5）×5枚
+     ⚠️見た目＝紙の原稿を赤ペンで直す「編集」。紺グラデ＋絵文字＋角丸カード（instagram-launch）は
+       オーナー判定で「AI感」なので使わない。LINEグリーンも使わない（assets/README.md）
+     ⚠️成果は書かない（元の告知は反応0件）。文言はREADMEの確定版と合わせる
+     フォントは fonts/ に今回の文字だけ切り出して置いてある（文言を変えたら fetch-fonts.sh を再実行） */
+  @font-face{font-family:'ZKG';font-weight:700;src:url('fonts/zkg-700.ttf');}
+  @font-face{font-family:'ZKG';font-weight:500;src:url('fonts/zkg-500.ttf');}
+  @font-face{font-family:'Klee';font-weight:600;src:url('fonts/klee-600.ttf');}
+  @font-face{font-family:'Anton';src:url('fonts/anton.ttf');}
+  :root{--ink:#13233b;--paper:#f3efe6;--pen:#d23c26;--gray:#8a8f98;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  body{background:#222;}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;
+    color:var(--ink);font-family:'ZKG',sans-serif;font-weight:700;background:var(--paper);}
+  /* 紙のざらつき（ごく薄く） */
+  .slide::before{content:"";position:absolute;inset:0;opacity:.35;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .4 0 0 0 0 .3 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .in{position:absolute;inset:70px 74px 64px;display:flex;flex-direction:column;}
+
+  /* 上下の罫（書類の体裁） */
+  .head{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:16px;
+    border-bottom:3px solid var(--ink);font-family:'Anton',sans-serif;font-weight:400;font-size:28px;letter-spacing:.14em;}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;padding-top:18px;
+    border-top:1.5px solid rgba(19,35,59,.35);font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:.12em;color:rgba(19,35,59,.7);}
+
+  /* 赤ペン */
+  .pen{font-family:'Klee',sans-serif;font-weight:600;color:var(--pen);}
+  .circ{position:relative;display:inline-block;padding:0 .14em;margin:0 .04em;}
+  .circ svg{position:absolute;left:-3%;top:-16%;width:110%;height:132%;overflow:visible;}
+  .circ path,.uline path{fill:none;stroke:var(--pen);stroke-width:5;stroke-linecap:round;}
+  /* 手で引いた取り消し線 */
+  .del{position:relative;display:inline;color:var(--gray);}
+  .del::after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:22px;transform:translateY(-50%);
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 22' preserveAspectRatio='none'%3E%3Cpath d='M2 13 C80 7 150 15 230 9 S350 12 398 8' fill='none' stroke='%23d23c26' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat;}
+
+  .mid{margin:auto 0;}
+  .mid + .foot{margin-top:0;}
+  /* 1枚目 */
+  .cover h1{font-size:122px;line-height:1.24;letter-spacing:.01em;}
+  .cover .sub{font-size:36px;margin-top:52px;color:rgba(19,35,59,.75);letter-spacing:.04em;}
+
+  /* 2枚目 */
+  .lbl{font-size:30px;letter-spacing:.12em;}
+  .lbl b{color:var(--pen);}
+  .memo{margin-top:30px;padding:44px 0 44px 42px;border-left:10px solid var(--ink);font-size:64px;line-height:1.45;}
+  .flow{margin-top:70px;font-size:36px;line-height:1.7;}
+  .flow .ar{font-family:'Anton',sans-serif;font-weight:400;color:var(--pen);margin:0 14px;}
+  .flow small{display:block;font-size:30px;font-weight:500;color:rgba(19,35,59,.7);}
+  .by{margin-top:60px;font-size:46px;transform:rotate(-2deg);transform-origin:left;}
+
+  /* 3枚目 */
+  h2{font-size:62px;line-height:1.35;margin-top:56px;}
+  .fix{margin-top:52px;display:flex;flex-direction:column;gap:46px;}
+  .fix .t{font-size:24px;font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.16em;color:var(--gray);}
+  .fix .d{font-size:44px;font-weight:500;line-height:1.35;margin-top:8px;}
+  .fix .r{font-size:44px;margin-top:10px;padding-left:4px;}
+
+  /* 4枚目 */
+  .shot{position:relative;margin:auto 0 auto 30px;width:580px;transform:rotate(-2.2deg);}
+  .shot img{display:block;width:100%;border:16px solid #fff;box-shadow:0 18px 40px rgba(19,35,59,.28),0 2px 6px rgba(19,35,59,.2);}
+  .shot .memo2{position:absolute;right:-320px;bottom:150px;transform:rotate(4deg);font-size:38px;line-height:1.4;white-space:nowrap;}
+  .shot .memo2 svg{display:block;width:120px;height:70px;margin:0 0 8px -50px;overflow:visible;}
+
+  /* 5枚目 */
+  .end h1{font-size:96px;line-height:1.3;}
+  .end .p{font-size:38px;line-height:1.75;margin-top:66px;font-weight:500;}
+  .end .p b{font-weight:700;}
+  .end .cta{font-size:44px;margin-top:62px;transform:rotate(-2deg);transform-origin:left;}
+</style></head><body>
+
+<!-- 1: 表紙 -->
+<div class="slide cover"><div class="in">
+  <div class="head"><span>BEHIND THE POST</span><span>01 / 05</span></div>
+  <div class="mid"><h1>AIに書かせた<br>買取告知、<br>最後は<span class="circ">自分で<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M8 58 C4 20 60 6 88 22 C104 34 98 78 60 90 C30 98 6 84 4 60 C3 46 16 30 32 24"/></svg></span><br>直した。</h1>
+  <div class="sub">部品屋20年、本業の告知の裏側</div></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>SWIPE</span></div>
+</div></div>
+
+<!-- 2: 頼んだこと -->
+<div class="slide"><div class="in">
+  <div class="head"><span>BEHIND THE POST</span><span>02 / 05</span></div>
+  <div class="mid"><div class="lbl">頼んだこと</div>
+  <div class="memo">連休明けに、鈑金屋さんへ<br>「買取やってます」を<br>思い出してもらう告知</div>
+  <div class="flow">ライター<span class="ar">→</span>SNS担当・アナリスト<small>書いて、校閲して、仕上げるところまで</small></div>
+  <div class="by pen">書いたのは、うちのAI社員</div></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>LUCENT / SAITAMA</span></div>
+</div></div>
+
+<!-- 3: 直した言葉 -->
+<div class="slide"><div class="in">
+  <div class="head"><span>BEHIND THE POST</span><span>03 / 05</span></div>
+  <h2>現場を知らない言葉が、<br>出てきた。</h2>
+  <div class="fix">
+    <div><div class="t">AI DRAFT</div><div class="d"><span class="del">外し取り・余剰在庫・処分予定でも</span></div><div class="r pen">→ 鈑金屋に余剰在庫は無い</div></div>
+    <div><div class="t">AI DRAFT</div><div class="d"><span class="del">割れていても直して使えるものがあります</span></div><div class="r pen">→ 何でも買うと思われる</div></div>
+    <div><div class="t">AI DRAFT</div><div class="d"><span class="del">捨てる前に声かけてください</span></div><div class="r pen">→ 取りに行くのは、こっち</div></div>
+  </div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>RED PEN BY TATSU</span></div>
+</div></div>
+
+<!-- 4: 完成品 -->
+<div class="slide"><div class="in">
+  <div class="head"><span>BEHIND THE POST</span><span>04 / 05</span></div>
+  <h2>直して出したのが、これ。</h2>
+  <div class="shot"><img src="../lucent-ai-series/buy-parts-A1-orange.png" alt="">
+    <div class="memo2 pen"><svg viewBox="0 0 120 70"><path d="M110 8 C80 10 40 30 12 60 M12 60 L34 54 M12 60 L16 38" fill="none" stroke="#d23c26" stroke-width="4" stroke-linecap="round"/></svg>9/23<br>本業のインスタに<br>出した告知</div>
+  </div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>LUCENT / SAITAMA</span></div>
+</div></div>
+
+<!-- 5: 結論 -->
+<div class="slide end"><div class="in">
+  <div class="head"><span>BEHIND THE POST</span><span>05 / 05</span></div>
+  <div class="mid"><h1>下書きと型は、AI。<br>現場の言葉は、<span class="circ">人。<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M10 60 C2 24 56 2 86 20 C104 34 96 80 56 92 C26 100 4 82 6 58 C8 44 20 30 36 26"/></svg></span></h1>
+  <div class="p">直した言葉は記録して、次から書かせない。<br>AI社員を作るとき<b>「会社情報ファイル」</b>に<br>書き込んでおくのが、この部分です。</div>
+  <div class="cta pen">→ プロフィールのリンクから</div></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>AI OFFICE</span></div>
+</div></div>
+
+</body></html>
