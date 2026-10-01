@@ -254,3 +254,29 @@ table.tbl th { font-size: .78rem; color: var(--muted); font-weight: 500; }
   .paper { box-shadow: none; margin: 0; width: 210mm; min-height: 297mm; padding: 16mm 17mm; }
   .paper table.lines th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ===== 書類の種類タブ・送付・スマホ共有 ===== */
+.tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+.tabs a {
+  flex: 1; text-align: center; padding: 9px 12px; border-radius: 10px; background: #fff; border: 1px solid var(--line);
+  color: var(--text); text-decoration: none; font-size: .9rem; white-space: nowrap;
+}
+.tabs a span { margin-left: 6px; font-size: .75rem; color: var(--muted); }
+.tabs a.active { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 700; }
+.tabs a.active span { color: rgba(255,255,255,.75); }
+.badge.type-quote { background: #e8f0fe; color: #1d4ed8; }
+.badge.type-delivery { background: #f3e8ff; color: #7e22ce; }
+.send-panel { border: 2px solid var(--orange); }
+.send-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
+.send-box { background: #fbfcfe; border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.send-box h3 { margin: 0 0 6px; font-size: .95rem; }
+.sync-badge {
+  position: fixed; top: 64px; left: 50%; transform: translateX(-50%); z-index: 40;
+  background: var(--danger-soft); color: var(--danger); border: 1px solid #f3c4c6;
+  padding: 6px 14px; border-radius: 999px; font-size: .8rem; max-width: 92vw;
+}
+.login { max-width: 360px; margin: 40px auto; text-align: center; }
+.login input { text-align: center; font-size: 22px; letter-spacing: .3em; }
+.qr svg { width: 180px; height: 180px; display: block; }
+.paper .lead { margin: 18px 0 0; }
+@media (min-width: 640px) { .send-grid { grid-template-columns: 1fr 1fr; } }

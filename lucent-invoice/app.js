@@ -1,6 +1,7 @@
 /* ===== Lucent 請求書管理：アプリ本体 =====
- * データはブラウザ（localStorage）に保存する。サーバー不要。
- * 端末をまたぐ場合・バックアップは「設定 → バックアップ」のJSON書き出し／読み込みを使う。
+ * 起動用サーバー（tools/server.py）経由で開いた場合、データはMacの ~/.lucent-invoice/data.json に保存され、
+ * Mac・スマホで同じデータを使える（ブラウザの localStorage は表示を速くするための控え）。
+ * ファイルを直接開いた場合は、この端末のブラウザ内だけに保存される。
  */
 (function () {
   'use strict';
@@ -22,10 +23,15 @@
       taxRate: 10,
       rounding: 'floor', // floor=切り捨て / round=四捨五入 / ceil=切り上げ
       dueRule: 'nextMonthEnd', // nextMonthEnd=翌月末 / monthEnd=当月末 / none=記載なし
-      nextNumber: 346
+      nextNumber: 346,         // 請求書の次の番号
+      nextQuoteNumber: 1,      // 見積書（Q0001〜）
+      nextDeliveryNumber: 1,   // 納品書（D0001〜）
+      quoteNotes: 'お見積りの有効期限は発行日より30日間です。\nご不明な点がございましたらお気軽にお問い合わせください。',
+      deliveryNotes: '上記の通り納品いたしました。ご査収のほどよろしくお願い申し上げます。'
     },
     customers: [],
-    invoices: []
+    invoices: [],   // 請求書・見積書・納品書（docType で区別）
+    deleted: {}     // 削除した記録のID → 削除日時（他の端末にも削除を伝えるため）
   };
 
   // ---------- 保存・読み込み ----------
@@ -36,24 +42,113 @@
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
         const s = JSON.parse(raw);
-        return {
-          settings: Object.assign({}, DEFAULT_STATE.settings, s.settings || {}),
-          customers: s.customers || [],
-          invoices: s.invoices || []
-        };
+        return normalizeState(s);
       }
     } catch (e) { console.warn('読み込み失敗', e); }
     return JSON.parse(JSON.stringify(DEFAULT_STATE));
   }
 
+  function normalizeState(s) {
+    return {
+      settings: Object.assign({}, DEFAULT_STATE.settings, (s && s.settings) || {}),
+      customers: (s && s.customers) || [],
+      invoices: (s && s.invoices) || [],
+      deleted: (s && s.deleted) || {}
+    };
+  }
+
   function save() {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify(state));
-      return true;
     } catch (e) {
-      alert('保存に失敗しました。ブラウザの保存領域を確認してください。\n' + e.message);
-      return false;
+      if (!SERVER) { alert('保存に失敗しました。ブラウザの保存領域を確認してください。\n' + e.message); return false; }
     }
+    if (SERVER) schedulePush();
+    return true;
+  }
+  const nowIso = () => new Date().toISOString();
+  // 変更した記録に更新日時を付ける（端末間で新しい方を採用するため）
+  function touch(obj) { obj.updatedAt = nowIso(); return obj; }
+  function touchSettings() { state.settings.updatedAt = nowIso(); }
+  function markDeleted(id) { if (id) state.deleted[id] = nowIso(); }
+
+  // ---------- サーバー（Mac）とのデータ共有 ----------
+  const SERVER = location.protocol === 'http:' || location.protocol === 'https:';
+  let serverRev = 0, pushTimer = null, pushing = null, authRequired = false;
+  async function api(path, body) {
+    const res = await fetch(path, body === undefined ? { credentials: 'same-origin' } : {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-Lucent': '1' }, body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401 && data.error === 'login') { authRequired = true; renderLogin(data.pinSet); throw new Error('ログインが必要です'); }
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    return data;
+  }
+  function schedulePush() {
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushState, 300);
+  }
+  async function pushState() {
+    if (authRequired) return;
+    if (pushing) { schedulePush(); return; }
+    pushing = (async () => {
+      try {
+        const r = await api('/api/data', { state });
+        serverRev = r.rev;
+        adoptState(r.state);
+        setSyncBadge('');
+      } catch (e) {
+        setSyncBadge('⚠ Macに保存できていません（' + e.message + '）');
+      } finally { pushing = null; }
+    })();
+    return pushing;
+  }
+  async function pullState() {
+    if (authRequired || pushing || pushTimer && document.querySelector('#f')) return;
+    try {
+      const r = await api('/api/data');
+      if (r.rev !== serverRev && r.state) {
+        serverRev = r.rev;
+        if (adoptState(r.state)) rerenderIfIdle();
+      }
+      setSyncBadge('');
+    } catch (e) { setSyncBadge('⚠ Macと通信できません'); }
+  }
+  // サーバーのデータを取り込む。既存の記録は同じオブジェクトのまま中身を更新する（表示中の画面が壊れないように）
+  function adoptState(ns) {
+    ns = normalizeState(ns);
+    let changed = JSON.stringify(ns.settings) !== JSON.stringify(state.settings);
+    Object.keys(state.settings).forEach((k) => { if (!(k in ns.settings)) delete state.settings[k]; });
+    Object.assign(state.settings, ns.settings);
+    ['invoices', 'customers'].forEach((coll) => {
+      const byId = new Map(state[coll].map((r) => [r.id, r]));
+      const next = ns[coll].map((r) => {
+        const cur = byId.get(r.id);
+        if (!cur) { changed = true; return r; }
+        if (JSON.stringify(cur) !== JSON.stringify(r)) {
+          changed = true;
+          Object.keys(cur).forEach((k) => { if (!(k in r)) delete cur[k]; });
+          Object.assign(cur, r);
+        }
+        return cur;
+      });
+      if (next.length !== state[coll].length) changed = true;
+      state[coll] = next;
+    });
+    state.deleted = ns.deleted;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* 控えなので失敗しても続行 */ }
+    return changed;
+  }
+  function isEditing() {
+    const h = location.hash;
+    return /\/(new|edit)(\?|$)/.test(h) || h.startsWith('#/customers/') || h.startsWith('#/settings') || !!document.querySelector('.send-panel:not([hidden])');
+  }
+  function rerenderIfIdle() { if (!isEditing()) route(); }
+  function setSyncBadge(msg) {
+    let el = $('#syncBadge');
+    if (!el) { el = document.createElement('div'); el.id = 'syncBadge'; el.className = 'sync-badge no-print'; document.body.appendChild(el); }
+    el.textContent = msg; el.hidden = !msg;
   }
 
   // ---------- ユーティリティ ----------
@@ -121,15 +216,42 @@
     return [md(it.date) + (it.car || ''), it.part || ''].filter(Boolean).join(' ').trim();
   }
 
+  // ---------- 書類の種類（請求書・見積書・納品書） ----------
+  const DOC = {
+    invoice: { label: '請求書', title: '御請求書', numKey: 'nextNumber', prefix: '', dateLabel: '発行日', dueLabel: 'お支払期限', lead: '下記の通りご請求申し上げます。', totalLabel: 'ご請求金額（税込）' },
+    quote: { label: '見積書', title: '御見積書', numKey: 'nextQuoteNumber', prefix: 'Q', dateLabel: '見積日', dueLabel: '有効期限', lead: '下記の通り御見積申し上げます。', totalLabel: '御見積金額（税込）' },
+    delivery: { label: '納品書', title: '納品書', numKey: 'nextDeliveryNumber', prefix: 'D', dateLabel: '納品日', dueLabel: '', lead: '下記の通り納品いたしました。', totalLabel: '合計金額（税込）' }
+  };
+  const typeOf = (inv) => (inv && DOC[inv.docType]) ? inv.docType : 'invoice';
+  const isInvoice = (inv) => typeOf(inv) === 'invoice';
+  const formatNumber = (type, n) => DOC[type].prefix ? DOC[type].prefix + String(n).padStart(4, '0') : String(n);
+  const nextNumberFor = (type) => formatNumber(type, state.settings[DOC[type].numKey] || 1);
+  function bumpNumber(type, number) {
+    const n = toInt(number), k = DOC[type].numKey;
+    if (n && n < 1e9 && n >= (state.settings[k] || 0)) { state.settings[k] = n + 1; touchSettings(); }
+  }
+  function addDays(dateStr, days) { const d = new Date(dateStr + 'T00:00:00'); d.setDate(d.getDate() + days); return ymd(d); }
+  function defaultDue(type, issueDate) {
+    if (type === 'quote') return addDays(issueDate, 30);
+    if (type === 'delivery') return '';
+    return calcDue(issueDate, state.settings.dueRule);
+  }
+  const defaultNotes = (type) => type === 'quote' ? state.settings.quoteNotes : type === 'delivery' ? state.settings.deliveryNotes : state.settings.notes;
+
   // ---------- 状態判定 ----------
   function statusOf(inv) {
-    if (inv.status === 'paid') return 'paid';
+    const t = typeOf(inv);
     if (inv.status === 'draft') return 'draft';
+    if (t === 'quote') return inv.status === 'accepted' ? 'accepted' : inv.status === 'lost' ? 'lost' : 'submitted';
+    if (t === 'delivery') return 'delivered';
+    if (inv.status === 'paid') return 'paid';
     if (inv.dueDate && inv.dueDate < today()) return 'overdue';
     return 'issued';
   }
-  const STATUS_LABEL = { draft: '下書き', issued: '未入金', overdue: '期限超過', paid: '入金済' };
-  const badge = (inv) => { const s = statusOf(inv); return `<span class="badge ${s}">${STATUS_LABEL[s]}</span>`; };
+  const STATUS_LABEL = { draft: '下書き', issued: '未入金', overdue: '期限超過', paid: '入金済', submitted: '提出済', accepted: '受注', lost: '失注', delivered: '納品済' };
+  const STATUS_CLASS = { submitted: 'issued', accepted: 'paid', lost: 'draft', delivered: 'paid' };
+  const badge = (inv) => { const s = statusOf(inv); return `<span class="badge ${STATUS_CLASS[s] || s}">${STATUS_LABEL[s]}</span>`; };
+  const typeTag = (inv) => isInvoice(inv) ? '' : `<span class="badge type-${typeOf(inv)}">${DOC[typeOf(inv)].label}</span> `;
 
   function findCustomer(id) { return state.customers.find((c) => c.id === id); }
   function findInvoice(id) { return state.invoices.find((i) => i.id === id); }
@@ -139,8 +261,10 @@
 
   // ---------- ルーター ----------
   const app = $('#app');
+  function hashQuery() { return new URLSearchParams((location.hash.split('?')[1]) || ''); }
   function route() {
-    const parts = (location.hash.replace(/^#\/?/, '') || '').split('/').filter(Boolean);
+    if (authRequired) return;
+    const parts = (location.hash.replace(/^#\/?/, '').split('?')[0] || '').split('/').filter(Boolean);
     const [a, b, c] = parts;
     let nav = 'dashboard';
     if (!a) renderDashboard();
@@ -161,7 +285,8 @@
   function renderDashboard() {
     const now = today();
     const thisMonth = ym(now);
-    const issued = state.invoices.filter((i) => i.status !== 'draft');
+    const issued = state.invoices.filter((i) => isInvoice(i) && i.status !== 'draft');
+    const openQuotes = state.invoices.filter((i) => typeOf(i) === 'quote' && statusOf(i) === 'submitted');
     const monthSales = issued.filter((i) => ym(i.issueDate) === thisMonth).reduce((s, i) => s + calcTotals(i).total, 0);
     const unpaid = issued.filter((i) => i.status !== 'paid');
     const unpaidSum = unpaid.reduce((s, i) => s + calcTotals(i).total, 0);
@@ -195,9 +320,11 @@
         <div><h1>ホーム</h1><div class="muted small">${fmtDate(now)} 現在${state.settings.lastMakeLeapsImport ? '・MakeLeaps同期 ' + new Date(state.settings.lastMakeLeapsImport).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}</div></div>
         <div class="btn-row">
           ${SERVER ? `<button class="btn" data-sync>🔄 MakeLeapsと同期</button>` : ''}
+          <a class="btn" href="#/invoices/new?type=quote">＋ 見積書</a>
           <a class="btn primary" href="#/invoices/new">＋ 請求書を作成</a>
         </div>
       </div>
+      ${openQuotes.length ? `<div class="card small">📝 提出中の見積書が <a href="#/invoices?type=quote">${openQuotes.length}件</a> あります（${yen(openQuotes.reduce((s, i) => s + calcTotals(i).total, 0))}）</div>` : ''}
       ${!state.invoices.length ? `<div class="card" style="background:var(--orange-soft)">
         <h2>はじめに：MakeLeapsのデータを読み込みましょう</h2>
         <p class="small" style="margin:0 0 10px">${SERVER ? '「設定」でMakeLeapsのクライアントIDとシークレットを入力して「接続設定を保存」を押すと、今年の請求書（内訳・入金状態つき）が読み込まれます。設定済みなら右上の「🔄 MakeLeapsと同期」を押してください。' : '「Lucent請求書.command」をダブルクリックして開くと、MakeLeapsと同期できます。'}</p>
@@ -233,11 +360,12 @@
 
   function invoiceRow(inv, withPay) {
     const t = calcTotals(inv);
-    const payBtn = withPay === true && inv.status !== 'paid' ? `<button class="btn sm primary pay-btn" data-pay="${inv.id}">入金</button>` : '';
+    const payBtn = withPay === true && isInvoice(inv) && inv.status !== 'paid' ? `<button class="btn sm primary pay-btn" data-pay="${inv.id}">入金</button>` : '';
+    const lastSent = (inv.sent || [])[inv.sent ? inv.sent.length - 1 : 0];
     return `<li class="${payBtn ? 'has-action' : ''}"><a class="row" href="#/invoices/${inv.id}">
-      <span class="title">No.${esc(inv.number)}　${esc(inv.customerName || '（取引先未設定）')}</span>
+      <span class="title">${typeTag(inv)}No.${esc(inv.number)}　${esc(inv.customerName || '（取引先未設定）')}</span>
       <span class="amount">${yen(t.total)}</span>
-      <span class="meta">${fmtDate(inv.issueDate)} 発行${inv.dueDate ? '・期限 ' + fmtDate(inv.dueDate) : ''}${inv.paidDate ? '・入金 ' + fmtDate(inv.paidDate) : ''}${inv.source === 'makeleaps' ? '・MakeLeaps' : ''}</span>
+      <span class="meta">${fmtDate(inv.issueDate)} ${DOC[typeOf(inv)].dateLabel.replace('日', '')}${inv.dueDate ? '・期限 ' + fmtDate(inv.dueDate) : ''}${inv.paidDate ? '・入金 ' + fmtDate(inv.paidDate) : ''}${lastSent ? '・送付 ' + fmtDate(lastSent.at.slice(0, 10)) : ''}${inv.source === 'makeleaps' ? '・MakeLeaps' : ''}</span>
       <span>${badge(inv)}</span>
     </a>${payBtn}</li>`;
   }
@@ -264,19 +392,11 @@
     if (!b) return;
     e.preventDefault();
     const inv = findInvoice(b.dataset.pay);
+    if (inv && !isInvoice(inv)) return;
     if (inv && markPaid(inv)) route();
   });
 
   // ---------- MakeLeaps 同期（起動用サーバー経由） ----------
-  const SERVER = location.protocol === 'http:' || location.protocol === 'https:';
-  async function api(path, body) {
-    const res = await fetch(path, body === undefined ? {} : {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Lucent': '1' }, body: JSON.stringify(body)
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
-    return data;
-  }
   let syncing = false;
   async function syncMakeLeaps(opts = {}) {
     if (!SERVER) { alert('同期は「Lucent請求書.command」から開いたときに使えます。'); return; }
@@ -311,24 +431,28 @@
 
   // ================= 請求書一覧 =================
   function renderInvoiceList() {
-    const months = Array.from(new Set(state.invoices.map((i) => ym(i.issueDate)).filter(Boolean))).sort().reverse();
+    const type = DOC[hashQuery().get('type')] ? hashQuery().get('type') : 'invoice';
+    const docs = state.invoices.filter((i) => typeOf(i) === type);
+    const months = Array.from(new Set(docs.map((i) => ym(i.issueDate)).filter(Boolean))).sort().reverse();
+    const statusOpts = type === 'invoice'
+      ? [['unpaid', '未入金（期限超過含む）'], ['overdue', '期限超過'], ['paid', '入金済'], ['draft', '下書き']]
+      : type === 'quote' ? [['submitted', '提出済'], ['accepted', '受注'], ['lost', '失注'], ['draft', '下書き']]
+        : [['delivered', '納品済'], ['draft', '下書き']];
     app.innerHTML = `
       <div class="page-head">
-        <div><h1>請求書</h1><div class="muted small">全${state.invoices.length}件</div></div>
+        <div><h1>書類</h1><div class="muted small">${DOC[type].label} ${docs.length}件</div></div>
         <div class="btn-row">
           <button class="btn" id="csv">CSV出力</button>
-          <a class="btn primary" href="#/invoices/new">＋ 新規作成</a>
+          <a class="btn primary" href="#/invoices/new?type=${type}">＋ ${DOC[type].label}を作成</a>
         </div>
       </div>
+      <div class="tabs">${Object.keys(DOC).map((k) => `<a href="#/invoices?type=${k}" class="${k === type ? 'active' : ''}">${DOC[k].label}<span>${state.invoices.filter((i) => typeOf(i) === k).length}</span></a>`).join('')}</div>
       <div class="card">
         <div class="filters">
           <input class="search" id="q" type="search" placeholder="取引先・番号・車種・部品で検索">
           <select id="fs">
             <option value="">すべての状態</option>
-            <option value="unpaid">未入金（期限超過含む）</option>
-            <option value="overdue">期限超過</option>
-            <option value="paid">入金済</option>
-            <option value="draft">下書き</option>
+            ${statusOpts.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}
           </select>
           <select id="fm"><option value="">すべての月</option>${months.map((m) => `<option value="${m}">${m.replace('-', '年')}月</option>`).join('')}</select>
         </div>
@@ -339,7 +463,7 @@
     const draw = () => {
       const q = $('#q').value.trim().toLowerCase();
       const fs = $('#fs').value, fm = $('#fm').value;
-      const rows = sortedInvoices().filter((inv) => {
+      const rows = sortedInvoices().filter((inv) => typeOf(inv) === type).filter((inv) => {
         const s = statusOf(inv);
         if (fs === 'unpaid' && !(s === 'issued' || s === 'overdue')) return false;
         if (fs && fs !== 'unpaid' && s !== fs) return false;
@@ -350,24 +474,24 @@
         }
         return true;
       });
-      $('#list').innerHTML = rows.length ? rows.map(invoiceRow).join('') : '<li class="empty">該当する請求書はありません</li>';
+      $('#list').innerHTML = rows.length ? rows.map((r) => invoiceRow(r)).join('') : `<li class="empty">該当する${DOC[type].label}はありません</li>`;
       $('#sum').textContent = rows.length ? `${rows.length}件　合計 ${yen(rows.reduce((s, i) => s + calcTotals(i).total, 0))}` : '';
       draw.rows = rows;
     };
     ['q', 'fs', 'fm'].forEach((id) => $('#' + id).addEventListener('input', draw));
-    $('#csv').addEventListener('click', () => exportCsv(draw.rows || []));
+    $('#csv').addEventListener('click', () => exportCsv(draw.rows || [], DOC[type].label));
     draw();
   }
 
-  function exportCsv(rows) {
-    const head = ['請求書番号', '発行日', '支払期限', '取引先', '小計', '消費税', '合計', '状態', '入金日', '入金額', '明細'];
+  function exportCsv(rows, label = '請求書') {
+    const head = [label + '番号', '日付', '期限', '取引先', '小計', '消費税', '合計', '状態', '入金日', '入金額', '明細'];
     const lines = [head].concat(rows.map((inv) => {
       const t = calcTotals(inv);
       return [inv.number, fmtDate(inv.issueDate), fmtDate(inv.dueDate), inv.customerName, t.subtotal, t.tax, t.total,
         STATUS_LABEL[statusOf(inv)], fmtDate(inv.paidDate), inv.paidAmount || '', inv.items.map(itemLabel).join(' / ')];
     }));
     const csv = lines.map((r) => r.map((v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',')).join('\r\n');
-    download('﻿' + csv, `請求書一覧_${today()}.csv`, 'text/csv');
+    download('﻿' + csv, `${label}一覧_${today()}.csv`, 'text/csv');
   }
 
   function download(text, name, type) {
@@ -381,31 +505,47 @@
   }
 
   // ================= 請求書エディタ =================
-  function newInvoice() {
-    const s = state.settings;
+  function newInvoice(type = 'invoice') {
     const issueDate = today();
     return {
-      id: null, number: String(s.nextNumber), issueDate, dueDate: calcDue(issueDate, s.dueRule),
-      customerId: '', customerName: '', honorific: '御中', customerPostal: '', customerAddress: '', customerTel: '', customerFax: '',
+      id: null, docType: type, number: nextNumberFor(type), issueDate, dueDate: defaultDue(type, issueDate),
+      customerId: '', customerName: '', honorific: '御中', customerPostal: '', customerAddress: '', customerTel: '', customerFax: '', customerEmail: '',
       items: [{ date: issueDate, car: '', part: '', qty: 1, price: 0 }],
-      notes: s.notes, status: 'issued', paidDate: '', paidAmount: '', memo: ''
+      notes: defaultNotes(type), status: 'issued', paidDate: '', paidAmount: '', memo: ''
     };
+  }
+  // 別の書類から新しい書類を作る（見積→納品書・請求書、納品書→請求書、複製）
+  function draftFrom(src, type) {
+    const d = newInvoice(type);
+    Object.assign(d, {
+      customerId: src.customerId, customerName: src.customerName, honorific: src.honorific,
+      customerPostal: src.customerPostal, customerAddress: src.customerAddress, customerTel: src.customerTel,
+      customerFax: src.customerFax, customerEmail: src.customerEmail || '',
+      items: src.items.map((it) => Object.assign({}, it)), sourceId: src.id
+    });
+    return d;
   }
 
   function renderEditor(id) {
     const src = id ? findInvoice(id) : null;
     if (id && !src) { app.innerHTML = '<div class="empty">請求書が見つかりません</div>'; return; }
     // 編集はコピーに対して行い、保存時に反映する
-    const inv = src ? JSON.parse(JSON.stringify(src)) : (renderEditor.draft || newInvoice());
+    const qType = DOC[hashQuery().get('type')] ? hashQuery().get('type') : 'invoice';
+    const inv = src ? JSON.parse(JSON.stringify(src)) : (renderEditor.draft || newInvoice(qType));
     renderEditor.draft = null;
+    const type = typeOf(inv), D = DOC[type];
+    const statusOpts = type === 'invoice' ? [['draft', '下書き'], ['issued', '発行済（未入金）'], ['paid', '入金済']]
+      : type === 'quote' ? [['draft', '下書き'], ['issued', '提出済'], ['accepted', '受注'], ['lost', '失注']]
+        : [['draft', '下書き'], ['issued', '納品済']];
 
     app.innerHTML = `
       <div class="page-head">
-        <div><h1>${src ? '請求書の編集' : '請求書の作成'}</h1><div class="muted small">No.${esc(inv.number)}</div></div>
+        <div><h1>${D.label}の${src ? '編集' : '作成'}</h1><div class="muted small">No.${esc(inv.number)}</div></div>
       </div>
+      ${src ? '' : `<div class="tabs">${Object.keys(DOC).map((k) => `<a href="#/invoices/new?type=${k}" data-type="${k}" class="${k === type ? 'active' : ''}">${DOC[k].label}</a>`).join('')}</div>`}
       <form id="f" autocomplete="off">
         <div class="card">
-          <h2>請求先</h2>
+          <h2>宛先</h2>
           <div class="grid-2">
             <label class="field"><span>取引先名（候補から選択 or 新しく入力）</span>
               <input name="customerName" list="custlist" value="${esc(inv.customerName)}" placeholder="例：有限会社 〇〇自動車" required>
@@ -421,14 +561,15 @@
             <label class="field"><span>FAX</span><input name="customerFax" value="${esc(inv.customerFax)}" inputmode="tel"></label>
           </div>
           <label class="field"><span>住所</span><textarea name="customerAddress" rows="2" style="min-height:56px">${esc(inv.customerAddress)}</textarea></label>
+          <label class="field"><span>メールアドレス（メール送付用・任意）</span><input name="customerEmail" type="email" value="${esc(inv.customerEmail || '')}" placeholder="example@example.com"></label>
         </div>
 
         <div class="card">
-          <h2>請求情報</h2>
+          <h2>${D.label}の情報</h2>
           <div class="grid-3">
-            <label class="field"><span>請求書番号</span><input name="number" value="${esc(inv.number)}" required></label>
-            <label class="field"><span>発行日</span><input name="issueDate" type="date" value="${esc(inv.issueDate)}" required></label>
-            <label class="field"><span>支払期限（空欄で記載なし）</span><input name="dueDate" type="date" value="${esc(inv.dueDate)}"></label>
+            <label class="field"><span>${D.label}番号</span><input name="number" value="${esc(inv.number)}" required></label>
+            <label class="field"><span>${D.dateLabel}</span><input name="issueDate" type="date" value="${esc(inv.issueDate)}" required></label>
+            ${D.dueLabel ? `<label class="field"><span>${D.dueLabel}（空欄で記載なし）</span><input name="dueDate" type="date" value="${esc(inv.dueDate)}"></label>` : '<input type="hidden" name="dueDate" value="">'}
           </div>
         </div>
 
@@ -451,29 +592,35 @@
 
         <div class="card">
           <h2>備考・状態</h2>
-          <label class="field"><span>備考（請求書に印字）</span><textarea name="notes" rows="4">${esc(inv.notes)}</textarea></label>
+          <label class="field"><span>備考（${D.label}に印字）</span><textarea name="notes" rows="4">${esc(inv.notes)}</textarea></label>
           <div class="grid-3">
             <label class="field"><span>状態</span>
-              <select name="status">
-                <option value="draft" ${inv.status === 'draft' ? 'selected' : ''}>下書き</option>
-                <option value="issued" ${inv.status === 'issued' ? 'selected' : ''}>発行済（未入金）</option>
-                <option value="paid" ${inv.status === 'paid' ? 'selected' : ''}>入金済</option>
-              </select>
+              <select name="status">${statusOpts.map(([v, l]) => `<option value="${v}" ${inv.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
             </label>
-            <label class="field"><span>入金日</span><input name="paidDate" type="date" value="${esc(inv.paidDate)}"></label>
-            <label class="field"><span>入金額</span><input name="paidAmount" inputmode="numeric" value="${esc(inv.paidAmount)}"></label>
+            ${type === 'invoice' ? `<label class="field"><span>入金日</span><input name="paidDate" type="date" value="${esc(inv.paidDate)}"></label>
+            <label class="field"><span>入金額</span><input name="paidAmount" inputmode="numeric" value="${esc(inv.paidAmount)}"></label>` : ''}
           </div>
           <label class="field"><span>社内メモ（印字されません）</span><input name="memo" value="${esc(inv.memo)}"></label>
         </div>
 
         <div class="sticky-actions">
-          <a class="btn" href="${src ? '#/invoices/' + src.id : '#/invoices'}">キャンセル</a>
+          <a class="btn" href="${src ? '#/invoices/' + src.id : '#/invoices?type=' + type}">キャンセル</a>
           <button type="submit" class="btn primary">保存してプレビュー</button>
         </div>
       </form>`;
 
     const f = $('#f');
     const itemsEl = $('#items');
+    $$('.tabs [data-type]').forEach((a) => a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const fd = Object.fromEntries(new FormData(f).entries());
+      const d = newInvoice(a.dataset.type);
+      ['customerName', 'honorific', 'customerPostal', 'customerAddress', 'customerTel', 'customerFax', 'customerEmail'].forEach((k) => { d[k] = fd[k] || ''; });
+      d.items = inv.items;
+      renderEditor.draft = d;
+      history.replaceState(null, '', '#/invoices/new?type=' + a.dataset.type);
+      route();
+    }));
 
     function drawItems() {
       itemsEl.innerHTML = inv.items.map((it, i) => `
@@ -549,11 +696,12 @@
       f.customerAddress.value = c.address || '';
       f.customerTel.value = c.tel || '';
       f.customerFax.value = c.fax || '';
+      f.customerEmail.value = c.email || '';
     });
     // 発行日を変えたら支払期限も追従（新規作成時のみ）
     let prevIssue = inv.issueDate;
     f.issueDate.addEventListener('change', () => {
-      if (!src) f.dueDate.value = calcDue(f.issueDate.value, state.settings.dueRule);
+      if (!src) f.dueDate.value = defaultDue(type, f.issueDate.value);
       // 発行日と同じ日付だった明細は新しい発行日に追従させる
       let changed = false;
       inv.items.forEach((it) => { if (!it.date || it.date === prevIssue) { it.date = f.issueDate.value; changed = true; } });
@@ -561,7 +709,7 @@
       if (changed) drawItems();
     });
     f.status.addEventListener('change', () => {
-      if (f.status.value === 'paid' && !f.paidDate.value) {
+      if (f.status.value === 'paid' && f.paidDate && !f.paidDate.value) {
         f.paidDate.value = today();
         if (!f.paidAmount.value) f.paidAmount.value = calcTotals(inv).total;
       }
@@ -571,8 +719,8 @@
       e.preventDefault();
       const fd = Object.fromEntries(new FormData(f).entries());
       const number = fd.number.trim();
-      if (state.invoices.some((x) => x.number === number && x.id !== inv.id)) {
-        if (!confirm(`請求書番号 ${number} は既に使われています。このまま保存しますか？`)) return;
+      if (state.invoices.some((x) => typeOf(x) === type && x.number === number && x.id !== inv.id)) {
+        if (!confirm(`${D.label}番号 ${number} は既に使われています。このまま保存しますか？`)) return;
       }
       inv.items = inv.items.filter((it) => it.part || it.car || toInt(it.price));
       if (!inv.items.length) { toast('明細を1行以上入力してください'); drawItems(); return; }
@@ -580,28 +728,33 @@
         number, issueDate: fd.issueDate, dueDate: fd.dueDate,
         customerName: fd.customerName.trim(), honorific: fd.honorific,
         customerPostal: fd.customerPostal.trim(), customerAddress: fd.customerAddress.trim(),
-        customerTel: fd.customerTel.trim(), customerFax: fd.customerFax.trim(),
+        customerTel: fd.customerTel.trim(), customerFax: fd.customerFax.trim(), customerEmail: (fd.customerEmail || '').trim(),
         notes: fd.notes, status: fd.status, paidDate: fd.status === 'paid' ? fd.paidDate : '',
         paidAmount: fd.status === 'paid' ? toInt(fd.paidAmount) || '' : '', memo: fd.memo,
-        updatedAt: new Date().toISOString()
+        docType: type, updatedAt: nowIso()
       });
 
-      // 取引先マスタに自動登録・更新
+      // 取引先マスタに自動登録・更新（メールは入力があるときだけ上書き）
       let c = state.customers.find((x) => x.name === inv.customerName);
       if (!c) { c = { id: uid(), name: inv.customerName }; state.customers.push(c); }
       Object.assign(c, { honorific: inv.honorific, postal: inv.customerPostal, address: inv.customerAddress, tel: inv.customerTel, fax: inv.customerFax });
+      if (inv.customerEmail) c.email = inv.customerEmail;
+      touch(c);
       inv.customerId = c.id;
 
-      if (src) {
-        if (!inv.importedTotals) delete src.importedTotals; // 明細を編集したら再計算に切り替え
-        Object.assign(src, inv);
+      // 編集開始後に他の端末の同期で入れ替わっていても、IDで最新の記録を探して反映する
+      const cur = src && findInvoice(src.id);
+      if (cur) {
+        if (!inv.importedTotals) delete cur.importedTotals; // 明細を編集したら再計算に切り替え
+        Object.assign(cur, inv);
       } else {
-        inv.id = uid();
+        inv.id = inv.id || uid();
         inv.createdAt = inv.updatedAt;
         state.invoices.push(inv);
-        // 次の番号を進める
-        const n = toInt(number);
-        if (n >= state.settings.nextNumber) state.settings.nextNumber = n + 1;
+        bumpNumber(type, number); // 次の番号を進める
+        // 見積書から作った書類なら、見積書を「受注」にする
+        const from = inv.sourceId && findInvoice(inv.sourceId);
+        if (from && typeOf(from) === 'quote' && from.status !== 'accepted') { from.status = 'accepted'; touch(from); }
       }
       if (save()) { toast('保存しました'); location.hash = '#/invoices/' + inv.id; }
     });
@@ -613,6 +766,7 @@
   function paperHtml(inv) {
     const s = state.settings;
     const t = calcTotals(inv);
+    const type = typeOf(inv), D = DOC[type];
     const rows = inv.items.map((it) => (!toInt(it.qty) && !toInt(it.price))
       ? `<tr><td>${esc(itemLabel(it))}</td><td></td><td></td><td></td></tr>`
       : `<tr><td>${esc(itemLabel(it))}</td><td class="c-qty">${num(it.qty)}</td><td class="c-price">${num(it.price)}</td><td class="c-amt">${num(lineAmount(it))}</td></tr>`);
@@ -620,7 +774,7 @@
     const br = (v) => esc(v).replace(/\n/g, '<br>');
     return `
       <div class="paper">
-        <h1 class="doc-title">御請求書</h1>
+        <h1 class="doc-title">${D.title}</h1>
         <div class="head">
           <div>
             <div class="to-name">${esc(inv.customerName)}<small>${esc(inv.honorific)}</small></div>
@@ -631,9 +785,9 @@
           </div>
           <div>
             <table class="meta-tbl">
-              <tr><td>請求書番号</td><td>${esc(inv.number)}</td></tr>
-              <tr><td>発行日</td><td>${fmtDate(inv.issueDate)}</td></tr>
-              ${inv.dueDate ? `<tr><td>お支払期限</td><td>${fmtDate(inv.dueDate)}</td></tr>` : ''}
+              <tr><td>${D.label}番号</td><td>${esc(inv.number)}</td></tr>
+              <tr><td>${D.dateLabel}</td><td>${fmtDate(inv.issueDate)}</td></tr>
+              ${inv.dueDate && D.dueLabel ? `<tr><td>${D.dueLabel}</td><td>${fmtDate(inv.dueDate)}</td></tr>` : ''}
             </table>
             <div class="from-name">${esc(s.companyName)}</div>
             ${s.postal ? `<div>〒${esc(s.postal)}</div>` : ''}
@@ -644,7 +798,8 @@
             ${s.registrationNo ? `<div>登録番号：${esc(s.registrationNo)}</div>` : ''}
           </div>
         </div>
-        <div class="total-box"><span class="t">合計金額（税込）</span><span class="v">${yen(t.total)}</span></div>
+        <p class="lead">${D.lead}</p>
+        <div class="total-box"><span class="t">${D.totalLabel}</span><span class="v">${yen(t.total)}</span></div>
         <table class="lines">
           <thead><tr><th>項目</th><th class="c-qty">数量</th><th class="c-price">単価</th><th class="c-amt">金額</th></tr></thead>
           <tbody>${rows.join('')}</tbody>
@@ -655,7 +810,7 @@
           <tr class="grand"><td>合計金額</td><td>${num(t.total)}</td></tr>
         </table>
         <div class="foot">
-          ${s.bank ? `<div><h3>お振込先</h3><p>${esc(s.bank)}</p></div>` : ''}
+          ${s.bank && type === 'invoice' ? `<div><h3>お振込先</h3><p>${esc(s.bank)}</p></div>` : ''}
           ${inv.notes ? `<div><h3>備考</h3><p>${esc(inv.notes)}</p></div>` : ''}
         </div>
       </div>`;
@@ -663,34 +818,47 @@
 
   function renderInvoiceView(id) {
     const inv = findInvoice(id);
-    if (!inv) { app.innerHTML = '<div class="empty">請求書が見つかりません。<a href="#/invoices">一覧へ</a></div>'; return; }
+    if (!inv) { app.innerHTML = '<div class="empty">書類が見つかりません。<a href="#/invoices">一覧へ</a></div>'; return; }
     const t = calcTotals(inv);
     const s = statusOf(inv);
+    const type = typeOf(inv), D = DOC[type];
+    const from = inv.sourceId && findInvoice(inv.sourceId);
+    const children = state.invoices.filter((x) => x.sourceId === inv.id);
     app.innerHTML = `
       <div class="page-head">
-        <div><h1>No.${esc(inv.number)}　${esc(inv.customerName)}</h1>
+        <div><h1>${typeTag(inv)}No.${esc(inv.number)}　${esc(inv.customerName)}</h1>
           <div class="small">${badge(inv)} <span class="muted">${yen(t.total)}${inv.paidDate ? '・' + fmtDate(inv.paidDate) + ' 入金' : ''}${inv.memo ? '・メモ：' + esc(inv.memo) : ''}</span></div></div>
       </div>
-      <div class="btn-row" style="margin-bottom:16px">
-        <button class="btn navy" id="print">🖨 印刷 / PDF保存</button>
-        ${s === 'issued' || s === 'overdue' ? '<button class="btn primary" id="pay">✓ 入金済にする</button>' : ''}
-        ${s === 'paid' ? '<button class="btn" id="unpay">未入金に戻す</button>' : ''}
-        ${s === 'draft' ? '<button class="btn primary" id="issue">発行済にする</button>' : ''}
+      <div class="btn-row" style="margin-bottom:12px">
+        <button class="btn primary" id="send">📤 送る（LINE・メール）</button>
+        <button class="btn navy" id="print">🖨 印刷 / PDF</button>
+        ${type === 'invoice' && (s === 'issued' || s === 'overdue') ? '<button class="btn primary" id="pay">✓ 入金済にする</button>' : ''}
+        ${type === 'invoice' && s === 'paid' ? '<button class="btn" id="unpay">未入金に戻す</button>' : ''}
+        ${s === 'draft' ? `<button class="btn" id="issue">${type === 'quote' ? '提出済' : type === 'delivery' ? '納品済' : '発行済'}にする</button>` : ''}
+        ${type === 'quote' && s === 'submitted' ? '<button class="btn" id="lost">失注にする</button>' : ''}
         <a class="btn" href="#/invoices/${inv.id}/edit">✎ 編集</a>
+      </div>
+      <div class="btn-row" style="margin-bottom:16px">
+        ${type === 'quote' ? '<button class="btn" data-convert="delivery">→ 納品書を作る</button><button class="btn" data-convert="invoice">→ 請求書を作る</button>' : ''}
+        ${type === 'delivery' ? '<button class="btn" data-convert="invoice">→ 請求書を作る</button>' : ''}
         <button class="btn" id="dup">⧉ 複製して新規</button>
         <button class="btn danger" id="del">削除</button>
       </div>
+      ${from || children.length ? `<div class="card small">🔗 ${from ? `元の書類：<a href="#/invoices/${from.id}">${DOC[typeOf(from)].label} No.${esc(from.number)}</a>　` : ''}${children.map((c) => `作成済み：<a href="#/invoices/${c.id}">${DOC[typeOf(c)].label} No.${esc(c.number)}</a>`).join('　')}</div>` : ''}
+      ${(inv.sent || []).length ? `<div class="card small">📤 送付履歴：${inv.sent.map((x) => `${new Date(x.at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })} ${esc(x.via)}${x.to ? '（' + esc(x.to) + '）' : ''}`).join(' ／ ')}</div>` : ''}
+      <section class="card send-panel" id="sendPanel" hidden></section>
       ${inv.source === 'makeleaps' && !(inv.items || []).some((it) => it.part || toInt(it.price)) ? `<div class="card small" style="background:var(--warn-soft)">⚠ この請求書はMakeLeapsから内訳が取り込めていません。
         ${SERVER ? '<button class="btn sm" id="inspect">原因を調べる</button><pre id="inspectOut" style="white-space:pre-wrap;font-size:11px;max-height:320px;overflow:auto;margin:8px 0 0"></pre>' : '「Lucent請求書.command」から開くと原因を調べられます。'}</div>` : ''}
-      ${!state.settings.bank ? '<div class="card small" style="background:var(--warn-soft)">⚠ 振込先が未設定です。<a href="#/settings">設定</a>で入力すると請求書に印字されます。</div>' : ''}
+      ${type === 'invoice' && !state.settings.bank ? '<div class="card small" style="background:var(--warn-soft)">⚠ 振込先が未設定です。<a href="#/settings">設定</a>で入力すると請求書に印字されます。</div>' : ''}
       <div class="paper-wrap">${paperHtml(inv)}</div>`;
 
     $('#print').addEventListener('click', () => {
       const old = document.title;
-      document.title = `請求書_${inv.number}_${inv.customerName}`; // PDF保存時のファイル名になる
+      document.title = docFileName(inv).replace(/\.pdf$/, ''); // PDF保存時のファイル名になる
       window.print();
       setTimeout(() => { document.title = old; }, 1000);
     });
+    $('#send').addEventListener('click', () => openSendPanel(inv));
     const on = (sel, fn) => { const el = $(sel); if (el) el.addEventListener('click', fn); };
     on('#pay', () => { if (markPaid(inv)) route(); });
     on('#inspect', async () => {
@@ -700,29 +868,179 @@
         $('#inspectOut').textContent = 'No.' + inv.number + '\n' + JSON.stringify(r, null, 1);
       } catch (err) { $('#inspectOut').textContent = 'エラー：' + err.message; }
     });
-    on('#unpay', () => { Object.assign(inv, { status: 'issued', paidDate: '', paidAmount: '', updatedAt: new Date().toISOString() }); save(); route(); });
-    on('#issue', () => { Object.assign(inv, { status: 'issued', updatedAt: new Date().toISOString() }); save(); route(); });
-    on('#dup', () => {
-      const d = newInvoice();
-      Object.assign(d, {
-        customerId: inv.customerId, customerName: inv.customerName, honorific: inv.honorific,
-        customerPostal: inv.customerPostal, customerAddress: inv.customerAddress, customerTel: inv.customerTel, customerFax: inv.customerFax,
-        items: inv.items.map((it) => Object.assign({}, it, { date: d.issueDate })), notes: inv.notes
-      });
+    on('#unpay', () => { Object.assign(inv, { status: 'issued', paidDate: '', paidAmount: '' }); touch(inv); save(); route(); });
+    on('#issue', () => { inv.status = 'issued'; touch(inv); save(); route(); });
+    on('#lost', () => { inv.status = 'lost'; touch(inv); save(); route(); });
+    $$('[data-convert]').forEach((b) => b.addEventListener('click', () => {
+      const to = b.dataset.convert;
+      const d = draftFrom(inv, to);
       renderEditor.draft = d;
-      if (location.hash === '#/invoices/new') route(); else location.hash = '#/invoices/new';
+      location.hash = '#/invoices/new?type=' + to;
+    }));
+    on('#dup', () => {
+      const d = draftFrom(inv, type);
+      delete d.sourceId;
+      d.items = d.items.map((it) => Object.assign(it, { date: it.date ? d.issueDate : '' }));
+      d.notes = inv.notes;
+      renderEditor.draft = d;
+      location.hash = '#/invoices/new?type=' + type;
     });
     on('#del', () => {
-      if (!confirm(`請求書 No.${inv.number} を削除します。元に戻せません。よろしいですか？`)) return;
+      if (!confirm(`${D.label} No.${inv.number} を削除します。元に戻せません。よろしいですか？`)) return;
       state.invoices = state.invoices.filter((x) => x.id !== inv.id);
-      save(); toast('削除しました'); location.hash = '#/invoices';
+      markDeleted(inv.id);
+      save(); toast('削除しました'); location.hash = '#/invoices?type=' + type;
     });
+  }
+
+  // ================= 送付（LINE・メール・PDF） =================
+  const docFileName = (inv) => `${DOC[typeOf(inv)].label}_${inv.number}_${(inv.customerName || '').replace(/[\\/:*?"<>|\s]+/g, '')}.pdf`;
+  function loadScript(src) {
+    return new Promise((ok, ng) => {
+      if (document.querySelector(`script[src="${src}"]`)) return ok();
+      const el = document.createElement('script');
+      el.src = src; el.onload = ok; el.onerror = () => ng(new Error(src + ' を読み込めませんでした'));
+      document.head.appendChild(el);
+    });
+  }
+  // 紙面をA4のPDFにする（画面の見た目そのまま）
+  async function makePdf(inv) {
+    await loadScript('vendor/html2pdf.bundle.min.js');
+    const holder = document.createElement('div');
+    // 画面の左上に（見えないよう背面に）置いて撮影する。画面外に置くと位置がずれるため
+    holder.style.cssText = 'position:fixed;left:0;top:0;width:794px;background:#fff;z-index:-1;pointer-events:none';
+    holder.innerHTML = paperHtml(inv);
+    document.body.appendChild(holder);
+    const paper = holder.firstElementChild;
+    paper.style.boxShadow = 'none';
+    paper.style.height = '1122px'; paper.style.minHeight = '0'; paper.style.overflow = 'hidden';
+    try {
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      return await window.html2pdf().set({
+        margin: 0, filename: docFileName(inv),
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 794, scrollX: 0, scrollY: 0, x: 0, y: 0 },
+        jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait', hotfixes: ['px_scaling'] }
+      }).from(paper).outputPdf('blob');
+    } finally { holder.remove(); }
+  }
+  function blobToBase64(blob) {
+    return new Promise((ok) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.readAsDataURL(blob); });
+  }
+  function downloadBlob(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function messageFor(inv) {
+    const s = state.settings, t = calcTotals(inv), type = typeOf(inv), D = DOC[type];
+    const lines = [
+      `${inv.customerName} ${inv.honorific}`, '',
+      `いつもお世話になっております。${s.companyName}です。`,
+      `${D.label}（No.${inv.number}）をお送りいたします。`, '',
+      `${type === 'quote' ? '御見積金額' : type === 'invoice' ? 'ご請求金額' : '合計金額'}：${yen(t.total)}（税込）`
+    ];
+    if (type === 'invoice' && inv.dueDate) lines.push(`お支払期限：${fmtDate(inv.dueDate)}`);
+    if (type === 'quote' && inv.dueDate) lines.push(`有効期限：${fmtDate(inv.dueDate)}`);
+    if (type === 'invoice' && s.bank) lines.push('', '【お振込先】', s.bank);
+    lines.push('', 'ご確認のほど、よろしくお願いいたします。', '', s.companyName);
+    if (s.tel) lines.push('TEL ' + s.tel);
+    return lines.join('\n');
+  }
+  function recordSent(inv, via, to) {
+    inv.sent = (inv.sent || []).concat([{ at: nowIso(), via, to: to || '' }]);
+    if (inv.status === 'draft') inv.status = 'issued'; // 送ったら発行済扱い
+    touch(inv); save();
+  }
+
+  async function openSendPanel(inv) {
+    const panel = $('#sendPanel');
+    const D = DOC[typeOf(inv)];
+    const cust = findCustomer(inv.customerId) || {};
+    let mailUser = '';
+    if (SERVER) { try { mailUser = (await api('/api/status')).mail || ''; } catch (e) { /* 未設定扱い */ } }
+    const canShareFiles = !!(navigator.canShare && navigator.canShare({ files: [new File([''], 'a.pdf', { type: 'application/pdf' })] }));
+    panel.hidden = false;
+    panel.innerHTML = `
+      <h2>📤 ${D.label}を送る</h2>
+      <label class="field"><span>メッセージ（LINE・メール本文。自由に直せます）</span><textarea id="sendMsg" rows="10">${esc(messageFor(inv))}</textarea></label>
+      <div class="send-grid">
+        <div class="send-box">
+          <h3>LINEで送る</h3>
+          ${canShareFiles
+            ? '<p class="small muted">「共有」を押して、出てきた一覧から<b>LINE</b>を選び、送り先のトークを選びます（PDFとメッセージが送られます）。</p><button class="btn primary" id="shareBtn">📱 共有（LINEなど）</button>'
+            : '<p class="small muted">① PDFを保存 → ② メッセージをコピー → ③ LINEを開いてトークにPDFをドラッグ＆メッセージを貼り付け。<br>※スマホで開くと「共有」ボタンから直接LINEに送れます。</p><button class="btn primary" id="lineBtn">LINE用に準備する</button>'}
+        </div>
+        <div class="send-box">
+          <h3>メールで送る</h3>
+          <label class="field"><span>宛先</span><input id="sendTo" type="email" value="${esc(inv.customerEmail || cust.email || '')}" placeholder="example@example.com"></label>
+          <label class="field"><span>件名</span><input id="sendSubject" value="${esc(`【${state.settings.companyName}】${D.label}送付のご案内（No.${inv.number}）`)}"></label>
+          ${mailUser
+            ? `<label class="small" style="display:block;margin-bottom:8px"><input type="checkbox" id="bccSelf" checked style="width:auto"> 自分（${esc(mailUser)}）にも控えを送る</label><button class="btn primary" id="mailBtn">✉️ PDFを添付して送信</button>`
+            : `<p class="small muted">PDFを保存してメールソフトを開きます。PDFは手で添付してください。${SERVER ? '<br>Macの<a href="#/settings">設定</a>でGmailを登録すると、ここからPDF付きで直接送信できます。' : ''}</p><button class="btn primary" id="mailtoBtn">✉️ メールを作成</button>`}
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn" id="pdfBtn">⬇ PDFだけ保存</button>
+        <button class="btn" id="copyBtn">📋 メッセージをコピー</button>
+        <button class="btn" id="closeSend">閉じる</button>
+      </div>
+      <p class="small muted" id="sendStatus"></p>`;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const status = (m) => { $('#sendStatus').textContent = m; };
+    const msg = () => $('#sendMsg').value;
+    let pdfCache = null;
+    const getPdf = async () => { status('PDFを作成しています…'); pdfCache = pdfCache || await makePdf(inv); status(''); return pdfCache; };
+    const copy = async () => { try { await navigator.clipboard.writeText(msg()); return true; } catch (e) { return false; } };
+    const guard = (fn) => async (e) => {
+      const b = e.currentTarget; b.disabled = true;
+      try { await fn(); } catch (err) { if (err.name !== 'AbortError') { status('⚠ ' + err.message); alert(err.message); } } finally { b.disabled = false; }
+    };
+    const on = (sel, fn) => { const el = $(sel, panel); if (el) el.addEventListener('click', guard(fn)); };
+
+    on('#shareBtn', async () => {
+      const pdf = await getPdf();
+      const file = new File([pdf], docFileName(inv), { type: 'application/pdf' });
+      await copy(); // LINEによっては本文が渡らないので、念のためコピーしておく
+      await navigator.share({ files: [file], text: msg(), title: `${D.label} No.${inv.number}` });
+      recordSent(inv, '共有（LINE等）'); toast('送付履歴に記録しました'); route();
+    });
+    on('#lineBtn', async () => {
+      downloadBlob(await getPdf(), docFileName(inv));
+      const copied = await copy();
+      status(`PDFを保存しました${copied ? '・メッセージをコピーしました' : ''}。LINEでトークを開き、PDFをドラッグしてメッセージを貼り付けてください。`);
+      try { window.location.href = 'line://'; } catch (e) { /* LINEアプリが無い場合は何もしない */ }
+      if (confirm('LINEで送り終わったら「OK」を押してください（送付履歴に記録します）')) { recordSent(inv, 'LINE'); route(); }
+    });
+    on('#mailBtn', async () => {
+      const to = $('#sendTo').value.trim();
+      if (!to) throw new Error('宛先のメールアドレスを入力してください');
+      const pdf = await getPdf();
+      status('送信しています…');
+      await api('/api/send-mail', { to, subject: $('#sendSubject').value, text: msg(), pdf: await blobToBase64(pdf), filename: docFileName(inv), bcc_self: $('#bccSelf') && $('#bccSelf').checked });
+      // 宛先を取引先に覚えておく
+      const c = findCustomer(inv.customerId);
+      if (c && c.email !== to) { c.email = to; touch(c); }
+      if (inv.customerEmail !== to) inv.customerEmail = to;
+      recordSent(inv, 'メール', to); toast(`${to} に送信しました`); route();
+    });
+    on('#mailtoBtn', async () => {
+      const to = $('#sendTo').value.trim();
+      downloadBlob(await getPdf(), docFileName(inv));
+      location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent($('#sendSubject').value)}&body=${encodeURIComponent(msg())}`;
+      status('PDFを保存しました。開いたメールにPDFを添付して送信してください。');
+      setTimeout(() => { if (confirm('メールを送り終わったら「OK」を押してください（送付履歴に記録します）')) { recordSent(inv, 'メール', to); route(); } }, 1500);
+    });
+    on('#pdfBtn', async () => { downloadBlob(await getPdf(), docFileName(inv)); status('PDFを保存しました'); });
+    on('#copyBtn', async () => { status((await copy()) ? 'メッセージをコピーしました' : 'コピーできませんでした。手で選択してコピーしてください'); });
+    on('#closeSend', async () => { panel.hidden = true; });
   }
 
   // ================= 取引先 =================
   function renderCustomerList() {
     const stats = {};
-    state.invoices.forEach((i) => {
+    state.invoices.filter(isInvoice).forEach((i) => {
       const k = i.customerId; if (!k) return;
       const st = stats[k] || (stats[k] = { count: 0, total: 0, unpaid: 0, last: '' });
       const t = calcTotals(i).total;
@@ -756,12 +1074,12 @@
   }
 
   function renderCustomerForm(id) {
-    const c = id ? findCustomer(id) : { id: null, name: '', honorific: '御中', postal: '', address: '', tel: '', fax: '', memo: '' };
+    const c = id ? findCustomer(id) : { id: null, name: '', honorific: '御中', postal: '', address: '', tel: '', fax: '', email: '', memo: '' };
     if (!c) { app.innerHTML = '<div class="empty">取引先が見つかりません</div>'; return; }
     const invs = id ? sortedInvoices().filter((i) => i.customerId === id) : [];
     app.innerHTML = `
       <div class="page-head"><h1>${id ? esc(c.name) : '取引先の追加'}</h1>
-        ${id ? `<button class="btn primary" id="newInv">＋ この取引先で請求書を作成</button>` : ''}</div>
+        ${id ? `<div class="btn-row"><button class="btn" data-newdoc="quote">＋ 見積書</button><button class="btn" data-newdoc="delivery">＋ 納品書</button><button class="btn primary" data-newdoc="invoice">＋ 請求書</button></div>` : ''}</div>
       <form class="card" id="f" autocomplete="off">
         <div class="grid-2">
           <label class="field"><span>取引先名</span><input name="name" value="${esc(c.name)}" required></label>
@@ -773,13 +1091,14 @@
           <label class="field"><span>FAX</span><input name="fax" value="${esc(c.fax)}" inputmode="tel"></label>
         </div>
         <label class="field"><span>住所</span><textarea name="address" rows="2">${esc(c.address)}</textarea></label>
+        <label class="field"><span>メールアドレス（請求書のメール送付用）</span><input name="email" type="email" value="${esc(c.email || '')}"></label>
         <label class="field"><span>メモ（担当者・締め日など）</span><input name="memo" value="${esc(c.memo)}"></label>
         <div class="btn-row" style="justify-content:space-between">
           ${id ? '<button type="button" class="btn danger" id="del">削除</button>' : '<span></span>'}
           <div class="btn-row"><a class="btn" href="#/customers">戻る</a><button class="btn primary">保存</button></div>
         </div>
       </form>
-      ${id ? `<div class="card"><h2>請求履歴</h2>${invs.length ? `<ul class="list">${invs.map(invoiceRow).join('')}</ul>` : '<div class="empty">まだ請求書はありません</div>'}</div>` : ''}`;
+      ${id ? `<div class="card"><h2>書類の履歴</h2>${invs.length ? `<ul class="list">${invs.map((r) => invoiceRow(r)).join('')}</ul>` : '<div class="empty">まだ書類はありません</div>'}</div>` : ''}`;
 
     const f = $('#f');
     f.addEventListener('submit', (e) => {
@@ -789,23 +1108,25 @@
       if (state.customers.some((x) => x.name === name && x.id !== c.id)) { toast('同じ名前の取引先があります'); return; }
       const oldName = c.name;
       Object.assign(c, fd, { name });
+      touch(c);
       if (!c.id) { c.id = uid(); state.customers.push(c); }
-      // 社名変更は未入金・下書きの請求書にだけ反映（発行済の控えは当時のまま残す）
-      if (oldName && oldName !== name) state.invoices.forEach((i) => { if (i.customerId === c.id && i.status === 'draft') i.customerName = name; });
+      // 社名変更は下書きの書類にだけ反映（発行済の控えは当時のまま残す）
+      if (oldName && oldName !== name) state.invoices.forEach((i) => { if (i.customerId === c.id && i.status === 'draft') { i.customerName = name; touch(i); } });
       save(); toast('保存しました'); location.hash = '#/customers';
     });
     if (id) {
       $('#del').addEventListener('click', () => {
         if (!confirm(`${c.name} を削除しますか？（発行済の請求書は残ります）`)) return;
         state.customers = state.customers.filter((x) => x.id !== c.id);
+        markDeleted(c.id);
         save(); location.hash = '#/customers';
       });
-      $('#newInv').addEventListener('click', () => {
-        const d = newInvoice();
-        Object.assign(d, { customerId: c.id, customerName: c.name, honorific: c.honorific, customerPostal: c.postal, customerAddress: c.address, customerTel: c.tel, customerFax: c.fax });
+      $$('[data-newdoc]').forEach((b) => b.addEventListener('click', () => {
+        const d = newInvoice(b.dataset.newdoc);
+        Object.assign(d, { customerId: c.id, customerName: c.name, honorific: c.honorific, customerPostal: c.postal, customerAddress: c.address, customerTel: c.tel, customerFax: c.fax, customerEmail: c.email || '' });
         renderEditor.draft = d;
-        location.hash = '#/invoices/new';
-      });
+        location.hash = '#/invoices/new?type=' + b.dataset.newdoc;
+      }));
     }
   }
 
@@ -829,7 +1150,9 @@
           <label class="field"><span>住所</span><textarea name="address" rows="2">${esc(s.address)}</textarea></label>
           <label class="field"><span>メール（任意）</span><input name="email" value="${esc(s.email)}"></label>
           <label class="field"><span>お振込先（改行可）</span><textarea name="bank" rows="4" placeholder="〇〇銀行\n〇〇支店\n普通 1234567\nカナメイギ">${esc(s.bank)}</textarea></label>
-          <label class="field"><span>備考の初期文</span><textarea name="notes" rows="4">${esc(s.notes)}</textarea></label>
+          <label class="field"><span>備考の初期文（請求書）</span><textarea name="notes" rows="4">${esc(s.notes)}</textarea></label>
+          <label class="field"><span>備考の初期文（見積書）</span><textarea name="quoteNotes" rows="3">${esc(s.quoteNotes)}</textarea></label>
+          <label class="field"><span>備考の初期文（納品書）</span><textarea name="deliveryNotes" rows="2">${esc(s.deliveryNotes)}</textarea></label>
         </div>
         <div class="card">
           <h2>計算・採番</h2>
@@ -842,6 +1165,8 @@
               ${[['nextMonthEnd', '翌月末'], ['monthEnd', '当月末'], ['none', '記載しない']].map(([v, l]) => `<option value="${v}" ${s.dueRule === v ? 'selected' : ''}>${l}</option>`).join('')}
             </select></label>
             <label class="field"><span>次の請求書番号</span><input name="nextNumber" inputmode="numeric" value="${esc(s.nextNumber)}"></label>
+            <label class="field"><span>次の見積書番号（Q＋4桁）</span><input name="nextQuoteNumber" inputmode="numeric" value="${esc(s.nextQuoteNumber)}"></label>
+            <label class="field"><span>次の納品書番号（D＋4桁）</span><input name="nextDeliveryNumber" inputmode="numeric" value="${esc(s.nextDeliveryNumber)}"></label>
           </div>
           <p class="muted small" style="margin:0">※税率・端数の変更は、税率を個別に持たない既存の請求書の表示にも反映されます。</p>
         </div>
@@ -850,13 +1175,14 @@
 
       <div class="card">
         <h2>バックアップ</h2>
-        <p class="small muted" style="margin-top:0">データはこの端末のブラウザ内に保存されています。別の端末で使う時や、念のための控えとして定期的に書き出してください。</p>
+        <p class="small muted" style="margin-top:0">${SERVER ? 'データはMacの中（~/.lucent-invoice/data.json）に保存され、毎日自動で控え（30日分）も残しています。念のため手元にも控えを取りたいときに使ってください。' : 'データはこの端末のブラウザ内に保存されています。念のための控えとして定期的に書き出してください。'}</p>
         <div class="btn-row">
           <button class="btn navy" id="exp">⬇ バックアップを書き出す</button>
           <label class="btn">⬆ バックアップを読み込む<input type="file" id="imp" accept="application/json,.json" hidden></label>
         </div>
       </div>
 
+      <div id="localOnly"></div>
       <div class="card">
         <h2>MakeLeaps連携</h2>
         ${SERVER ? `
@@ -884,6 +1210,8 @@
     if (SERVER) {
       api('/api/status').then((st) => {
         $('#mlstatus').innerHTML = st.configured ? '✅ MakeLeapsに接続設定済みです' : '⚠ まだ接続設定されていません';
+        if (st.local) renderLocalSettings(st);
+        else $('#mlstatus').innerHTML += '<br>※接続設定・スマホ共有・メール設定はMacの画面から変更できます。';
       }).catch(() => { $('#mlstatus').textContent = '⚠ 起動用サーバーに接続できません。「Lucent請求書.command」から開き直してください。'; });
       $('#mlsave').addEventListener('click', async () => {
         const client_id = $('#mlid').value.trim(), client_secret = $('#mlsecret').value.trim();
@@ -904,7 +1232,12 @@
     $('#f').addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = Object.fromEntries(new FormData(e.target).entries());
-      Object.assign(s, fd, { taxRate: toInt(fd.taxRate), nextNumber: toInt(fd.nextNumber) || s.nextNumber });
+      Object.keys(fd).forEach((k) => { if (typeof fd[k] === 'string' && k !== 'notes' && k !== 'quoteNotes' && k !== 'deliveryNotes' && k !== 'address' && k !== 'bank') fd[k] = fd[k].trim(); });
+      Object.assign(s, fd, {
+        taxRate: toInt(fd.taxRate), nextNumber: toInt(fd.nextNumber) || s.nextNumber,
+        nextQuoteNumber: toInt(fd.nextQuoteNumber) || s.nextQuoteNumber, nextDeliveryNumber: toInt(fd.nextDeliveryNumber) || s.nextDeliveryNumber
+      });
+      touchSettings();
       if (save()) toast('設定を保存しました');
     });
     $('#exp').addEventListener('click', () => {
@@ -918,7 +1251,14 @@
           const d = JSON.parse(r.result);
           if (!Array.isArray(d.invoices) || !Array.isArray(d.customers)) throw new Error('形式が違います');
           if (!confirm(`請求書${d.invoices.length}件・取引先${d.customers.length}社を読み込みます。\n今のデータは上書きされます。よろしいですか？`)) return;
-          state = { settings: Object.assign({}, DEFAULT_STATE.settings, d.settings || {}), customers: d.customers, invoices: d.invoices };
+          // 読み込んだ内容を最新として扱う（Macの共有データにも反映）
+          const stamp = nowIso();
+          d.invoices.forEach((x) => { x.updatedAt = stamp; });
+          d.customers.forEach((x) => { x.updatedAt = stamp; });
+          state.invoices.forEach((x) => { if (!d.invoices.some((y) => y.id === x.id)) markDeleted(x.id); });
+          state.customers.forEach((x) => { if (!d.customers.some((y) => y.id === x.id)) markDeleted(x.id); });
+          state = Object.assign(normalizeState(d), { deleted: state.deleted });
+          touchSettings();
           save(); toast('読み込みました'); route();
         } catch (err) { alert('読み込めませんでした：' + err.message); }
       };
@@ -943,6 +1283,89 @@
     });
   }
 
+  async function renderLocalSettings(st) {
+    const box = $('#localOnly'); if (!box) return;
+    let net = { ips: [], port: 8787, pinSet: false, devices: 0 };
+    try { net = await api('/api/network'); } catch (e) { /* 表示だけ省略 */ }
+    const url = net.ips.length ? `http://${net.ips[0]}:${net.port}/` : '';
+    box.innerHTML = `
+      <div class="card">
+        <h2>📱 スマホで使う（データ共有）</h2>
+        <p class="small muted" style="margin-top:0">スマホを<b>Macと同じWi-Fi</b>につないで、下のQRコードを読み取るかアドレスを開き、暗証番号を入れるとMacと同じデータを見たり、請求書を作ったり送ったりできます。</p>
+        <div class="grid-2">
+          <div>
+            <label class="field"><span>暗証番号（4〜8桁の数字）${net.pinSet ? '：✅ 設定済み' : '：未設定（スマホからは使えません）'}</span><input id="pin" inputmode="numeric" type="password" autocomplete="new-password" placeholder="${net.pinSet ? '変更するときだけ入力' : '例：1234'}"></label>
+            <div class="btn-row"><button class="btn primary" id="pinSave">${net.pinSet ? '暗証番号を変更' : 'スマホ共有をオンにする'}</button>${net.pinSet ? '<button class="btn danger" id="pinOff">スマホ共有をオフ</button>' : ''}</div>
+            <p class="small muted">ログイン中のスマホ：${net.devices}台（暗証番号を変えると全てログアウトされます）</p>
+          </div>
+          <div>
+            ${net.pinSet && url ? `<div id="qr" class="qr"></div><p class="small" style="word-break:break-all">${net.ips.map((ip) => `http://${ip}:${net.port}/`).join('<br>')}</p>
+              <p class="small muted">開いたら「ホーム画面に追加」（iPhoneは共有ボタン→ホーム画面に追加）でアプリのように使えます。</p>` : '<p class="small muted">暗証番号を設定するとQRコードが表示されます。</p>'}
+          </div>
+        </div>
+        <p class="small muted">※Macがスリープ中・電源オフのときはスマホから使えません。外出先からも使いたい場合は相談してください。初回に「受信接続を許可しますか？」と出たら「許可」を押してください。</p>
+      </div>
+      <div class="card">
+        <h2>✉️ メール送信（Gmail）</h2>
+        <p class="small muted" style="margin-top:0">登録すると、書類画面の「送る」からPDF付きメールを直接送信できます（Mac・スマホどちらからでも）。Gmailの<b>アプリパスワード</b>（Googleアカウント → セキュリティ → 2段階認証 → アプリパスワード で作る16文字）を使います。普段のパスワードではありません。</p>
+        <p class="small">${st.mail ? `✅ ${esc(st.mail)} から送信します` : '⚠ まだ設定されていません'}</p>
+        <div class="grid-3">
+          <label class="field"><span>Gmailアドレス</span><input id="mailUser" type="email" value="${esc(st.mail || '')}" placeholder="example@gmail.com"></label>
+          <label class="field"><span>アプリパスワード（16文字）</span><input id="mailPass" type="password" autocomplete="new-password" placeholder="${st.mail ? '変更するときだけ入力' : 'xxxx xxxx xxxx xxxx'}"></label>
+          <label class="field"><span>差出人名</span><input id="mailName" value="${esc(state.settings.companyName)}"></label>
+        </div>
+        <div class="btn-row"><button class="btn primary" id="mailSave">確認して保存</button>${st.mail ? '<button class="btn danger" id="mailOff">メール送信をオフ</button>' : ''}</div>
+      </div>`;
+    if (net.pinSet && url) {
+      try {
+        await loadScript('vendor/qrcode.js');
+        const qr = window.qrcode(0, 'M'); qr.addData(url); qr.make();
+        $('#qr').innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2 });
+      } catch (e) { /* QRが出なくてもアドレスで開ける */ }
+    }
+    const busy = async (btn, fn) => { btn.disabled = true; try { await fn(); } catch (err) { alert(err.message); } finally { btn.disabled = false; } };
+    $('#pinSave').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+      const pin = $('#pin').value.trim();
+      if (!/^\d{4,8}$/.test(pin)) throw new Error('暗証番号は4〜8桁の数字で入力してください');
+      await api('/api/pin', { pin }); toast('スマホ共有をオンにしました'); renderLocalSettings(st);
+    }));
+    if ($('#pinOff')) $('#pinOff').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+      if (!confirm('スマホ共有をオフにします。ログイン中のスマホからは使えなくなります。')) return;
+      await api('/api/pin', { pin: '' }); toast('スマホ共有をオフにしました'); renderLocalSettings(st);
+    }));
+    $('#mailSave').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+      const user = $('#mailUser').value.trim(), password = $('#mailPass').value.trim();
+      if (!user || !password) throw new Error('Gmailアドレスとアプリパスワードを入力してください');
+      e.currentTarget.textContent = '確認中…';
+      await api('/api/mail-settings', { user, password, from_name: $('#mailName').value.trim() });
+      toast('メール送信を設定しました'); st.mail = user; renderLocalSettings(st);
+    }));
+    if ($('#mailOff')) $('#mailOff').addEventListener('click', (e) => busy(e.currentTarget, async () => {
+      await api('/api/mail-settings', { user: '' }); st.mail = ''; toast('メール送信をオフにしました'); renderLocalSettings(st);
+    }));
+  }
+
+  // ---------- スマホのログイン画面 ----------
+  function renderLogin(pinSet) {
+    $$('#nav a').forEach((el) => el.classList.remove('active'));
+    app.innerHTML = `
+      <div class="card login">
+        <h1>🔒 Lucent 請求書管理</h1>
+        ${pinSet ? `<p class="small muted">Macで設定した暗証番号を入力してください。</p>
+          <form id="lf"><input id="lpin" inputmode="numeric" type="password" autocomplete="current-password" placeholder="暗証番号" autofocus>
+          <button class="btn primary" style="width:100%;margin-top:10px">ログイン</button></form>`
+          : '<p class="small">スマホ共有がオフになっています。Macの「設定 → スマホで使う」で暗証番号を設定してください。</p>'}
+        <p class="small" id="lmsg" style="color:var(--danger)"></p>
+      </div>`;
+    const lf = $('#lf');
+    if (lf) lf.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const res = await fetch('/api/login', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-Lucent': '1' }, body: JSON.stringify({ pin: $('#lpin').value }) });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok) { authRequired = false; startServerSync(); } else $('#lmsg').textContent = d.error || 'ログインできませんでした';
+    });
+  }
+
   // MakeLeapsデータを既存データに追加（externalIdで重複判定）
   function importMakeLeaps(d) {
     const res = { added: 0, updated: 0, kept: 0, newCustomers: 0 };
@@ -951,41 +1374,63 @@
       let c = state.customers.find((x) => x.name === mc.name);
       if (!c) {
         c = { id: uid(), name: mc.name, honorific: mc.honorific || '御中', postal: mc.postal || '', address: mc.address || '', tel: mc.tel || '', fax: mc.fax || '', memo: '' };
-        state.customers.push(c); res.newCustomers++;
+        touch(c); state.customers.push(c); res.newCustomers++;
       } else {
         // 空欄だけ補う（手入力した情報は上書きしない）
-        ['postal', 'address', 'tel', 'fax'].forEach((k) => { if (!c[k] && mc[k]) c[k] = mc[k]; });
+        let filled = false;
+        ['postal', 'address', 'tel', 'fax'].forEach((k) => { if (!c[k] && mc[k]) { c[k] = mc[k]; filled = true; } });
+        if (filled) touch(c);
       }
     });
     const now = new Date().toISOString();
     d.invoices.forEach((mi) => {
       const c = state.customers.find((x) => x.name === mi.customerName);
-      const data = Object.assign({}, mi, { customerId: c ? c.id : '', importedAt: now });
+      const data = Object.assign({}, mi, { docType: 'invoice', customerId: c ? c.id : '', importedAt: now });
       const ex = mi.externalId && state.invoices.find((x) => x.externalId === mi.externalId);
       if (ex) {
         // このアプリで編集した請求書は上書きしない（入金状態だけはMakeLeaps側が入金済なら反映）
         if (ex.updatedAt && ex.importedAt && ex.updatedAt > ex.importedAt) {
-          if (mi.status === 'paid' && ex.status !== 'paid') Object.assign(ex, { status: 'paid', paidDate: mi.paidDate, paidAmount: mi.paidAmount });
-          if (!(ex.items || []).some((it) => it.part || toInt(it.price)) && (mi.items || []).length) Object.assign(ex, { items: mi.items, importedTotals: mi.importedTotals });
+          let changed = false;
+          if (mi.status === 'paid' && ex.status !== 'paid') { Object.assign(ex, { status: 'paid', paidDate: mi.paidDate, paidAmount: mi.paidAmount }); changed = true; }
+          if (!(ex.items || []).some((it) => it.part || toInt(it.price)) && (mi.items || []).length) { Object.assign(ex, { items: mi.items, importedTotals: mi.importedTotals }); changed = true; }
+          if (changed) touch(ex); // importedAt はそのまま（手で編集した扱いを保つ）
           res.kept++;
         } else {
           const keepPaid = ex.status === 'paid' && data.status !== 'paid' ? { status: 'paid', paidDate: ex.paidDate, paidAmount: ex.paidAmount } : {};
-          Object.assign(ex, data, keepPaid, { id: ex.id, updatedAt: now }); res.updated++;
+          const keepLocal = { sent: ex.sent, customerEmail: ex.customerEmail, sourceId: ex.sourceId };
+          if (JSON.stringify(Object.assign({}, ex, data, keepPaid, keepLocal, { id: ex.id, updatedAt: ex.updatedAt, importedAt: ex.importedAt })) !== JSON.stringify(ex)) {
+            Object.assign(ex, data, keepPaid, keepLocal, { id: ex.id, updatedAt: now }); res.updated++;
+          }
         }
       } else {
         state.invoices.push(Object.assign(data, { id: uid(), createdAt: now, updatedAt: now })); res.added++;
       }
-      const n = toInt(mi.number);
-      if (n && n < 1e9 && n >= state.settings.nextNumber) state.settings.nextNumber = n + 1;
+      bumpNumber('invoice', mi.number);
     });
     return res;
   }
 
-  route();
-  if (SERVER) {
-    api('/api/status').then((st) => {
+  // ---------- 起動 ----------
+  let pollTimer = null;
+  async function startServerSync() {
+    try {
+      // この端末の控えとMacのデータを合わせる（初回はこの端末のデータがMacに入る）
+      const r = await api('/api/data', { state });
+      serverRev = r.rev;
+      adoptState(r.state);
+    } catch (e) {
+      if (authRequired) return;
+      setSyncBadge('⚠ Macと通信できません。この端末の控えを表示しています');
+    }
+    route();
+    clearInterval(pollTimer);
+    pollTimer = setInterval(() => { if (document.visibilityState === 'visible') pullState(); }, 15000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullState(); });
+    try {
+      const st = await api('/api/status');
       const last = Date.parse(state.settings.lastMakeLeapsImport || 0) || 0;
       if (st.configured && Date.now() - last > 30 * 60 * 1000) syncMakeLeaps({ silent: true });
-    }).catch(() => {});
+    } catch (e) { /* 同期できなくても画面は使える */ }
   }
+  if (SERVER) { app.innerHTML = '<div class="empty">読み込み中…</div>'; startServerSync(); } else route();
 })();
