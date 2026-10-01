@@ -52,6 +52,7 @@ def save_creds(cid, secret):
 
 
 class Handler(SimpleHTTPRequestHandler):
+    extensions_map = {**SimpleHTTPRequestHandler.extensions_map, ".webmanifest": "application/manifest+json"}
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=APP_DIR, **kw)
 
