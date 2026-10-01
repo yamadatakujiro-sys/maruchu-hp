@@ -139,7 +139,14 @@ def find_partner_mid(cli):
     sys.exit("組織（partner）の mid が見つかりませんでした。--mid で指定してください。")
 
 
+def paid_date(doc):
+    """MakeLeaps は入金済になると date_paid（または payment_date）に日付が入る"""
+    return to_date(pick(doc, "date_paid", "payment_date", "paid_date"))
+
+
 def is_paid(doc):
+    if paid_date(doc):
+        return True
     for k in ("paid", "is_paid", "payment_completed"):
         if doc.get(k) is True:
             return True
@@ -159,28 +166,34 @@ def convert(docs, clients_by_url, since, until):
         date = to_date(pick(d, "date", "issue_date", "created"))
         if since and date < since or until and date > until:
             continue
-        if d.get("deleted") or d.get("is_deleted") or str(d.get("status", "")).lower() in ("cancelled", "canceled", "void"):
+        if d.get("date_cancelled") or d.get("date_removed") or d.get("deleted") or d.get("is_deleted") or str(d.get("status", "")).lower() in ("cancelled", "canceled", "void"):
             skipped += 1
             continue
 
         c = d.get("client")
         cobj = clients_by_url.get(c) if isinstance(c, str) else (c if isinstance(c, dict) else {})
         cobj = cobj or {}
-        name = pick(cobj, "display_name", "name", "company_name") or pick(d, "client_name", "client_display_name") or "（取引先不明）"
+        name = pick(cobj, "display_name", "name", "company_name") or pick(d, "recipient_name", "client_name") or "（取引先不明）"
+        # 住所は「都道府県＋市区町村＋番地」と「建物名」を2行に
+        addr1 = "".join(str(pick(d, k)) for k in ("recipient_region", "recipient_locality", "recipient_street_address"))
+        addr2 = str(pick(d, "recipient_extended_address"))
+        addr = "\n".join(x for x in (addr1, addr2) if x) or pick(cobj, "address", "address_line_1")
         cust = customers.setdefault(name, {
             "name": name,
-            "honorific": "御中",
-            "postal": pick(cobj, "postal_code", "zipcode"),
-            "address": pick(cobj, "address", "address_line_1"),
-            "tel": pick(cobj, "phone", "tel", "phone_number"),
-            "fax": pick(cobj, "fax", "fax_number"),
+            "honorific": pick(d, "recipient_honorific") or "御中",
+            "postal": pick(d, "recipient_postal_code") or pick(cobj, "postal_code", "zipcode"),
+            "address": addr,
+            "tel": pick(d, "recipient_phone_number") or pick(cobj, "phone", "tel", "phone_number"),
+            "fax": pick(d, "recipient_fax_number") or pick(cobj, "fax", "fax_number"),
             "externalId": pick(cobj, "mid"),
         })
 
         items = []
-        for ln in d.get("lines") or d.get("items") or []:
-            kind = str(ln.get("kind", "normal")).lower()
-            if kind not in ("normal", "simple", "item", ""):
+        for ln in d.get("lineitems") or d.get("lines") or d.get("items") or []:
+            if not isinstance(ln, dict):
+                continue
+            kind = str(ln.get("kind", "")).lower()
+            if kind in ("subtotal", "text", "heading", "header", "note", "comment"):
                 continue  # 小計行・見出し行などは除外
             desc = pick(ln, "description", "name", "title")
             qty = ln.get("quantity", 1)
@@ -189,6 +202,8 @@ def convert(docs, clients_by_url, since, until):
             except (TypeError, ValueError):
                 qty_f = 1
             price = money(pick(ln, "price", "unit_price", default=0))
+            if not price and pick(ln, "amount", "total"):
+                price, qty_f = money(pick(ln, "amount", "total")), 1  # 単価が無ければ行金額を1個分として扱う
             if not desc and not price:
                 continue
             # 数量が小数の場合は金額を単価に寄せて1個扱いにする
@@ -205,7 +220,7 @@ def convert(docs, clients_by_url, since, until):
             "source": "makeleaps",
             "number": str(pick(d, "document_number", "number")),
             "issueDate": date,
-            "dueDate": to_date(pick(d, "due_date", "payment_due_date")),
+            "dueDate": to_date(pick(d, "date_due", "due_date", "payment_due_date")),
             "customerName": name,
             "honorific": cust["honorific"],
             "customerPostal": cust["postal"],
@@ -217,7 +232,7 @@ def convert(docs, clients_by_url, since, until):
             "importedTotals": {"subtotal": subtotal, "tax": tax, "total": total},
             "notes": pick(d, "note", "notes", "memo"),
             "status": "paid" if paid else "issued",
-            "paidDate": to_date(pick(d, "paid_date", "payment_date")) if paid else "",
+            "paidDate": paid_date(d) if paid else "",
             "paidAmount": total if paid else "",
             "memo": "MakeLeapsから取り込み",
         })
