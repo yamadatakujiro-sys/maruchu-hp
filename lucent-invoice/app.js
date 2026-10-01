@@ -286,7 +286,11 @@
       save();
       const g = d.diagnostics || {};
       let msg = `同期完了：新規 ${res.added}件／更新 ${res.updated}件`;
-      if (g.invoices && !g.withItems) {
+      const missing = state.invoices.filter((i) => i.source === 'makeleaps' && !(i.items || []).some((it) => it.part || toInt(it.price)));
+      if (missing.length) msg += `\n\n⚠ 内訳が入っていない請求書：${missing.length}件（No.${missing.map((i) => i.number).join(', No.')}）\n請求書を開くと「原因を調べる」ボタンがあります。`;
+      if (missing.length && g.invoices && g.withItems) {
+        alert(msg);
+      } else if (g.invoices && !g.withItems) {
         alert(msg + '\n\n⚠ 明細（内訳）が取得できませんでした。この画面のスクリーンショットを送ってください。\n診断：' + JSON.stringify(g.lineitems) + '\n項目：' + JSON.stringify(g.itemFields));
       } else if (!opts.silent || res.added) toast(msg);
     } catch (err) {
@@ -604,7 +608,9 @@
   function paperHtml(inv) {
     const s = state.settings;
     const t = calcTotals(inv);
-    const rows = inv.items.map((it) => `<tr><td>${esc(itemLabel(it))}</td><td class="c-qty">${num(it.qty)}</td><td class="c-price">${num(it.price)}</td><td class="c-amt">${num(lineAmount(it))}</td></tr>`);
+    const rows = inv.items.map((it) => (!toInt(it.qty) && !toInt(it.price))
+      ? `<tr><td>${esc(itemLabel(it))}</td><td></td><td></td><td></td></tr>`
+      : `<tr><td>${esc(itemLabel(it))}</td><td class="c-qty">${num(it.qty)}</td><td class="c-price">${num(it.price)}</td><td class="c-amt">${num(lineAmount(it))}</td></tr>`);
     while (rows.length < 8) rows.push('<tr><td></td><td></td><td></td><td></td></tr>'); // 空行で紙面を整える
     const br = (v) => esc(v).replace(/\n/g, '<br>');
     return `
@@ -669,6 +675,8 @@
         <button class="btn" id="dup">⧉ 複製して新規</button>
         <button class="btn danger" id="del">削除</button>
       </div>
+      ${inv.source === 'makeleaps' && !(inv.items || []).some((it) => it.part || toInt(it.price)) ? `<div class="card small" style="background:var(--warn-soft)">⚠ この請求書はMakeLeapsから内訳が取り込めていません。
+        ${SERVER ? '<button class="btn sm" id="inspect">原因を調べる</button><pre id="inspectOut" style="white-space:pre-wrap;font-size:11px;max-height:320px;overflow:auto;margin:8px 0 0"></pre>' : '「Lucent請求書.command」から開くと原因を調べられます。'}</div>` : ''}
       ${!state.settings.bank ? '<div class="card small" style="background:var(--warn-soft)">⚠ 振込先が未設定です。<a href="#/settings">設定</a>で入力すると請求書に印字されます。</div>' : ''}
       <div class="paper-wrap">${paperHtml(inv)}</div>`;
 
@@ -680,6 +688,13 @@
     });
     const on = (sel, fn) => { const el = $(sel); if (el) el.addEventListener('click', fn); };
     on('#pay', () => { if (markPaid(inv)) route(); });
+    on('#inspect', async () => {
+      $('#inspectOut').textContent = '調査中…';
+      try {
+        const r = await api('/api/inspect?doc=' + encodeURIComponent(inv.externalId));
+        $('#inspectOut').textContent = 'No.' + inv.number + '\n' + JSON.stringify(r, null, 1);
+      } catch (err) { $('#inspectOut').textContent = 'エラー：' + err.message; }
+    });
     on('#unpay', () => { Object.assign(inv, { status: 'issued', paidDate: '', paidAmount: '', updatedAt: new Date().toISOString() }); save(); route(); });
     on('#issue', () => { Object.assign(inv, { status: 'issued', updatedAt: new Date().toISOString() }); save(); route(); });
     on('#dup', () => {
@@ -946,6 +961,7 @@
         // このアプリで編集した請求書は上書きしない（入金状態だけはMakeLeaps側が入金済なら反映）
         if (ex.updatedAt && ex.importedAt && ex.updatedAt > ex.importedAt) {
           if (mi.status === 'paid' && ex.status !== 'paid') Object.assign(ex, { status: 'paid', paidDate: mi.paidDate, paidAmount: mi.paidAmount });
+          if (!(ex.items || []).some((it) => it.part || toInt(it.price)) && (mi.items || []).length) Object.assign(ex, { items: mi.items, importedTotals: mi.importedTotals });
           res.kept++;
         } else {
           const keepPaid = ex.status === 'paid' && data.status !== 'paid' ? { status: 'paid', paidDate: ex.paidDate, paidAmount: ex.paidAmount } : {};

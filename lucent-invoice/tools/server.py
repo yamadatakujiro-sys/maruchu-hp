@@ -94,11 +94,35 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._json({"error": "forbidden"}, 403)
             if self.path == "/api/status":
                 return self._json({"server": True, "configured": bool(load_creds())})
+            if self.path.startswith("/api/inspect?"):
+                return self._inspect()
             return self._json({"error": "not found"}, 404)
         p = posixpath.normpath(urllib.parse.unquote(self.path.split("?")[0]))
         if p.startswith("/tools") or any(seg.startswith(".") for seg in p.split("/") if seg):
             return self.send_error(404)  # スクリプトや隠しファイルは配信しない
         return super().do_GET()
+
+    def _inspect(self):
+        """1件の請求書について MakeLeaps 上の明細をそのまま返す（内訳が取れない原因調査用）"""
+        creds = load_creds()
+        if not creds:
+            return self._json({"error": "MakeLeapsの接続設定がまだです"}, 400)
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        doc = (q.get("doc") or [""])[0]
+        try:
+            cli = ml.Client(creds["client_id"], creds["client_secret"])
+            cli.auth()
+            url = doc if doc.startswith("http") else f"/api/partner/{ml.find_partner_mid(cli)}/document/{doc}/"
+            detail = ml.unwrap(cli.get(url))
+            lines = ml.resolve_lineitems(cli, detail if isinstance(detail, dict) else {})
+            keys = sorted(detail.keys()) if isinstance(detail, dict) else []
+            return self._json({
+                "documentKeys": [k for k in keys if any(w in k for w in ("line", "item", "group", "total"))],
+                "lineitemsRaw": detail.get("lineitems") if isinstance(detail, dict) else None,
+                "resolved": lines,
+            })
+        except ml.MLError as e:
+            return self._json({"error": str(e)}, 502)
 
     def do_POST(self):
         if not self._allowed():

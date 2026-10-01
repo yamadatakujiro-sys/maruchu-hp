@@ -196,6 +196,43 @@ def resolve_lineitems(cli, d):
 resolve_lineitems.diag = None
 
 
+def flatten_lines(lines):
+    """グループ（税率ごと等）で入れ子になった明細を1列に並べる"""
+    out = []
+    for ln in lines or []:
+        if not isinstance(ln, dict):
+            continue
+        children = next((ln[k] for k in ("lineitems", "items", "children", "sub_lineitems") if isinstance(ln.get(k), list)), None)
+        if children:
+            out.extend(flatten_lines(children))
+        else:
+            out.append(ln)
+    return out
+
+
+def line_to_item(ln):
+    """MakeLeaps の明細1行 → アプリの明細1行（小計行は除外。品名だけの行は金額空欄で残す）"""
+    kind = str(ln.get("kind", "")).lower()
+    if kind in ("subtotal", "total"):
+        return None
+    desc = str(pick(ln, "description", "name", "title", "text", "label")).strip()
+    try:
+        qty_f = float(pick(ln, "quantity", "qty", default=1))
+    except (TypeError, ValueError):
+        qty_f = 1
+    price = money(pick(ln, "price", "unit_price", "price_per_unit", "rate", default=0))
+    if not price and pick(ln, "amount", "total", "subtotal"):
+        price, qty_f = money(pick(ln, "amount", "total", "subtotal")), 1  # 単価が無ければ行金額を1個分として扱う
+    if not desc and not price:
+        return None
+    if not price and kind in ("text", "heading", "header", "note", "comment"):
+        return {"date": "", "car": "", "part": desc, "qty": 0, "price": 0}  # 見出し・メモ行
+    # 数量が小数の場合は金額を単価に寄せて1個扱いにする
+    if qty_f != int(qty_f):
+        price, qty_f = int(round(price * qty_f)), 1
+    return {"date": "", "car": "", "part": desc, "qty": int(qty_f), "price": price}
+
+
 def convert(cli, docs, clients_by_url, since, until):
     customers, invoices = {}, []
     skipped = 0
@@ -228,31 +265,17 @@ def convert(cli, docs, clients_by_url, since, until):
             "externalId": pick(cobj, "mid"),
         })
 
-        items = []
-        lines = resolve_lineitems(cli, d) or d.get("lines") or d.get("items") or []
+        lines = flatten_lines(resolve_lineitems(cli, d) or d.get("lines") or d.get("items") or [])
         if lines and not convert.sample:
             convert.sample = {k: type(v).__name__ for k, v in lines[0].items()}
-        for ln in lines:
-            if not isinstance(ln, dict):
-                continue
-            kind = str(ln.get("kind", "")).lower()
-            if kind in ("subtotal", "text", "heading", "header", "note", "comment"):
-                continue  # 小計行・見出し行などは除外
-            desc = pick(ln, "description", "name", "title")
-            qty = ln.get("quantity", 1)
-            try:
-                qty_f = float(qty)
-            except (TypeError, ValueError):
-                qty_f = 1
-            price = money(pick(ln, "price", "unit_price", default=0))
-            if not price and pick(ln, "amount", "total"):
-                price, qty_f = money(pick(ln, "amount", "total")), 1  # 単価が無ければ行金額を1個分として扱う
-            if not desc and not price:
-                continue
-            # 数量が小数の場合は金額を単価に寄せて1個扱いにする
-            if qty_f != int(qty_f):
-                price, qty_f = int(round(price * qty_f)), 1
-            items.append({"date": "", "car": "", "part": desc, "qty": int(qty_f), "price": price})
+        items = [it for it in (line_to_item(ln) for ln in lines) if it]
+        if not items:
+            # 内訳が取れなかった請求書は、原因調査のため明細の形を記録しておく
+            convert.missing.append({
+                "number": str(pick(d, "document_number")), "lines": len(lines),
+                "kinds": sorted({str(ln.get("kind", "")) for ln in lines}),
+                "fields": sorted(lines[0].keys()) if lines else [],
+            })
 
         subtotal = money(pick(d, "subtotal", "total_excluding_tax", default=0))
         tax = money(pick(d, "tax", "tax_total", "total_tax", default=0))
@@ -294,6 +317,7 @@ def export(cli, since=None, until=None, mid=None, log=print):
     docs = cli.get_all(f"/api/partner/{mid}/document/")
     log("明細を取得中…")
     convert.sample = None
+    convert.missing = []
     resolve_lineitems.diag = None
     customers, invoices, skipped = convert(cli, docs, clients_by_url, since, until)
     out = {
@@ -307,6 +331,7 @@ def export(cli, since=None, until=None, mid=None, log=print):
         "paid": sum(1 for i in invoices if i["status"] == "paid"),
         "withItems": sum(1 for i in invoices if i["items"]),
         "itemFields": convert.sample, "lineitems": resolve_lineitems.diag,
+        "missingItems": convert.missing,
     }
     return out, diag, {"clients": clients, "documents": docs}
 
@@ -348,6 +373,8 @@ def main():
     print(f"入金日あり  : {diag['paid']} 件")
     print(f"明細あり    : {diag['withItems']} / {len(invoices)} 件")
     print(f"明細の診断  : {diag['lineitems']}  項目: {diag['itemFields']}")
+    for m in diag["missingItems"]:
+        print(f"  内訳なし No.{m['number']}：明細{m['lines']}行 種類{m['kinds']} 項目{m['fields']}")
     print(f"取引先      : {len(out['customers'])} 社")
     print(f"ファイル    : {os.path.abspath(a.out)}")
     print("→ 請求書管理の「設定 → MakeLeapsから取り込む」で読み込んでください。")
