@@ -192,8 +192,11 @@
 
     app.innerHTML = `
       <div class="page-head">
-        <div><h1>ホーム</h1><div class="muted small">${fmtDate(now)} 現在</div></div>
-        <a class="btn primary" href="#/invoices/new">＋ 請求書を作成</a>
+        <div><h1>ホーム</h1><div class="muted small">${fmtDate(now)} 現在${state.settings.lastMakeLeapsImport ? '・MakeLeaps同期 ' + new Date(state.settings.lastMakeLeapsImport).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}</div></div>
+        <div class="btn-row">
+          ${SERVER ? `<button class="btn" data-sync>🔄 MakeLeapsと同期</button>` : ''}
+          <a class="btn primary" href="#/invoices/new">＋ 請求書を作成</a>
+        </div>
       </div>
       <div class="stats">
         <div class="stat"><div class="label">今月の売上（税込）</div><div class="value">${yen(monthSales)}</div></div>
@@ -204,7 +207,7 @@
 
       <div class="card">
         <h2>入金待ちの請求書</h2>
-        ${unpaidList.length ? `<ul class="list">${unpaidList.map(invoiceRow).join('')}</ul>` : '<div class="empty">入金待ちはありません 🎉</div>'}
+        ${unpaidList.length ? `<ul class="list">${unpaidList.map((i) => invoiceRow(i, true)).join('')}</ul>` : '<div class="empty">入金待ちはありません 🎉</div>'}
       </div>
 
       <div class="grid-2">
@@ -223,14 +226,78 @@
       </div>`;
   }
 
-  function invoiceRow(inv) {
+  function invoiceRow(inv, withPay) {
     const t = calcTotals(inv);
-    return `<li><a class="row" href="#/invoices/${inv.id}">
+    const payBtn = withPay === true && inv.status !== 'paid' ? `<button class="btn sm primary pay-btn" data-pay="${inv.id}">入金</button>` : '';
+    return `<li class="${payBtn ? 'has-action' : ''}"><a class="row" href="#/invoices/${inv.id}">
       <span class="title">No.${esc(inv.number)}　${esc(inv.customerName || '（取引先未設定）')}</span>
       <span class="amount">${yen(t.total)}</span>
       <span class="meta">${fmtDate(inv.issueDate)} 発行${inv.dueDate ? '・期限 ' + fmtDate(inv.dueDate) : ''}${inv.paidDate ? '・入金 ' + fmtDate(inv.paidDate) : ''}${inv.source === 'makeleaps' ? '・MakeLeaps' : ''}</span>
       <span>${badge(inv)}</span>
-    </a></li>`;
+    </a>${payBtn}</li>`;
+  }
+
+  // ---------- 入金の消し込み（入金日・入金額を入れて入金済にする） ----------
+  function markPaid(inv) {
+    const total = calcTotals(inv).total;
+    const d = prompt(`No.${inv.number} ${inv.customerName}（${yen(total)}）\n\n入金日（YYYY-MM-DD）`, today());
+    if (d === null) return false;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('日付の形式が正しくありません（例：2026-10-01）'); return false; }
+    const amt = prompt('入金額（振込手数料を引かれていたら実際の入金額）', total);
+    if (amt === null) return false;
+    Object.assign(inv, { status: 'paid', paidDate: d, paidAmount: toInt(amt), updatedAt: new Date().toISOString() });
+    if (toInt(amt) !== total) inv.memo = (inv.memo ? inv.memo + ' / ' : '') + `入金差額 ${num(toInt(amt) - total)}円`;
+    save(); toast(`No.${inv.number} を入金済にしました`);
+    return true;
+  }
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-sync]')) { e.preventDefault(); syncMakeLeaps(); }
+  });
+  // 一覧の「入金」ボタン（どの画面でも共通で拾う）
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pay]');
+    if (!b) return;
+    e.preventDefault();
+    const inv = findInvoice(b.dataset.pay);
+    if (inv && markPaid(inv)) route();
+  });
+
+  // ---------- MakeLeaps 同期（起動用サーバー経由） ----------
+  const SERVER = location.protocol === 'http:' || location.protocol === 'https:';
+  async function api(path, body) {
+    const res = await fetch(path, body === undefined ? {} : {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Lucent': '1' }, body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    return data;
+  }
+  let syncing = false;
+  async function syncMakeLeaps(opts = {}) {
+    if (!SERVER) { alert('同期は「Lucent請求書.command」から開いたときに使えます。'); return; }
+    if (syncing) return;
+    syncing = true;
+    $$('[data-sync]').forEach((b) => { b.dataset.label = b.dataset.label || b.textContent; b.disabled = true; b.textContent = '同期中…'; });
+    if (!opts.silent) toast('MakeLeapsからデータを取得しています…');
+    try {
+      const d = await api('/api/sync', { all: !!opts.all });
+      const res = importMakeLeaps(d);
+      state.settings.lastMakeLeapsImport = new Date().toISOString();
+      save();
+      const g = d.diagnostics || {};
+      let msg = `同期完了：新規 ${res.added}件／更新 ${res.updated}件`;
+      if (g.invoices && !g.withItems) {
+        alert(msg + '\n\n⚠ 明細（内訳）が取得できませんでした。この画面のスクリーンショットを送ってください。\n診断：' + JSON.stringify(g.lineitems) + '\n項目：' + JSON.stringify(g.itemFields));
+      } else if (!opts.silent || res.added) toast(msg);
+    } catch (err) {
+      if (!opts.silent) alert('同期できませんでした：' + err.message);
+    } finally {
+      syncing = false;
+      $$('[data-sync]').forEach((b) => { b.disabled = false; if (b.dataset.label) b.textContent = b.dataset.label; });
+      // 入力中の画面（作成・編集・取引先・設定）は描き直さない
+      const h = location.hash;
+      if (!/\/(new|edit)$/.test(h) && !h.startsWith('#/customers/') && !h.startsWith('#/settings')) route();
+    }
   }
 
   // ================= 請求書一覧 =================
@@ -612,16 +679,7 @@
       setTimeout(() => { document.title = old; }, 1000);
     });
     const on = (sel, fn) => { const el = $(sel); if (el) el.addEventListener('click', fn); };
-    on('#pay', () => {
-      const d = prompt('入金日（YYYY-MM-DD）', today());
-      if (d === null) return;
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('日付の形式が正しくありません'); return; }
-      const amt = prompt('入金額', t.total);
-      if (amt === null) return;
-      Object.assign(inv, { status: 'paid', paidDate: d, paidAmount: toInt(amt), updatedAt: new Date().toISOString() });
-      if (toInt(amt) !== t.total) inv.memo = (inv.memo ? inv.memo + ' / ' : '') + `入金差額 ${num(toInt(amt) - t.total)}円`;
-      save(); toast('入金済にしました'); route();
-    });
+    on('#pay', () => { if (markPaid(inv)) route(); });
     on('#unpay', () => { Object.assign(inv, { status: 'issued', paidDate: '', paidAmount: '', updatedAt: new Date().toISOString() }); save(); route(); });
     on('#issue', () => { Object.assign(inv, { status: 'issued', updatedAt: new Date().toISOString() }); save(); route(); });
     on('#dup', () => {
@@ -780,11 +838,48 @@
       </div>
 
       <div class="card">
-        <h2>MakeLeapsから取り込む</h2>
-        <p class="small muted" style="margin-top:0">MacでMakeLeaps書き出しスクリプト（<code>tools/makeleaps_export.py</code>）を実行してできた <code>makeleaps-export.json</code> を選んでください。今のデータは消えず<b>追加</b>されます。同じ請求書を2回取り込んでも重複せず、MakeLeaps側の最新内容に更新されます。</p>
+        <h2>MakeLeaps連携</h2>
+        ${SERVER ? `
+          <p class="small muted" style="margin-top:0">MakeLeapsの「APIキー」画面のクライアントIDとシークレットを一度だけ入力してください。以後はホームの「🔄 MakeLeapsと同期」を押すだけで、請求書・明細・入金状態が反映されます（起動時にも自動で同期します）。</p>
+          <p class="small" id="mlstatus">接続状態を確認中…</p>
+          <div class="grid-2">
+            <label class="field"><span>クライアントID</span><input id="mlid" autocomplete="off"></label>
+            <label class="field"><span>クライアントシークレット</span><input id="mlsecret" type="password" autocomplete="new-password"></label>
+          </div>
+          <div class="btn-row" style="margin-bottom:12px">
+            <button class="btn" id="mlsave">接続設定を保存</button>
+            <button class="btn navy" data-sync>🔄 今年分を同期</button>
+            <button class="btn" id="mlall">全期間を同期</button>
+          </div>
+          <p class="small muted">※ID・シークレットはこのMacの中（~/.lucent-invoice）にだけ保存され、GitHubには上がりません。</p>
+          <details class="small"><summary class="muted">ファイルから取り込む（予備の方法）</summary>` : `
+          <p class="small" style="margin-top:0;background:var(--warn-soft);padding:8px;border-radius:8px">⚠ 今はファイルを直接開いているため、同期ボタンが使えません。<b>lucent-invoice フォルダの「Lucent請求書.command」をダブルクリック</b>して開いてください。</p>
+          <details class="small"><summary class="muted">ファイルから取り込む（予備の方法）</summary>`}
+        <p class="small muted">MacでMakeLeaps書き出しスクリプト（<code>tools/makeleaps_export.py</code>）を実行してできた <code>makeleaps-export.json</code> を選んでください。今のデータは消えず<b>追加</b>されます。同じ請求書を2回取り込んでも重複せず、MakeLeaps側の最新内容に更新されます。</p>
         ${s.lastMakeLeapsImport ? `<p class="small" style="margin-top:0">最終取り込み：${new Date(s.lastMakeLeapsImport).toLocaleString('ja-JP')}</p>` : ''}
-        <label class="btn navy">⬆ MakeLeapsデータを取り込む<input type="file" id="mlimp" accept="application/json,.json" hidden></label>
+        <label class="btn">⬆ MakeLeapsデータを取り込む<input type="file" id="mlimp" accept="application/json,.json" hidden></label>
+        </details>
       </div>`;
+
+    if (SERVER) {
+      api('/api/status').then((st) => {
+        $('#mlstatus').innerHTML = st.configured ? '✅ MakeLeapsに接続設定済みです' : '⚠ まだ接続設定されていません';
+      }).catch(() => { $('#mlstatus').textContent = '⚠ 起動用サーバーに接続できません。「Lucent請求書.command」から開き直してください。'; });
+      $('#mlsave').addEventListener('click', async () => {
+        const client_id = $('#mlid').value.trim(), client_secret = $('#mlsecret').value.trim();
+        if (!client_id || !client_secret) { toast('クライアントIDとシークレットを入力してください'); return; }
+        $('#mlsave').disabled = true; $('#mlsave').textContent = '確認中…';
+        try {
+          await api('/api/credentials', { client_id, client_secret });
+          toast('接続できました。同期を始めます');
+          syncMakeLeaps();
+        } catch (err) {
+          alert('保存できませんでした：' + err.message);
+          $('#mlsave').disabled = false; $('#mlsave').textContent = '接続設定を保存';
+        }
+      });
+      $('#mlall').addEventListener('click', () => syncMakeLeaps({ all: true }));
+    }
 
     $('#f').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -866,4 +961,10 @@
   }
 
   route();
+  if (SERVER) {
+    api('/api/status').then((st) => {
+      const last = Date.parse(state.settings.lastMakeLeapsImport || 0) || 0;
+      if (st.configured && Date.now() - last > 30 * 60 * 1000) syncMakeLeaps({ silent: true });
+    }).catch(() => {});
+  }
 })();

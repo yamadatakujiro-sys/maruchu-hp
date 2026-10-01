@@ -124,6 +124,9 @@ textarea { min-height: 80px; resize: vertical; }
 .list .row .title { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .list .row .amount { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
 .list .row .meta { font-size: .8rem; color: var(--muted); }
+.list li.has-action { display: flex; align-items: center; gap: 8px; }
+.list li.has-action a.row { flex: 1; min-width: 0; }
+.btn:disabled { opacity: .6; cursor: wait; }
 .filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .filters .search { grid-column: 1 / -1; }
 

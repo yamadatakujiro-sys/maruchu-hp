@@ -35,6 +35,10 @@ API = os.environ.get("MAKELEAPS_API_BASE", "https://api.makeleaps.com")  # テ�
 TOKEN_URL = API + "/user/oauth2/token/"
 
 
+class MLError(Exception):
+    """MakeLeaps との通信エラー（画面にそのまま表示できる日本語メッセージ）"""
+
+
 # ---------- HTTP ----------
 class Client:
     def __init__(self, client_id, client_secret):
@@ -55,7 +59,7 @@ class Client:
                 self.token = json.load(r)["access_token"]
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", "replace")[:300]
-            sys.exit(f"認証に失敗しました（HTTP {e.code}）。クライアントID／シークレットを確認してください。\n{body}")
+            raise MLError(f"認証に失敗しました（HTTP {e.code}）。クライアントID／シークレットを確認してください。\n{body}")
 
     def get(self, url, retry=5):
         if not url.startswith("http"):
@@ -72,7 +76,7 @@ class Client:
                 time.sleep(wait)
                 return self.get(url, retry - 1)
             body = e.read().decode("utf-8", "replace")[:300]
-            sys.exit(f"取得に失敗しました（HTTP {e.code}）: {url}\n{body}")
+            raise MLError(f"取得に失敗しました（HTTP {e.code}）: {url}\n{body}")
 
     def get_all(self, url):
         """ページングをたどって全件を返す"""
@@ -116,7 +120,7 @@ def find_partner_mid(cli):
     for path in ("/api/partner/", "/api/"):
         try:
             data = cli.get(path)
-        except SystemExit:
+        except MLError:
             continue
         found = []
 
@@ -136,7 +140,7 @@ def find_partner_mid(cli):
                 for p in found:
                     print(f"  {p.get('mid')}  {p.get('name', '')}", file=sys.stderr)
             return found[0]["mid"]
-    sys.exit("組織（partner）の mid が見つかりませんでした。--mid で指定してください。")
+    raise MLError("組織（partner）の mid が見つかりませんでした。")
 
 
 def paid_date(doc):
@@ -164,10 +168,16 @@ def unwrap(data):
 def resolve_lineitems(cli, d):
     """明細を取り出す。MakeLeapsは明細がURL（別リソース）で返ることがあるので、その場合は取りに行く"""
     li = d.get("lineitems")
-    if li is None and d.get("url"):
-        # 一覧に明細が含まれない場合は書類の詳細を取得
+    diag = {"一覧の明細": type(li).__name__ + (f"({len(li)})" if isinstance(li, (list, str)) else "")}
+    if not li and d.get("url"):
+        # 一覧に明細が含まれない（空）場合は書類の詳細を取得
         detail = unwrap(cli.get(d["url"]))
         li = detail.get("lineitems") if isinstance(detail, dict) else None
+        diag["詳細の明細"] = type(li).__name__ + (f"({len(li)})" if isinstance(li, (list, str)) else "")
+        if isinstance(detail, dict) and not li:
+            diag["詳細の項目名"] = sorted(k for k in detail.keys() if "line" in k or "item" in k)
+    if not resolve_lineitems.diag:
+        resolve_lineitems.diag = diag
     if isinstance(li, str):
         li = unwrap(cli.get(li))
         if isinstance(li, dict):
@@ -181,6 +191,9 @@ def resolve_lineitems(cli, d):
         if isinstance(x, dict):
             out.append(x)
     return out
+
+
+resolve_lineitems.diag = None
 
 
 def convert(cli, docs, clients_by_url, since, until):
@@ -269,6 +282,35 @@ def convert(cli, docs, clients_by_url, since, until):
     return list(customers.values()), invoices, skipped
 
 
+def export(cli, since=None, until=None, mid=None, log=print):
+    """MakeLeaps から請求書を取得し、取り込み用データ（dict）と診断情報を返す"""
+    log("認証中…")
+    cli.auth()
+    mid = mid or find_partner_mid(cli)
+    log("取引先を取得中…")
+    clients = cli.get_all(f"/api/partner/{mid}/client/")
+    clients_by_url = {c.get("url"): c for c in clients if isinstance(c, dict)}
+    log("書類を取得中…")
+    docs = cli.get_all(f"/api/partner/{mid}/document/")
+    log("明細を取得中…")
+    convert.sample = None
+    resolve_lineitems.diag = None
+    customers, invoices, skipped = convert(cli, docs, clients_by_url, since, until)
+    out = {
+        "app": "lucent-invoice", "kind": "makeleaps-import",
+        "exportedAt": dt.datetime.now().isoformat(timespec="seconds"),
+        "range": {"since": since, "until": until},
+        "customers": customers, "invoices": invoices,
+    }
+    diag = {
+        "documents": len(docs), "invoices": len(invoices), "skipped": skipped,
+        "paid": sum(1 for i in invoices if i["status"] == "paid"),
+        "withItems": sum(1 for i in invoices if i["items"]),
+        "itemFields": convert.sample, "lineitems": resolve_lineitems.diag,
+    }
+    return out, diag, {"clients": clients, "documents": docs}
+
+
 def main():
     ap = argparse.ArgumentParser(description="MakeLeaps → Lucent請求書管理 の書き出し")
     ap.add_argument("--since", help="この日以降（YYYY-MM-DD）。省略時は今年の1月1日")
@@ -283,50 +325,30 @@ def main():
     cid = os.environ.get("MAKELEAPS_CLIENT_ID") or input("MakeLeaps クライアントID: ").strip()
     secret = os.environ.get("MAKELEAPS_CLIENT_SECRET") or getpass.getpass("MakeLeaps クライアントシークレット（入力は表示されません）: ").strip()
 
-    cli = Client(cid, secret)
-    print("認証中…")
-    cli.auth()
-    mid = a.mid or find_partner_mid(cli)
-    print(f"組織 mid: {mid}")
-
-    print("取引先を取得中…")
-    clients = cli.get_all(f"/api/partner/{mid}/client/")
-    clients_by_url = {c.get("url"): c for c in clients if isinstance(c, dict)}
-    print(f"  {len(clients)} 件")
-
-    print("書類を取得中…（件数が多いと数分かかります）")
-    docs = cli.get_all(f"/api/partner/{mid}/document/")
-    print(f"  {len(docs)} 件")
+    try:
+        out, diag, raw = export(Client(cid, secret), since, a.until, a.mid)
+    except MLError as e:
+        sys.exit(str(e))
 
     if a.raw:
         with open("makeleaps-raw.json", "w", encoding="utf-8") as f:
-            json.dump({"clients": clients, "documents": docs}, f, ensure_ascii=False, indent=2)
+            json.dump(raw, f, ensure_ascii=False, indent=2)
         print("生データを makeleaps-raw.json に保存しました（顧客情報を含むので取り扱い注意）")
-
-    print("明細を取得中…")
-    convert.sample = None
-    customers, invoices, skipped = convert(cli, docs, clients_by_url, since, a.until)
-    out = {
-        "app": "lucent-invoice", "kind": "makeleaps-import",
-        "exportedAt": dt.datetime.now().isoformat(timespec="seconds"),
-        "range": {"since": since, "until": a.until},
-        "customers": customers, "invoices": invoices,
-    }
     with open(a.out, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
 
+    invoices = out["invoices"]
     total = sum(i["importedTotals"]["total"] for i in invoices)
     unpaid = sum(i["importedTotals"]["total"] for i in invoices if i["status"] != "paid")
     print("\n===== 書き出し完了 =====")
     print(f"期間        : {since or '全期間'} 〜 {a.until or '今日'}")
-    print(f"請求書      : {len(invoices)} 件（取消など除外 {skipped} 件）")
+    print(f"請求書      : {len(invoices)} 件（取消など除外 {diag['skipped']} 件）")
     print(f"売上合計    : ¥{total:,}")
     print(f"うち未入金  : ¥{unpaid:,}")
-    print(f"入金日あり  : {sum(1 for i in invoices if i['status'] == 'paid')} 件（MakeLeapsで入金登録した請求書だけ「入金済」になります）")
-    print(f"明細あり    : {sum(1 for i in invoices if i['items'])} / {len(invoices)} 件")
-    if convert.sample:
-        print(f"明細の項目  : {convert.sample}")
-    print(f"取引先      : {len(customers)} 社")
+    print(f"入金日あり  : {diag['paid']} 件")
+    print(f"明細あり    : {diag['withItems']} / {len(invoices)} 件")
+    print(f"明細の診断  : {diag['lineitems']}  項目: {diag['itemFields']}")
+    print(f"取引先      : {len(out['customers'])} 社")
     print(f"ファイル    : {os.path.abspath(a.out)}")
     print("→ 請求書管理の「設定 → MakeLeapsから取り込む」で読み込んでください。")
 
