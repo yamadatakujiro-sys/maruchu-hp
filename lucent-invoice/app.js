@@ -95,6 +95,11 @@
   }
   function lineAmount(it) { return toInt(it.qty) * toInt(it.price); }
   function calcTotals(inv) {
+    // MakeLeapsから取り込んだ請求書は、明細を編集するまで元の金額をそのまま使う
+    if (inv.importedTotals) {
+      const t = inv.importedTotals;
+      return { subtotal: t.subtotal, tax: t.tax, total: t.total, rate: state.settings.taxRate };
+    }
     const subtotal = inv.items.reduce((s, it) => s + lineAmount(it), 0);
     const rate = inv.taxRate != null ? inv.taxRate : state.settings.taxRate;
     const tax = roundTax(subtotal * rate / 100);
@@ -223,7 +228,7 @@
     return `<li><a class="row" href="#/invoices/${inv.id}">
       <span class="title">No.${esc(inv.number)}　${esc(inv.customerName || '（取引先未設定）')}</span>
       <span class="amount">${yen(t.total)}</span>
-      <span class="meta">${fmtDate(inv.issueDate)} 発行${inv.dueDate ? '・期限 ' + fmtDate(inv.dueDate) : ''}${inv.paidDate ? '・入金 ' + fmtDate(inv.paidDate) : ''}</span>
+      <span class="meta">${fmtDate(inv.issueDate)} 発行${inv.dueDate ? '・期限 ' + fmtDate(inv.dueDate) : ''}${inv.paidDate ? '・入金 ' + fmtDate(inv.paidDate) : ''}${inv.source === 'makeleaps' ? '・MakeLeaps' : ''}</span>
       <span>${badge(inv)}</span>
     </a></li>`;
   }
@@ -418,6 +423,7 @@
     itemsEl.addEventListener('input', (e) => {
       const row = e.target.closest('.item'); const k = e.target.dataset.k;
       if (!row || !k) return;
+      delete inv.importedTotals;
       const it = inv.items[+row.dataset.i];
       it[k] = (k === 'qty' || k === 'price') ? toInt(e.target.value) : e.target.value;
       $('[data-amt]', row).textContent = num(lineAmount(it));
@@ -426,12 +432,14 @@
     itemsEl.addEventListener('click', (e) => {
       if (!e.target.closest('[data-del]')) return;
       const i = +e.target.closest('.item').dataset.i;
+      delete inv.importedTotals;
       inv.items.splice(i, 1);
       if (!inv.items.length) inv.items.push({ date: f.issueDate.value, car: '', part: '', qty: 1, price: 0 });
       drawItems();
     });
     $('#addItem').addEventListener('click', () => {
       const last = inv.items[inv.items.length - 1] || {};
+      delete inv.importedTotals;
       inv.items.push({ date: last.date || f.issueDate.value, car: last.car || '', part: '', qty: 1, price: 0 });
       drawItems();
       const inputs = $$('.item:last-child [data-k="part"]', itemsEl);
@@ -444,12 +452,13 @@
       if (!target) { toast('そろえたい税込合計を入力してください'); return; }
       const last = inv.items[inv.items.length - 1];
       const qty = toInt(last.qty) || 1;
-      const rate = calcTotals(inv).rate;
+      const rate = state.settings.taxRate;
       const { subtotal, exact } = subtotalForTotal(target, rate);
       const others = inv.items.slice(0, -1).reduce((s, it) => s + lineAmount(it), 0);
       const need = subtotal - others;
       if (need <= 0) { toast('他の行の合計が大きすぎて調整できません'); return; }
       if (need % qty !== 0) { toast('最終行の数量を1にしてから調整してください'); return; }
+      delete inv.importedTotals;
       last.price = need / qty;
       drawItems();
       toast(exact ? `税込 ${yen(target)} にそろえました` : `端数の都合で ${yen(calcTotals(inv).total)} が最も近い金額です`);
@@ -508,6 +517,7 @@
       inv.customerId = c.id;
 
       if (src) {
+        if (!inv.importedTotals) delete src.importedTotals; // 明細を編集したら再計算に切り替え
         Object.assign(src, inv);
       } else {
         inv.id = uid();
@@ -767,6 +777,12 @@
           <button class="btn navy" id="exp">⬇ バックアップを書き出す</button>
           <label class="btn">⬆ バックアップを読み込む<input type="file" id="imp" accept="application/json,.json" hidden></label>
         </div>
+      </div>
+
+      <div class="card">
+        <h2>MakeLeapsから取り込む</h2>
+        <p class="small muted" style="margin-top:0">MacでMakeLeaps書き出しスクリプト（<code>tools/makeleaps_export.py</code>）を実行してできた <code>makeleaps-export.json</code> を選んでください。今のデータは消えず<b>追加</b>されます。同じ請求書を2回取り込んでも重複せず、MakeLeaps側の最新内容に更新されます。</p>
+        <label class="btn navy">⬆ MakeLeapsデータを取り込む<input type="file" id="mlimp" accept="application/json,.json" hidden></label>
       </div>`;
 
     $('#f').addEventListener('submit', (e) => {
@@ -792,6 +808,58 @@
       };
       r.readAsText(file);
     });
+    $('#mlimp').addEventListener('change', (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const d = JSON.parse(r.result);
+          if (d.kind !== 'makeleaps-import' || !Array.isArray(d.invoices)) throw new Error('MakeLeaps書き出しファイルではありません');
+          const res = importMakeLeaps(d);
+          save();
+          alert(`取り込み完了\n新規 ${res.added}件／更新 ${res.updated}件（手で編集済みのため保護 ${res.kept}件）\n取引先 新規 ${res.newCustomers}社`);
+          location.hash = '#/';
+        } catch (err) { alert('取り込めませんでした：' + err.message); }
+        e.target.value = '';
+      };
+      r.readAsText(file);
+    });
+  }
+
+  // MakeLeapsデータを既存データに追加（externalIdで重複判定）
+  function importMakeLeaps(d) {
+    const res = { added: 0, updated: 0, kept: 0, newCustomers: 0 };
+    (d.customers || []).forEach((mc) => {
+      if (!mc.name) return;
+      let c = state.customers.find((x) => x.name === mc.name);
+      if (!c) {
+        c = { id: uid(), name: mc.name, honorific: mc.honorific || '御中', postal: mc.postal || '', address: mc.address || '', tel: mc.tel || '', fax: mc.fax || '', memo: '' };
+        state.customers.push(c); res.newCustomers++;
+      } else {
+        // 空欄だけ補う（手入力した情報は上書きしない）
+        ['postal', 'address', 'tel', 'fax'].forEach((k) => { if (!c[k] && mc[k]) c[k] = mc[k]; });
+      }
+    });
+    const now = new Date().toISOString();
+    d.invoices.forEach((mi) => {
+      const c = state.customers.find((x) => x.name === mi.customerName);
+      const data = Object.assign({}, mi, { customerId: c ? c.id : '', importedAt: now });
+      const ex = mi.externalId && state.invoices.find((x) => x.externalId === mi.externalId);
+      if (ex) {
+        // このアプリで編集した請求書は上書きしない（入金状態だけはMakeLeaps側が入金済なら反映）
+        if (ex.updatedAt && ex.importedAt && ex.updatedAt > ex.importedAt) {
+          if (mi.status === 'paid' && ex.status !== 'paid') Object.assign(ex, { status: 'paid', paidDate: mi.paidDate, paidAmount: mi.paidAmount });
+          res.kept++;
+        } else {
+          Object.assign(ex, data, { id: ex.id, updatedAt: now }); res.updated++;
+        }
+      } else {
+        state.invoices.push(Object.assign(data, { id: uid(), createdAt: now, updatedAt: now })); res.added++;
+      }
+      const n = toInt(mi.number);
+      if (n && n < 1e9 && n >= state.settings.nextNumber) state.settings.nextNumber = n + 1;
+    });
+    return res;
   }
 
   route();

@@ -15,3 +15,7 @@ config.js
 
 # Claude Code ローカル設定
 .claude/settings.local.json
+
+# MakeLeapsの書き出しデータ（顧客情報を含むのでコミットしない）
+makeleaps-export*.json
+makeleaps-raw*.json
