@@ -198,6 +198,11 @@
           <a class="btn primary" href="#/invoices/new">＋ 請求書を作成</a>
         </div>
       </div>
+      ${!state.invoices.length ? `<div class="card" style="background:var(--orange-soft)">
+        <h2>はじめに：MakeLeapsのデータを読み込みましょう</h2>
+        <p class="small" style="margin:0 0 10px">${SERVER ? '「設定」でMakeLeapsのクライアントIDとシークレットを入力して「接続設定を保存」を押すと、今年の請求書（内訳・入金状態つき）が読み込まれます。設定済みなら右上の「🔄 MakeLeapsと同期」を押してください。' : '「Lucent請求書.command」をダブルクリックして開くと、MakeLeapsと同期できます。'}</p>
+        ${SERVER ? '<a class="btn primary" href="#/settings">設定を開く</a>' : ''}
+      </div>` : ''}
       <div class="stats">
         <div class="stat"><div class="label">今月の売上（税込）</div><div class="value">${yen(monthSales)}</div></div>
         <div class="stat"><div class="label">今年の売上（税込）</div><div class="value">${yen(yearSales)}</div></div>
