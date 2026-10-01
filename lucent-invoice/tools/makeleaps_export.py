@@ -156,7 +156,34 @@ def is_paid(doc):
     return False
 
 
-def convert(docs, clients_by_url, since, until):
+def unwrap(data):
+    """{"meta":…, "response": …} 形式なら中身を取り出す"""
+    return data.get("response", data) if isinstance(data, dict) else data
+
+
+def resolve_lineitems(cli, d):
+    """明細を取り出す。MakeLeapsは明細がURL（別リソース）で返ることがあるので、その場合は取りに行く"""
+    li = d.get("lineitems")
+    if li is None and d.get("url"):
+        # 一覧に明細が含まれない場合は書類の詳細を取得
+        detail = unwrap(cli.get(d["url"]))
+        li = detail.get("lineitems") if isinstance(detail, dict) else None
+    if isinstance(li, str):
+        li = unwrap(cli.get(li))
+        if isinstance(li, dict):
+            li = li.get("results") or li.get("lineitems") or []
+    out = []
+    for x in li or []:
+        if isinstance(x, str):
+            x = unwrap(cli.get(x))
+        elif isinstance(x, dict) and set(x.keys()) <= {"url", "mid"} and x.get("url"):
+            x = unwrap(cli.get(x["url"]))
+        if isinstance(x, dict):
+            out.append(x)
+    return out
+
+
+def convert(cli, docs, clients_by_url, since, until):
     customers, invoices = {}, []
     skipped = 0
     for d in docs:
@@ -189,7 +216,10 @@ def convert(docs, clients_by_url, since, until):
         })
 
         items = []
-        for ln in d.get("lineitems") or d.get("lines") or d.get("items") or []:
+        lines = resolve_lineitems(cli, d) or d.get("lines") or d.get("items") or []
+        if lines and not convert.sample:
+            convert.sample = {k: type(v).__name__ for k, v in lines[0].items()}
+        for ln in lines:
             if not isinstance(ln, dict):
                 continue
             kind = str(ln.get("kind", "")).lower()
@@ -273,7 +303,9 @@ def main():
             json.dump({"clients": clients, "documents": docs}, f, ensure_ascii=False, indent=2)
         print("生データを makeleaps-raw.json に保存しました（顧客情報を含むので取り扱い注意）")
 
-    customers, invoices, skipped = convert(docs, clients_by_url, since, a.until)
+    print("明細を取得中…")
+    convert.sample = None
+    customers, invoices, skipped = convert(cli, docs, clients_by_url, since, a.until)
     out = {
         "app": "lucent-invoice", "kind": "makeleaps-import",
         "exportedAt": dt.datetime.now().isoformat(timespec="seconds"),
@@ -289,7 +321,11 @@ def main():
     print(f"期間        : {since or '全期間'} 〜 {a.until or '今日'}")
     print(f"請求書      : {len(invoices)} 件（取消など除外 {skipped} 件）")
     print(f"売上合計    : ¥{total:,}")
-    print(f"うち未入金  : ¥{unpaid:,}  ※入金状態が取れない場合は全件「未入金」になります")
+    print(f"うち未入金  : ¥{unpaid:,}")
+    print(f"入金日あり  : {sum(1 for i in invoices if i['status'] == 'paid')} 件（MakeLeapsで入金登録した請求書だけ「入金済」になります）")
+    print(f"明細あり    : {sum(1 for i in invoices if i['items'])} / {len(invoices)} 件")
+    if convert.sample:
+        print(f"明細の項目  : {convert.sample}")
     print(f"取引先      : {len(customers)} 社")
     print(f"ファイル    : {os.path.abspath(a.out)}")
     print("→ 請求書管理の「設定 → MakeLeapsから取り込む」で読み込んでください。")

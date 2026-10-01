@@ -618,12 +618,12 @@
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { toast('日付の形式が正しくありません'); return; }
       const amt = prompt('入金額', t.total);
       if (amt === null) return;
-      Object.assign(inv, { status: 'paid', paidDate: d, paidAmount: toInt(amt) });
+      Object.assign(inv, { status: 'paid', paidDate: d, paidAmount: toInt(amt), updatedAt: new Date().toISOString() });
       if (toInt(amt) !== t.total) inv.memo = (inv.memo ? inv.memo + ' / ' : '') + `入金差額 ${num(toInt(amt) - t.total)}円`;
       save(); toast('入金済にしました'); route();
     });
-    on('#unpay', () => { Object.assign(inv, { status: 'issued', paidDate: '', paidAmount: '' }); save(); route(); });
-    on('#issue', () => { inv.status = 'issued'; save(); route(); });
+    on('#unpay', () => { Object.assign(inv, { status: 'issued', paidDate: '', paidAmount: '', updatedAt: new Date().toISOString() }); save(); route(); });
+    on('#issue', () => { Object.assign(inv, { status: 'issued', updatedAt: new Date().toISOString() }); save(); route(); });
     on('#dup', () => {
       const d = newInvoice();
       Object.assign(d, {
@@ -782,6 +782,7 @@
       <div class="card">
         <h2>MakeLeapsから取り込む</h2>
         <p class="small muted" style="margin-top:0">MacでMakeLeaps書き出しスクリプト（<code>tools/makeleaps_export.py</code>）を実行してできた <code>makeleaps-export.json</code> を選んでください。今のデータは消えず<b>追加</b>されます。同じ請求書を2回取り込んでも重複せず、MakeLeaps側の最新内容に更新されます。</p>
+        ${s.lastMakeLeapsImport ? `<p class="small" style="margin-top:0">最終取り込み：${new Date(s.lastMakeLeapsImport).toLocaleString('ja-JP')}</p>` : ''}
         <label class="btn navy">⬆ MakeLeapsデータを取り込む<input type="file" id="mlimp" accept="application/json,.json" hidden></label>
       </div>`;
 
@@ -816,6 +817,7 @@
           const d = JSON.parse(r.result);
           if (d.kind !== 'makeleaps-import' || !Array.isArray(d.invoices)) throw new Error('MakeLeaps書き出しファイルではありません');
           const res = importMakeLeaps(d);
+          state.settings.lastMakeLeapsImport = new Date().toISOString();
           save();
           alert(`取り込み完了\n新規 ${res.added}件／更新 ${res.updated}件（手で編集済みのため保護 ${res.kept}件）\n取引先 新規 ${res.newCustomers}社`);
           location.hash = '#/';
@@ -851,7 +853,8 @@
           if (mi.status === 'paid' && ex.status !== 'paid') Object.assign(ex, { status: 'paid', paidDate: mi.paidDate, paidAmount: mi.paidAmount });
           res.kept++;
         } else {
-          Object.assign(ex, data, { id: ex.id, updatedAt: now }); res.updated++;
+          const keepPaid = ex.status === 'paid' && data.status !== 'paid' ? { status: 'paid', paidDate: ex.paidDate, paidAmount: ex.paidAmount } : {};
+          Object.assign(ex, data, keepPaid, { id: ex.id, updatedAt: now }); res.updated++;
         }
       } else {
         state.invoices.push(Object.assign(data, { id: uid(), createdAt: now, updatedAt: now })); res.added++;
