@@ -19,3 +19,6 @@ config.js
 # MakeLeapsの書き出しデータ（顧客情報を含むのでコミットしない）
 makeleaps-export*.json
 makeleaps-raw*.json
+
+# Python
+__pycache__/
