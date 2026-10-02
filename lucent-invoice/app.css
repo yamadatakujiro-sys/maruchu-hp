@@ -68,7 +68,7 @@ h2 { font-size: 1.05rem; margin: 0 0 12px; }
   display: grid; place-items: center; font-weight: 700;
 }
 
-.container { max-width: 1080px; margin: 0 auto; padding: 16px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 16px; }
 
 /* ----- 共通パーツ ----- */
 .page-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
@@ -145,9 +145,10 @@ table.tbl th { font-size: .78rem; color: var(--muted); font-weight: 500; }
 .item .f-date { grid-column: 1 / 2; }
 .item .f-car { grid-column: 1 / -1; }
 .item .f-part { grid-column: 1 / -1; }
-.item .f-qty { grid-column: 1 / 2; }
-.item .f-price { grid-column: 2 / 3; }
-.item .f-amount { grid-column: 1 / 2; align-self: center; font-weight: 700; }
+.item .f-cond { grid-column: 1 / -1; }
+.item textarea { min-height: 64px; resize: vertical; line-height: 1.45; }
+.item .f-amount { grid-column: 1 / 2; }
+.item .f-amount input { font-weight: 700; }
 .item .f-del { grid-column: 2 / 3; justify-self: end; align-self: center; }
 .item .lbl { display: block; font-size: .72rem; color: var(--muted); }
 .items-head { display: none; }
@@ -216,10 +217,11 @@ table.tbl th { font-size: .78rem; color: var(--muted); font-weight: 500; }
 
   /* 明細を1行の表形式に */
   .items-head, .item {
-    display: grid; grid-template-columns: 110px 1.3fr 1.5fr 70px 110px 100px 40px; gap: 8px; align-items: center;
+    display: grid; grid-template-columns: 120px 1.1fr 1.2fr 2.6fr 130px 36px; gap: 8px; align-items: start;
   }
   .items-head { font-size: .75rem; color: var(--muted); padding: 0 10px; }
-  .items-head span:nth-child(n+4) { text-align: right; }
+  .items-head span:nth-child(5) { text-align: right; }
+  .item .f-del { padding-top: 4px; }
   .item { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; padding: 6px 10px; }
   .item > * { grid-column: auto !important; }
   .item .lbl { display: none; }
@@ -280,3 +282,15 @@ table.tbl th { font-size: .78rem; color: var(--muted); font-weight: 500; }
 .qr svg { width: 180px; height: 180px; display: block; }
 .paper .lead { margin: 18px 0 0; }
 @media (min-width: 640px) { .send-grid { grid-template-columns: 1fr 1fr; } }
+
+/* 紙面：商品の状態（品名の下に小さく） */
+.paper table.lines .cond { font-size: 11px; color: #444; white-space: pre-wrap; margin-top: 2px; line-height: 1.45; }
+
+/* タブレット〜小さめのPC：「商品の状態」は同じ行の下に横いっぱいで広く書けるようにする */
+@media (min-width: 640px) and (max-width: 1099px) {
+  .items-head, .item { grid-template-columns: 120px 1.2fr 1.5fr 130px 36px; }
+  .items-head span:nth-child(4) { display: none; }
+  .items-head span:nth-child(5) { text-align: right; }
+  .item .f-cond { grid-column: 2 / 5 !important; grid-row: 2; }
+  .item .f-cond .lbl { display: block; }
+}

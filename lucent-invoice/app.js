@@ -488,7 +488,7 @@
     const lines = [head].concat(rows.map((inv) => {
       const t = calcTotals(inv);
       return [inv.number, fmtDate(inv.issueDate), fmtDate(inv.dueDate), inv.customerName, t.subtotal, t.tax, t.total,
-        STATUS_LABEL[statusOf(inv)], fmtDate(inv.paidDate), inv.paidAmount || '', inv.items.map(itemLabel).join(' / ')];
+        STATUS_LABEL[statusOf(inv)], fmtDate(inv.paidDate), inv.paidAmount || '', inv.items.map((it) => itemLabel(it) + (it.condition ? `（${it.condition.replace(/\s+/g, ' ')}）` : '')).join(' / ')];
     }));
     const csv = lines.map((r) => r.map((v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',')).join('\r\n');
     download('﻿' + csv, `${label}一覧_${today()}.csv`, 'text/csv');
@@ -575,7 +575,7 @@
 
         <div class="card">
           <h2>明細</h2>
-          <div class="items-head"><span>日付</span><span>車種・型式</span><span>部品・品名</span><span>数量</span><span>単価</span><span>金額</span><span></span></div>
+          <div class="items-head"><span>日付</span><span>車種・型式</span><span>部品・品名</span><span>商品の状態（色・傷の場所など）</span><span>金額</span><span></span></div>
           <div class="items" id="items"></div>
           <div class="btn-row" style="margin-top:10px">
             <button type="button" class="btn" id="addItem">＋ 行を追加</button>
@@ -628,13 +628,14 @@
           <label class="f-date"><span class="lbl">日付</span><input type="date" data-k="date" value="${esc(it.date)}"></label>
           <label class="f-car"><span class="lbl">車種・型式</span><input data-k="car" value="${esc(it.car)}" placeholder="マークX GRX130"></label>
           <label class="f-part"><span class="lbl">部品・品名</span><input data-k="part" value="${esc(it.part)}" placeholder="左フェンダー"></label>
-          <label class="f-qty"><span class="lbl">数量</span><input data-k="qty" inputmode="numeric" value="${esc(it.qty)}" class="num"></label>
-          <label class="f-price"><span class="lbl">単価</span><input data-k="price" inputmode="numeric" value="${esc(it.price || '')}" class="num" placeholder="0"></label>
-          <div class="f-amount num" data-amt>${num(lineAmount(it))}</div>
+          <label class="f-cond"><span class="lbl">商品の状態（色・傷の場所など）</span><textarea data-k="condition" rows="2" placeholder="例：カラー070 パール。先端に小キズ2か所、裏側に補修跡あり">${esc(it.condition || '')}</textarea></label>
+          <label class="f-amount"><span class="lbl">金額</span><input data-k="amount" inputmode="numeric" value="${lineAmount(it) || ''}" class="num" placeholder="0"></label>
           <div class="f-del"><button type="button" class="btn sm danger" data-del title="この行を削除">✕</button></div>
         </div>`).join('');
+      $$('[data-k="condition"]', itemsEl).forEach((ta) => { if (ta.value) autoGrow(ta); });
       drawTotals();
     }
+    function autoGrow(ta) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 320) + 'px'; }
     function drawTotals() {
       const t = calcTotals(inv);
       $('#totals').innerHTML = `
@@ -646,10 +647,10 @@
     itemsEl.addEventListener('input', (e) => {
       const row = e.target.closest('.item'); const k = e.target.dataset.k;
       if (!row || !k) return;
-      delete inv.importedTotals;
       const it = inv.items[+row.dataset.i];
-      it[k] = (k === 'qty' || k === 'price') ? toInt(e.target.value) : e.target.value;
-      $('[data-amt]', row).textContent = num(lineAmount(it));
+      if (k === 'condition') { it.condition = e.target.value; autoGrow(e.target); return; }
+      delete inv.importedTotals;
+      if (k === 'amount') { it.qty = 1; it.price = toInt(e.target.value); } else it[k] = e.target.value;
       drawTotals();
     });
     itemsEl.addEventListener('click', (e) => {
@@ -722,7 +723,7 @@
       if (state.invoices.some((x) => typeOf(x) === type && x.number === number && x.id !== inv.id)) {
         if (!confirm(`${D.label}番号 ${number} は既に使われています。このまま保存しますか？`)) return;
       }
-      inv.items = inv.items.filter((it) => it.part || it.car || toInt(it.price));
+      inv.items = inv.items.filter((it) => it.part || it.car || it.condition || toInt(it.price));
       if (!inv.items.length) { toast('明細を1行以上入力してください'); drawItems(); return; }
       Object.assign(inv, {
         number, issueDate: fd.issueDate, dueDate: fd.dueDate,
@@ -767,10 +768,16 @@
     const s = state.settings;
     const t = calcTotals(inv);
     const type = typeOf(inv), D = DOC[type];
-    const rows = inv.items.map((it) => (!toInt(it.qty) && !toInt(it.price))
-      ? `<tr><td>${esc(itemLabel(it))}</td><td></td><td></td><td></td></tr>`
-      : `<tr><td>${esc(itemLabel(it))}</td><td class="c-qty">${num(it.qty)}</td><td class="c-price">${num(it.price)}</td><td class="c-amt">${num(lineAmount(it))}</td></tr>`);
-    while (rows.length < 8) rows.push('<tr><td></td><td></td><td></td><td></td></tr>'); // 空行で紙面を整える
+    const simple = inv.items.every((it) => toInt(it.qty) <= 1);
+    const name = (it) => esc(itemLabel(it)) + (it.condition ? `<div class="cond">状態：${esc(it.condition)}</div>` : '');
+    const rows = inv.items.map((it) => simple
+      ? `<tr><td>${name(it)}</td><td class="c-amt">${toInt(it.price) ? num(lineAmount(it) || it.price) : ''}</td></tr>`
+      : (!toInt(it.qty) && !toInt(it.price))
+      ? `<tr><td>${name(it)}</td><td></td><td></td><td></td></tr>`
+      : `<tr><td>${name(it)}</td><td class="c-qty">${num(it.qty)}</td><td class="c-price">${num(it.price)}</td><td class="c-amt">${num(lineAmount(it))}</td></tr>`);
+    // 空行で紙面を整える（状態の説明が長いぶんは空行を減らして1枚に収める）
+    const extraLines = inv.items.reduce((n, it) => n + (it.condition ? it.condition.split('\n').reduce((m, l) => m + Math.max(1, Math.ceil(l.length / 42)), 0) * 0.6 : 0), 0);
+    while (rows.length + extraLines < 8) rows.push(simple ? '<tr><td></td><td></td></tr>' : '<tr><td></td><td></td><td></td><td></td></tr>');
     const br = (v) => esc(v).replace(/\n/g, '<br>');
     return `
       <div class="paper">
@@ -801,7 +808,7 @@
         <p class="lead">${D.lead}</p>
         <div class="total-box"><span class="t">${D.totalLabel}</span><span class="v">${yen(t.total)}</span></div>
         <table class="lines">
-          <thead><tr><th>項目</th><th class="c-qty">数量</th><th class="c-price">単価</th><th class="c-amt">金額</th></tr></thead>
+          <thead><tr><th>項目</th>${simple ? '' : '<th class="c-qty">数量</th><th class="c-price">単価</th>'}<th class="c-amt">金額</th></tr></thead>
           <tbody>${rows.join('')}</tbody>
         </table>
         <table class="sum-tbl">
