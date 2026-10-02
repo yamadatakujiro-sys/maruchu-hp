@@ -534,6 +534,7 @@
     const inv = src ? JSON.parse(JSON.stringify(src)) : (renderEditor.draft || newInvoice(qType));
     renderEditor.draft = null;
     const type = typeOf(inv), D = DOC[type];
+    const quoteItems = type === 'quote'; // 見積書は「商品の状態」欄＋金額だけ。請求書・納品書は数量・単価あり
     const statusOpts = type === 'invoice' ? [['draft', '下書き'], ['issued', '発行済（未入金）'], ['paid', '入金済']]
       : type === 'quote' ? [['draft', '下書き'], ['issued', '提出済'], ['accepted', '受注'], ['lost', '失注']]
         : [['draft', '下書き'], ['issued', '納品済']];
@@ -575,8 +576,12 @@
 
         <div class="card">
           <h2>明細</h2>
-          <div class="items-head"><span>日付</span><span>車種・型式</span><span>部品・品名</span><span>商品の状態（色・傷の場所など）</span><span>金額</span><span></span></div>
-          <div class="items" id="items"></div>
+          <div class="items-wrap ${quoteItems ? 'mode-quote' : 'mode-full'}">
+            ${quoteItems
+              ? '<div class="items-head"><span>日付</span><span>車種・型式</span><span>部品・品名</span><span>商品の状態（色・傷の場所など）</span><span>金額</span><span></span></div>'
+              : '<div class="items-head"><span>日付</span><span>車種・型式</span><span>部品・品名</span><span>数量</span><span>単価</span><span>金額</span><span></span></div>'}
+            <div class="items" id="items"></div>
+          </div>
           <div class="btn-row" style="margin-top:10px">
             <button type="button" class="btn" id="addItem">＋ 行を追加</button>
             <span class="muted small" style="align-self:center">新しい行は前の行の日付・車種を引き継ぎます</span>
@@ -628,8 +633,11 @@
           <label class="f-date"><span class="lbl">日付</span><input type="date" data-k="date" value="${esc(it.date)}"></label>
           <label class="f-car"><span class="lbl">車種・型式</span><input data-k="car" value="${esc(it.car)}" placeholder="マークX GRX130"></label>
           <label class="f-part"><span class="lbl">部品・品名</span><input data-k="part" value="${esc(it.part)}" placeholder="左フェンダー"></label>
-          <label class="f-cond"><span class="lbl">商品の状態（色・傷の場所など）</span><textarea data-k="condition" rows="2" placeholder="例：カラー070 パール。先端に小キズ2か所、裏側に補修跡あり">${esc(it.condition || '')}</textarea></label>
-          <label class="f-amount"><span class="lbl">金額</span><input data-k="amount" inputmode="numeric" value="${lineAmount(it) || ''}" class="num" placeholder="0"></label>
+          ${quoteItems ? `<label class="f-cond"><span class="lbl">商品の状態（色・傷の場所など）</span><textarea data-k="condition" rows="2" placeholder="例：カラー070 パール。先端に小キズ2か所、裏側に補修跡あり">${esc(it.condition || '')}</textarea></label>
+          <label class="f-amount"><span class="lbl">金額</span><input data-k="amount" inputmode="numeric" value="${lineAmount(it) || ''}" class="num" placeholder="0"></label>`
+          : `<label class="f-qty"><span class="lbl">数量</span><input data-k="qty" inputmode="numeric" value="${esc(it.qty)}" class="num"></label>
+          <label class="f-price"><span class="lbl">単価</span><input data-k="price" inputmode="numeric" value="${esc(it.price || '')}" class="num" placeholder="0"></label>
+          <div class="f-total num" data-amt>${num(lineAmount(it))}</div>`}
           <div class="f-del"><button type="button" class="btn sm danger" data-del title="この行を削除">✕</button></div>
         </div>`).join('');
       $$('[data-k="condition"]', itemsEl).forEach((ta) => { if (ta.value) autoGrow(ta); });
@@ -650,7 +658,8 @@
       const it = inv.items[+row.dataset.i];
       if (k === 'condition') { it.condition = e.target.value; autoGrow(e.target); return; }
       delete inv.importedTotals;
-      if (k === 'amount') { it.qty = 1; it.price = toInt(e.target.value); } else it[k] = e.target.value;
+      if (k === 'amount') { it.qty = 1; it.price = toInt(e.target.value); } else it[k] = (k === 'qty' || k === 'price') ? toInt(e.target.value) : e.target.value;
+      const amt = $('[data-amt]', row); if (amt) amt.textContent = num(lineAmount(it));
       drawTotals();
     });
     itemsEl.addEventListener('click', (e) => {
@@ -768,15 +777,15 @@
     const s = state.settings;
     const t = calcTotals(inv);
     const type = typeOf(inv), D = DOC[type];
-    const simple = inv.items.every((it) => toInt(it.qty) <= 1);
-    const name = (it) => esc(itemLabel(it)) + (it.condition ? `<div class="cond">状態：${esc(it.condition)}</div>` : '');
+    const simple = type === 'quote' && inv.items.every((it) => toInt(it.qty) <= 1);
+    const name = (it) => esc(itemLabel(it)) + (type === 'quote' && it.condition ? `<div class="cond">状態：${esc(it.condition)}</div>` : '');
     const rows = inv.items.map((it) => simple
       ? `<tr><td>${name(it)}</td><td class="c-amt">${toInt(it.price) ? num(lineAmount(it) || it.price) : ''}</td></tr>`
       : (!toInt(it.qty) && !toInt(it.price))
       ? `<tr><td>${name(it)}</td><td></td><td></td><td></td></tr>`
       : `<tr><td>${name(it)}</td><td class="c-qty">${num(it.qty)}</td><td class="c-price">${num(it.price)}</td><td class="c-amt">${num(lineAmount(it))}</td></tr>`);
     // 空行で紙面を整える（状態の説明が長いぶんは空行を減らして1枚に収める）
-    const extraLines = inv.items.reduce((n, it) => n + (it.condition ? it.condition.split('\n').reduce((m, l) => m + Math.max(1, Math.ceil(l.length / 42)), 0) * 0.6 : 0), 0);
+    const extraLines = type !== 'quote' ? 0 : inv.items.reduce((n, it) => n + (it.condition ? it.condition.split('\n').reduce((m, l) => m + Math.max(1, Math.ceil(l.length / 42)), 0) * 0.6 : 0), 0);
     while (rows.length + extraLines < 8) rows.push(simple ? '<tr><td></td><td></td></tr>' : '<tr><td></td><td></td><td></td><td></td></tr>');
     const br = (v) => esc(v).replace(/\n/g, '<br>');
     return `

@@ -149,6 +149,9 @@ table.tbl th { font-size: .78rem; color: var(--muted); font-weight: 500; }
 .item textarea { min-height: 64px; resize: vertical; line-height: 1.45; }
 .item .f-amount { grid-column: 1 / 2; }
 .item .f-amount input { font-weight: 700; }
+.item .f-qty { grid-column: 1 / 2; }
+.item .f-price { grid-column: 2 / 3; }
+.item .f-total { grid-column: 1 / 2; align-self: center; font-weight: 700; }
 .item .f-del { grid-column: 2 / 3; justify-self: end; align-self: center; }
 .item .lbl { display: block; font-size: .72rem; color: var(--muted); }
 .items-head { display: none; }
@@ -217,11 +220,16 @@ table.tbl th { font-size: .78rem; color: var(--muted); font-weight: 500; }
 
   /* 明細を1行の表形式に */
   .items-head, .item {
-    display: grid; grid-template-columns: 120px 1.1fr 1.2fr 2.6fr 130px 36px; gap: 8px; align-items: start;
+    display: grid; grid-template-columns: 110px 1.3fr 1.5fr 70px 110px 100px 40px; gap: 8px; align-items: center;
   }
   .items-head { font-size: .75rem; color: var(--muted); padding: 0 10px; }
-  .items-head span:nth-child(5) { text-align: right; }
-  .item .f-del { padding-top: 4px; }
+  .items-head span:nth-child(n+4) { text-align: right; }
+  .item .f-total { text-align: right; }
+  /* 見積書：品名の隣に「商品の状態」、金額だけ */
+  .mode-quote .items-head, .mode-quote .item { grid-template-columns: 120px 1.1fr 1.2fr 2.6fr 130px 36px; align-items: start; }
+  .mode-quote .items-head span:nth-child(n+4) { text-align: left; }
+  .mode-quote .items-head span:nth-child(5) { text-align: right; }
+  .mode-quote .item .f-del { padding-top: 4px; }
   .item { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; padding: 6px 10px; }
   .item > * { grid-column: auto !important; }
   .item .lbl { display: none; }
@@ -288,9 +296,9 @@ table.tbl th { font-size: .78rem; color: var(--muted); font-weight: 500; }
 
 /* タブレット〜小さめのPC：「商品の状態」は同じ行の下に横いっぱいで広く書けるようにする */
 @media (min-width: 640px) and (max-width: 1099px) {
-  .items-head, .item { grid-template-columns: 120px 1.2fr 1.5fr 130px 36px; }
-  .items-head span:nth-child(4) { display: none; }
-  .items-head span:nth-child(5) { text-align: right; }
-  .item .f-cond { grid-column: 2 / 5 !important; grid-row: 2; }
-  .item .f-cond .lbl { display: block; }
+  .mode-quote .items-head, .mode-quote .item { grid-template-columns: 120px 1.2fr 1.5fr 130px 36px; }
+  .mode-quote .items-head span:nth-child(4) { display: none; }
+  .mode-quote .items-head span:nth-child(5) { text-align: right; }
+  .mode-quote .item .f-cond { grid-column: 2 / 5 !important; grid-row: 2; }
+  .mode-quote .item .f-cond .lbl { display: block; }
 }
