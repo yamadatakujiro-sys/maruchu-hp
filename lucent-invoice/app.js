@@ -871,6 +871,7 @@
     $('#print').addEventListener('click', () => {
       const old = document.title;
       document.title = docFileName(inv).replace(/\.pdf$/, ''); // PDF保存時のファイル名になる
+      fitPrint();
       window.print();
       setTimeout(() => { document.title = old; }, 1000);
     });
@@ -909,6 +910,19 @@
     });
   }
 
+  // ---------- 印刷を必ずA4・1枚に収める ----------
+  // 印刷範囲（A4から余白8mmを除いた 約733×1062px）に入るよう、紙面の縮小率を決める
+  function fitPrint() {
+    const paper = $('.paper-wrap .paper');
+    if (!paper) return;
+    paper.classList.add('measure');
+    const h = paper.scrollHeight;
+    paper.classList.remove('measure');
+    const zoom = Math.min(733 / 794, 1050 / h);
+    paper.style.setProperty('--print-zoom', zoom.toFixed(3));
+  }
+  window.addEventListener('beforeprint', fitPrint); // ⌘P で印刷したときも同じように収める
+
   // ================= 送付（LINE・メール・PDF） =================
   const docFileName = (inv) => `${DOC[typeOf(inv)].label}_${inv.number}_${(inv.customerName || '').replace(/[\\/:*?"<>|\s]+/g, '')}.pdf`;
   function loadScript(src) {
@@ -925,11 +939,13 @@
     const holder = document.createElement('div');
     // 画面の左上に（見えないよう背面に）置いて撮影する。画面外に置くと位置がずれるため
     holder.style.cssText = 'position:fixed;left:0;top:0;width:794px;background:#fff;z-index:-1;pointer-events:none';
-    holder.innerHTML = paperHtml(inv);
+    // A4（794×1123px）の枠の中に紙面を入れ、はみ出す長さなら縮小して1枚に収める
+    holder.innerHTML = `<div style="width:794px;height:1123px;overflow:hidden;background:#fff">${paperHtml(inv)}</div>`;
     document.body.appendChild(holder);
-    const paper = holder.firstElementChild;
+    const page = holder.firstElementChild, paper = page.firstElementChild;
     paper.style.boxShadow = 'none';
-    paper.style.height = '1122px'; paper.style.minHeight = '0'; paper.style.overflow = 'hidden';
+    const h = paper.scrollHeight;
+    if (h > 1123) { paper.style.transformOrigin = 'top center'; paper.style.transform = `scale(${(1123 / h).toFixed(4)})`; }
     try {
       if (document.fonts && document.fonts.ready) await document.fonts.ready;
       return await window.html2pdf().set({
@@ -937,7 +953,7 @@
         image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 794, scrollX: 0, scrollY: 0, x: 0, y: 0 },
         jsPDF: { unit: 'px', format: [794, 1123], orientation: 'portrait', hotfixes: ['px_scaling'] }
-      }).from(paper).outputPdf('blob');
+      }).from(page).outputPdf('blob');
     } finally { holder.remove(); }
   }
   function blobToBase64(blob) {

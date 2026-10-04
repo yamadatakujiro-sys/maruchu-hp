@@ -255,15 +255,21 @@ table.tbl th { font-size: .78rem; color: var(--muted); font-weight: 500; }
 }
 
 /* ===== 印刷（A4・紙面のみ出力） ===== */
-@page { size: A4; margin: 0; }
+/* プリンターが端まで印刷できなくても切れないよう、用紙の余白を少し取る（印刷範囲 約194×281mm） */
+@page { size: A4; margin: 8mm; }
 @media print {
   body { background: #fff; padding: 0; }
-  .no-print, .topbar, .page-head, .btn-row, .card:not(.paper) { display: none !important; }
+  .no-print, .topbar, .page-head, .btn-row, .card:not(.paper), .tabs, .sync-badge, .toast { display: none !important; }
   .container { padding: 0; max-width: none; }
   .paper-wrap { margin: 0; padding: 0; overflow: visible; }
-  .paper { box-shadow: none; margin: 0; width: 210mm; min-height: 297mm; padding: 16mm 17mm; }
+  /* 内容の長さに合わせて縮小率（--print-zoom）を計算し、必ずA4・1枚に収める */
+  .paper { box-shadow: none; margin: 0; width: 794px; min-height: 0; height: auto; padding: 36px 44px; zoom: var(--print-zoom, .92); break-inside: avoid; }
+  .paper table.lines td { height: 26px; }
   .paper table.lines th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+/* 印刷用の高さを測るときだけ使う */
+.paper.measure { min-height: 0 !important; padding: 36px 44px !important; }
+.paper.measure table.lines td { height: 26px; }
 
 /* ===== 書類の種類タブ・送付・スマホ共有 ===== */
 .tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
