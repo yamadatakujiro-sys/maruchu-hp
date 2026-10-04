@@ -94,6 +94,16 @@ class Client:
 
 
 # ---------- 値の取り出し（API の項目名の揺れに備えて複数候補を見る） ----------
+# MakeLeaps は都道府県をローマ字（例：saitama）で返すので漢字に直す
+PREFECTURES = {"hokkaido": "北海道", "aomori": "青森県", "iwate": "岩手県", "miyagi": "宮城県", "akita": "秋田県", "yamagata": "山形県", "fukushima": "福島県", "ibaraki": "茨城県", "tochigi": "栃木県", "gunma": "群馬県", "saitama": "埼玉県", "chiba": "千葉県", "tokyo": "東京都", "kanagawa": "神奈川県", "niigata": "新潟県", "toyama": "富山県", "ishikawa": "石川県", "fukui": "福井県", "yamanashi": "山梨県", "nagano": "長野県", "gifu": "岐阜県", "shizuoka": "静岡県", "aichi": "愛知県", "mie": "三重県", "shiga": "滋賀県", "kyoto": "京都府", "osaka": "大阪府", "hyogo": "兵庫県", "nara": "奈良県", "wakayama": "和歌山県", "tottori": "鳥取県", "shimane": "島根県", "okayama": "岡山県", "hiroshima": "広島県", "yamaguchi": "山口県", "tokushima": "徳島県", "kagawa": "香川県", "ehime": "愛媛県", "kochi": "高知県", "fukuoka": "福岡県", "saga": "佐賀県", "nagasaki": "長崎県", "kumamoto": "熊本県", "oita": "大分県", "miyazaki": "宮崎県", "kagoshima": "鹿児島県", "okinawa": "沖縄県"}
+
+
+def prefecture_ja(v):
+    key = str(v or "").strip().lower().replace("-ken", "").replace("-to", "").replace("-fu", "").replace(" ", "")
+    key = {"hokkaidō": "hokkaido", "tōkyō": "tokyo", "kyōto": "kyoto", "ōsaka": "osaka", "hyōgo": "hyogo", "kōchi": "kochi", "ōita": "oita"}.get(key, key)
+    return PREFECTURES.get(key, str(v or ""))
+
+
 def pick(d, *keys, default=""):
     for k in keys:
         if isinstance(d, dict) and d.get(k) not in (None, ""):
@@ -252,7 +262,7 @@ def convert(cli, docs, clients_by_url, since, until):
         cobj = cobj or {}
         name = pick(cobj, "display_name", "name", "company_name") or pick(d, "recipient_name", "client_name") or "（取引先不明）"
         # 住所は「都道府県＋市区町村＋番地」と「建物名」を2行に
-        addr1 = "".join(str(pick(d, k)) for k in ("recipient_region", "recipient_locality", "recipient_street_address"))
+        addr1 = prefecture_ja(pick(d, "recipient_region")) + "".join(str(pick(d, k)) for k in ("recipient_locality", "recipient_street_address"))
         addr2 = str(pick(d, "recipient_extended_address"))
         addr = "\n".join(x for x in (addr1, addr2) if x) or pick(cobj, "address", "address_line_1")
         cust = customers.setdefault(name, {

@@ -737,7 +737,7 @@
       Object.assign(inv, {
         number, issueDate: fd.issueDate, dueDate: fd.dueDate,
         customerName: fd.customerName.trim(), honorific: fd.honorific,
-        customerPostal: fd.customerPostal.trim(), customerAddress: fd.customerAddress.trim(),
+        customerPostal: fd.customerPostal.trim(), customerAddress: fixPrefecture(fd.customerAddress.trim()),
         customerTel: fd.customerTel.trim(), customerFax: fd.customerFax.trim(), customerEmail: (fd.customerEmail || '').trim(),
         notes: fd.notes, status: fd.status, paidDate: fd.status === 'paid' ? fd.paidDate : '',
         paidAmount: fd.status === 'paid' ? toInt(fd.paidAmount) || '' : '', memo: fd.memo,
@@ -1423,7 +1423,32 @@
       }
       bumpNumber('invoice', mi.number);
     });
+    fixAllAddresses();
     return res;
+  }
+
+  // ---------- 住所の都道府県（ローマ字 → 漢字） ----------
+  // MakeLeapsから取り込んだ住所が「saitamaさいたま市…」のようになるのを「埼玉県さいたま市…」に直す
+  const PREFECTURES = { hokkaido: '北海道', aomori: '青森県', iwate: '岩手県', miyagi: '宮城県', akita: '秋田県', yamagata: '山形県', fukushima: '福島県', ibaraki: '茨城県', tochigi: '栃木県', gunma: '群馬県', saitama: '埼玉県', chiba: '千葉県', tokyo: '東京都', kanagawa: '神奈川県', niigata: '新潟県', toyama: '富山県', ishikawa: '石川県', fukui: '福井県', yamanashi: '山梨県', nagano: '長野県', gifu: '岐阜県', shizuoka: '静岡県', aichi: '愛知県', mie: '三重県', shiga: '滋賀県', kyoto: '京都府', osaka: '大阪府', hyogo: '兵庫県', nara: '奈良県', wakayama: '和歌山県', tottori: '鳥取県', shimane: '島根県', okayama: '岡山県', hiroshima: '広島県', yamaguchi: '山口県', tokushima: '徳島県', kagawa: '香川県', ehime: '愛媛県', kochi: '高知県', fukuoka: '福岡県', saga: '佐賀県', nagasaki: '長崎県', kumamoto: '熊本県', oita: '大分県', miyazaki: '宮崎県', kagoshima: '鹿児島県', okinawa: '沖縄県' };
+  function fixPrefecture(addr) {
+    if (!addr) return addr;
+    return String(addr).replace(/^\s*([A-Za-zōū]+)(?:[\s-]*(?:ken|to|fu|do)\b)?[\s,、]*/, (m, w) => {
+      const key = w.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/^hokkai$/, 'hokkaido');
+      return PREFECTURES[key] || m;
+    });
+  }
+  // 保存済みの取引先・書類の住所をまとめて直す（直した件数を返す）
+  function fixAllAddresses() {
+    let n = 0;
+    state.customers.forEach((c) => { const v = fixPrefecture(c.address); if (v !== c.address) { c.address = v; touch(c); n++; } });
+    state.invoices.forEach((i) => {
+      const v = fixPrefecture(i.customerAddress);
+      if (v === i.customerAddress) return;
+      const pristine = i.importedAt && !(i.updatedAt > i.importedAt); // 手で編集していない取り込み分は、編集扱いにしない
+      i.customerAddress = v; touch(i); n++;
+      if (pristine) i.importedAt = i.updatedAt;
+    });
+    return n;
   }
 
   // ---------- 起動 ----------
@@ -1434,6 +1459,7 @@
       const r = await api('/api/data', { state });
       serverRev = r.rev;
       adoptState(r.state);
+      if (fixAllAddresses()) save();
     } catch (e) {
       if (authRequired) return;
       setSyncBadge('⚠ Macと通信できません。この端末の控えを表示しています');
@@ -1448,5 +1474,5 @@
       if (st.configured && Date.now() - last > 30 * 60 * 1000) syncMakeLeaps({ silent: true });
     } catch (e) { /* 同期できなくても画面は使える */ }
   }
-  if (SERVER) { app.innerHTML = '<div class="empty">読み込み中…</div>'; startServerSync(); } else route();
+  if (SERVER) { app.innerHTML = '<div class="empty">読み込み中…</div>'; startServerSync(); } else { if (fixAllAddresses()) save(); route(); }
 })();
