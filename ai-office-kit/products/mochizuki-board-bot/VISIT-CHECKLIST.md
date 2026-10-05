@@ -12,6 +12,9 @@
   - [ ] `cloudflared tunnel --url http://localhost:18790` 起動
   - [ ] ⚠️ **当日の朝、トンネルURLをLINE Webhookに設定し直す**（起動ごとにURLが変わる）
   - [ ] LINEの「検証」→成功 を確認
+- [ ] **デモ用の車を仕込む**（当日の朝に実行。日付は自動で“今日以降”になる）
+  - [ ] `node scripts/demo-seed.mjs` → 7台投入
+  - [ ] `node bin/notify.mjs --force` で先回り通知が届くか下見（被り1・遅れ2・本日1）
 - [ ] **見積書を印刷して持参**（`estimates/quote-mochizuki-2026-0910.pdf`）
 - [ ] スマホで共有シートが開けることを確認（現場で見せる用）
 - [ ] モバイルWi-Fi/テザリングの確認（現地のネット環境が不安なら）
