@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>Lucent 部品買取サムネ</title><style>
+  /* Lucent（@lucent_autoparts）部品買取の告知サムネ 1080×1350（4:5）
+     ⚠️買取の実態＝鈑金屋が交換で外した部品は基本捨てる → その前に声をかけて取りに行く
+     ⚠️「割れていても」「余剰在庫」「処分予定」「車の買取はしていません」は書かない（README参照）
+     ⚠️方向＝英語まじりのブランド型（オーナー選択）。写真を主役に、左下に英字を大きく
+     フォントは fonts/ に今回の文字だけ切り出して置いてある（fetch-fonts.sh で作り直せる） */
+  @font-face{font-family:'ZKG';font-weight:700;src:url('fonts/zkg-700.ttf');}
+  @font-face{font-family:'Anton';src:url('fonts/anton.ttf');}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  body{background:#111;}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;color:#fff;}
+  .photo{position:absolute;inset:0;background:url('buy-photo.jpg') center 40%/cover no-repeat;}
+  .shade{position:absolute;left:0;right:0;bottom:0;height:52%;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.5) 50%,rgba(0,0,0,.7) 100%);}
+  .txt{position:absolute;left:66px;right:66px;bottom:62px;}
+  .en{text-transform:uppercase;line-height:.9;}
+  .jp{font-family:'ZKG',sans-serif;font-weight:700;font-size:32px;margin-top:30px;letter-spacing:.04em;}
+  .sign{display:flex;justify-content:space-between;margin-top:34px;padding-top:20px;
+    border-top:2px solid rgba(255,255,255,.5);font-size:26px;letter-spacing:.18em;color:rgba(255,255,255,.85);}
+
+  /* A1：Anton */
+  .a1 .en,.a1 .sign{font-family:'Anton',sans-serif;}
+  .a1 .en{font-size:230px;letter-spacing:.005em;}
+  /* 差し色は「WANTED.」の文字だけ（帯や飾りは付けない＝シンプルさを保つ） */
+  .en .c{color:var(--c);}
+  .red{--c:#ff3b2f;} .yellow{--c:#ffd23f;} .orange{--c:#ff6a13;}
+</style></head><body>
+
+<!-- A1-red -->
+<div class="slide a1 red"><div class="photo"></div><div class="shade"></div>
+  <div class="txt">
+    <div class="en">Parts<br><span class="c">Wanted.</span></div>
+    <div class="jp">高年式の外装パーツ、買い取ります。</div>
+    <div class="sign"><span>LUCENT</span><span>SAITAMA, JAPAN</span></div>
+  </div>
+</div>
+
+<!-- A1-yellow -->
+<div class="slide a1 yellow"><div class="photo"></div><div class="shade"></div>
+  <div class="txt">
+    <div class="en">Parts<br><span class="c">Wanted.</span></div>
+    <div class="jp">高年式の外装パーツ、買い取ります。</div>
+    <div class="sign"><span>LUCENT</span><span>SAITAMA, JAPAN</span></div>
+  </div>
+</div>
+
+<!-- A1-orange -->
+<div class="slide a1 orange"><div class="photo"></div><div class="shade"></div>
+  <div class="txt">
+    <div class="en">Parts<br><span class="c">Wanted.</span></div>
+    <div class="jp">高年式の外装パーツ、買い取ります。</div>
+    <div class="sign"><span>LUCENT</span><span>SAITAMA, JAPAN</span></div>
+  </div>
+</div>
+
+</body></html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>スマホで頼む様子</title><style>
+  /* @line_ai_office インスタ用カルーセル「インスタの投稿、スマホでこう頼んでいます。」1080×1350（4:5）×7枚
+     見た目は ichigen.html と同じ「紙＋紺＋赤ペン」の体裁（紙 #f3efe6／紺 #13233b／赤ペン #d23c26）
+     ⚠️絵文字・LINEグリーン・紺グラデは使わない。赤線の取り消しも使わない
+     ⚠️本文の文言はライター→SNS担当の確定版。一字も変えない（改行位置だけ調整）
+     スクショ（phone-shot-*.png）は元画像から必要な所だけ切り出したもの。
+       ステータスバー・ヘッダー・入力欄・↓ボタンは入れない／phone-shot-2 の「商品化前の状態」はぼかし済み
+     フォントは fonts/*-phone.ttf（bash fetch-fonts.sh phone.html で作る。文言を変えたら再実行） */
+  @font-face{font-family:'ZKG';font-weight:700;src:url('fonts/zkg-700-phone.ttf');}
+  @font-face{font-family:'ZKG';font-weight:500;src:url('fonts/zkg-500-phone.ttf');}
+  @font-face{font-family:'Klee';font-weight:600;src:url('fonts/klee-600-phone.ttf');}
+  @font-face{font-family:'Anton';src:url('fonts/anton-phone.ttf');}
+  :root{--ink:#13233b;--paper:#f3efe6;--pen:#d23c26;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  body{background:#222;}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;
+    color:var(--ink);font-family:'ZKG',sans-serif;font-weight:700;background:var(--paper);}
+  /* 紙のざらつき（ごく薄く） */
+  .slide::before{content:"";position:absolute;inset:0;opacity:.35;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .4 0 0 0 0 .3 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .in{position:absolute;inset:70px 74px 64px;display:flex;flex-direction:column;}
+
+  /* 上下の罫（書類の体裁） */
+  .head{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:16px;
+    border-bottom:3px solid var(--ink);font-family:'Anton',sans-serif;font-weight:400;font-size:28px;letter-spacing:.14em;}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;padding-top:18px;
+    border-top:1.5px solid rgba(19,35,59,.35);font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:.12em;color:rgba(19,35,59,.7);}
+
+  /* 赤ペン（丸囲みと手書き矢印だけ） */
+  .pen{font-family:'Klee',sans-serif;font-weight:600;color:var(--pen);}
+  .circ{position:relative;display:inline-block;padding:0 .12em;margin:0 .02em;}
+  .circ svg{position:absolute;left:-4%;top:-14%;width:108%;height:128%;overflow:visible;}
+  .circ path{fill:none;stroke:var(--pen);stroke-width:5;stroke-linecap:round;}
+  .arw{position:absolute;overflow:visible;}
+  .arw path{fill:none;stroke:var(--pen);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;}
+  .note{position:absolute;font-size:46px;line-height:1.4;white-space:nowrap;}
+
+  .mid{margin:auto 0;}
+  .mid + .foot{margin-top:0;}
+
+  /* 見出し */
+  h2{font-size:80px;line-height:1.3;letter-spacing:.01em;margin-top:46px;}
+
+  /* スクショ・完成画像（白フチ＋影で、机に置いたプリント風） */
+  .shot{position:absolute;}
+  .shot img{display:block;width:100%;border:15px solid #fff;
+    box-shadow:0 18px 40px rgba(19,35,59,.28),0 2px 6px rgba(19,35,59,.2);}
+  /* 見出しの下の、画像と赤ペンを置く場所 */
+  .stage{position:relative;flex:1;margin:30px 0 26px;}
+
+  /* 1枚目：表紙 */
+  .cover h1{font-size:108px;line-height:1.3;letter-spacing:.01em;}
+  .cover .row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:70px;}
+  .cover .sub{font-size:32px;line-height:1.6;color:rgba(19,35,59,.75);letter-spacing:.04em;font-weight:500;}
+  .cover .row .pen{font-size:58px;line-height:1.35;margin-top:34px;transform:rotate(-2deg);transform-origin:left;}
+  .cover .shot{position:relative;width:250px;flex:none;transform:rotate(3deg);margin-right:14px;}
+  .cover .shot img{border-width:11px;}
+
+  /* 7枚目：結論（ichigen.html の5枚目と同じ体裁） */
+  .end h1{font-size:84px;line-height:1.36;}
+  .end .cta{display:flex;align-items:center;gap:18px;font-size:50px;margin-top:84px;transform:rotate(-2deg);transform-origin:left;}
+  .end .cta svg{width:74px;height:34px;flex:none;overflow:visible;}
+</style></head><body>
+
+<!-- 1: 表紙（見出し＋完成画像を小さく） -->
+<div class="slide cover"><div class="in">
+  <div class="head"><span>HOW I ASK</span><span>01 / 07</span></div>
+  <div class="mid"><h1>インスタの投稿、<br><span class="circ">スマホ<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M8 58 C4 20 60 6 88 22 C104 34 98 78 60 90 C30 98 6 84 4 60 C3 46 16 30 32 24"/></svg></span>でこう<br>頼んでいます。</h1>
+  <div class="row"><div><div class="sub">例は、本業（車の中古部品屋）の<br>今週の投稿。</div>
+      <div class="pen">ふだんの言葉と、<br>タップだけ</div></div>
+    <div class="shot"><img src="../lucent-ai-series/buy2-1.png" alt=""></div></div></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>SWIPE</span></div>
+</div></div>
+
+<!-- 2: 最初に送った1行 -->
+<div class="slide"><div class="in">
+  <div class="head"><span>HOW I ASK</span><span>02 / 07</span></div>
+  <h2>最初に送ったのは、<br>この1行。</h2>
+  <div class="stage">
+    <div class="shot" style="left:6px;top:170px;width:920px;transform:rotate(-1.5deg);"><img src="phone-shot-1a.png" alt=""></div>
+    <svg class="arw" style="left:560px;top:342px;width:140px;height:230px;" viewBox="0 0 140 230"><path d="M40 226 C26 150 50 70 92 14 M64 24 L94 10 L98 42"/></svg>
+    <div class="note pen" style="left:380px;top:590px;transform:rotate(-2deg);">店とこのアカウントの分</div>
+  </div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>1 MESSAGE</span></div>
+</div></div>
+
+<!-- 3: 返ってきた質問（選ぶだけ） -->
+<div class="slide"><div class="in">
+  <div class="head"><span>HOW I ASK</span><span>03 / 07</span></div>
+  <h2>返ってきたのは、質問。<br>選んで答えるだけ。</h2>
+  <div class="stage">
+    <div class="shot" style="left:0;top:0;width:690px;transform:rotate(-1deg);"><img src="phone-shot-1b.png" alt=""></div>
+    <svg class="arw" style="left:320px;top:400px;width:450px;height:80px;" viewBox="0 0 450 80"><path d="M440 24 C300 56 150 48 14 40 M36 22 L14 40 L38 58"/></svg>
+    <div class="note pen" style="left:740px;top:210px;transform:rotate(-3deg);">ここは<br>文字を<br>打たない</div>
+  </div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>TAP TO ANSWER</span></div>
+</div></div>
+
+<!-- 4: 写真1枚＋ひとこと -->
+<div class="slide"><div class="in">
+  <div class="head"><span>HOW I ASK</span><span>04 / 07</span></div>
+  <h2>写真を1枚と、ひとこと。</h2>
+  <div class="stage">
+    <div class="shot" style="right:0;top:150px;width:700px;transform:rotate(1.5deg);"><img src="phone-shot-2.png" alt=""></div>
+    <div class="note pen" style="left:0;top:200px;transform:rotate(-3deg);">倉庫に<br>並んだ<br>部品の写真</div>
+    <svg class="arw" style="left:120px;top:420px;width:270px;height:120px;" viewBox="0 0 270 120"><path d="M10 10 C40 80 140 100 250 70 M226 48 L252 70 L222 92"/></svg>
+  </div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>1 PHOTO + 1 LINE</span></div>
+</div></div>
+
+<!-- 5: 直してほしい所も、ふだんの言葉で -->
+<div class="slide"><div class="in">
+  <div class="head"><span>HOW I ASK</span><span>05 / 07</span></div>
+  <h2>直してほしい所も、<br>ふだんの言葉で。</h2>
+  <div class="stage">
+    <div class="shot" style="left:6px;top:130px;width:920px;transform:rotate(-1.2deg);"><img src="phone-shot-3.png" alt=""></div>
+    <svg class="arw" style="left:300px;top:560px;width:140px;height:140px;" viewBox="0 0 140 140"><path d="M110 134 C80 110 50 70 50 12 M30 34 L50 10 L72 32"/></svg>
+    <div class="note pen" style="left:60px;top:710px;transform:rotate(-2deg);">「〜みたいな文章にしてほしい」でOK</div>
+  </div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>PLAIN WORDS</span></div>
+</div></div>
+
+<!-- 6: 今日出した1枚（完成品を大きく） -->
+<div class="slide"><div class="in">
+  <div class="head"><span>HOW I ASK</span><span>06 / 07</span></div>
+  <h2>店のインスタに、<br>今日出した1枚。</h2>
+  <div class="stage">
+    <div class="shot" style="left:30px;top:10px;width:560px;transform:rotate(-2deg);"><img src="../lucent-ai-series/buy2-1.png" alt=""></div>
+    <div class="note pen" style="left:660px;top:360px;font-size:52px;transform:rotate(-3deg);">言い方を<br>直した版</div>
+    <svg class="arw" style="left:412px;top:500px;width:298px;height:120px;" viewBox="0 0 298 120"><path d="M274 12 C278 70 220 100 16 100 M40 82 L16 100 L42 116"/></svg>
+  </div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>LUCENT / SAITAMA</span></div>
+</div></div>
+
+<!-- 7: 結論 -->
+<div class="slide end"><div class="in">
+  <div class="head"><span>HOW I ASK</span><span>07 / 07</span></div>
+  <div class="mid"><h1>スマホで頼むだけの<br>AIチーム（9職種）を、<br>事業主向けに<br>作っています。</h1>
+  <div class="cta pen"><svg viewBox="0 0 74 34"><path d="M4 18 C24 14 44 20 64 16 M50 4 L66 16 L52 29" fill="none" stroke="#d23c26" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>プロフィールのリンクから</div></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>AI OFFICE</span></div>
+</div></div>
+
+</body></html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>Lucent 部品の買取告知（10/5）</title><style>
+  /* Lucent（@lucent_autoparts）部品の買取告知サムネ 1080×1350（4:5）
+     ⚠️先週の入荷投稿（arrival.html）とまったく同じ型＝シリーズに見せる
+       写真を主役に、左下に Anton の英字＋差し色オレンジは1語だけ（今回は FENDERS.）
+     ⚠️黒い影を濃くしない・帯・飾り・絵文字は入れない（README「どこでも見る広告テンプレにしない」）
+     フォントは fonts/ に今回の文字だけ切り出して置いてある（bash fetch-fonts.sh buy2.html） */
+  @font-face{font-family:'ZKG';font-weight:700;src:url('fonts/zkg-700-buy2.ttf');}
+  @font-face{font-family:'Anton';src:url('fonts/anton-buy2.ttf');}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  body{background:#111;}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;color:#fff;}
+  /* 写真は1932×2576（3:4）→ 横幅ぴったりで敷くと縦が90px余るだけ（左右は切れない）。
+     y=100%で余りを全部上から切り、写真を90px持ち上げる → 見せ場の青いフェンダーが BUMPERS. の上に丸ごと出て、
+     通路の奥行き（左右の棚と奥へ並ぶフェンダー）が上半分に残る。SERENA の文字は手前の低い位置なので英字の裏に入る */
+  .photo{position:absolute;inset:0;background:url('buy2-photo.jpg') center 100%/cover no-repeat;}
+  /* 影は買取告知・入荷投稿と同じ薄さ（最大.72・濃くしない）。英字が3段で高くなり、LIGHTS. の裏に白いフェンダーが来るので、
+     始まりだけ60%→64%に上げて BUMPERS. の上半分にも少し効かせる */
+  .shade{position:absolute;left:0;right:0;bottom:0;height:64%;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.5) 50%,rgba(0,0,0,.72) 100%);}
+  .txt{position:absolute;left:66px;right:66px;bottom:62px;}
+  /* 3段なので入荷投稿の230pxより小さく180px（一番長い BUMPERS. でも右に余白が残り、写真の上半分が空く） */
+  .en{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.9;font-size:180px;letter-spacing:.005em;}
+  .en .c{color:#ff6a13;}
+  .jp{font-family:'ZKG',sans-serif;font-weight:700;font-size:32px;margin-top:30px;letter-spacing:.04em;}
+  .sign{display:flex;justify-content:space-between;margin-top:34px;padding-top:20px;font-family:'Anton',sans-serif;
+    border-top:2px solid rgba(255,255,255,.5);font-size:26px;letter-spacing:.18em;color:rgba(255,255,255,.85);}
+</style></head><body>
+
+<div class="slide"><div class="photo"></div><div class="shade"></div>
+  <div class="txt">
+    <div class="en">Bumpers.<br>Lights.<br><span class="c">Fenders.</span></div>
+    <div class="jp">高年式の外装部品、買い取らせてください！</div>
+    <div class="sign"><span>LUCENT</span><span>SAITAMA, JAPAN</span></div>
+  </div>
+</div>
+
+</body></html>
