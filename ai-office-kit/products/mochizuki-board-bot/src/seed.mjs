@@ -93,14 +93,15 @@ export async function seedAll() {
     data.push({ range: `${B}!${R.c2}${r}:${R.c3}${r}`, values: [[x[1], x[2]]] });
   });
 
-  // --- 代車（右下）：見出しの日付＋貸出 ---
+  // --- 車検・代車（右下）：見出しの日付＋（6R＝車検ラウンド／車名＝代車） ---
   const dayCols = `${CAR_DAY_COLS[0]}`;
   const lastDay = CAR_DAY_COLS[CAR_DAY_COLS.length - 1];
   data.push({ range: `${B}!${dayCols}${R.carHeadRow}:${lastDay}${R.carHeadRow}`, values: [CAR_DAY_COLS.map((_, k) => wd(k))] });
   const loans = [
-    ['青木様／シエンタ', ['N-WGN 9:00〜', 'N-WGN', 'N-WGN', 'N-WGN', 'N-WGN']],
-    ['上田様／ノート',   ['クリッパー 17:00〜', 'クリッパー', '夜 返却', '', '']],
-    ['片山様／プリウス', ['', '', 'エブリィ', 'エブリィ', 'エブリィ']],
+    ['前田様／ファンクロス', ['6R・N-WGN 9:00', 'N-WGN', '', '', '']],
+    ['宮田様／アトレー',     ['クリッパー 17:00〜', '6R', '夜 納車', '', '']],
+    ['宮本様／キャンバス',   ['', '', '2R', '', '']],
+    ['青木様／シエンタ',     ['エブリィ', 'エブリィ', 'エブリィ', 'エブリィ', 'エブリィ']],
     ['', ['', '', '', '', '']],
   ];
   loans.forEach(([who, days], k) => {
@@ -121,7 +122,7 @@ export async function seedAll() {
     ['ハイエース 塗装', 'ハイエース 塗装'],
     ['プリウス 磨き', '代車 引取り'],
     ['休み', '休み'],
-    ['アウトランダー 納車準備', 'アウトランダー 納車 2R'],
+    ['アウトランダー 納車準備', 'ファンクロス 車検 6R'],
   ];
   const schedRows = [];
   for (let k = 0; k < SCHED.staffRows; k++) {

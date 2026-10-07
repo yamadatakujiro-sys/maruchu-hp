@@ -8,7 +8,8 @@
 //    3〜18行目: 1〜16番の車（1行＝1台）
 //    左から: No / 入庫日 / 入庫先(札) / お客様 / 車種／登録番号 / 調色(色番号) / 調色(状態)
 //           / 備考(保険の札) / 備考(メモ) / 工程8列 / 納車予定日 / 部品 / 更新(隠し列)
-//    右側  : 部品発注（1〜7行目）／入庫予定（8〜13行目）／代車（14〜18行目）
+//    右側  : 部品発注（1〜7行目・日付は入荷日）／入庫予定（8〜13行目）
+//           ／車検・代車（14〜19行目：お客様／車種 × 日付。「6R」＝車検場のラウンド、車名＝代車）
 //
 //  予定表（タブ）… 紙の予定表と同じ：スタッフ × 午前・午後 ＋ 備考 ＋ 戸締りチェック
 // =============================================================
@@ -61,7 +62,7 @@ export const STAGE_FIRST = colLetter(I.stageStart);
 export const STAGE_LAST = colLetter(I.stageStart + NS - 1);
 
 // --- 右側ブロック（行は1始まり） ---
-// 列: r0=発注先/お客様, r1=日付, r2=車種, r3..r6=部品・内容（r3〜r6を結合）
+// 列: r0=発注先/お客様, r1=入荷日, r2=車種, r3..r6=部品・内容（r3〜r6を結合）
 export const R = {
   c0: colLetter(I.right),
   c1: colLetter(I.right + 1),
@@ -75,11 +76,15 @@ export const R = {
   reserveHeadRow: 8,
   reserveFirst: 9,
   reserveLast: 13,
-  carHeadRow: 14,      // 代車：見出し（日付が並ぶ）
+  carHeadRow: 14,      // 車検・代車：見出し（日付が並ぶ）
   carFirst: 15,
-  carLast: 18,
-  carDays: 5,          // 代車表に並べる日数（今日から5日）
+  carLast: 19,         // 代車は5台なので5行
+  carDays: 5,          // 並べる日数（今日から5日）
 };
+// ボード全体の最下行（左の16台と右の車検・代車のうち下の方）
+export const BOARD_BOTTOM = Math.max(LAST_ROW, R.carLast);
+// 「6R」「2R」＝車検場のラウンド（受検枠）
+export const ROUND_RE = /(\d+)\s*R/i;
 // 代車の日付列（c2〜c6）
 export const CAR_DAY_COLS = Array.from({ length: R.carDays }, (_, k) => colLetter(I.right + 2 + k));
 

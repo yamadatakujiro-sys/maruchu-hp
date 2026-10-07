@@ -3,7 +3,7 @@
 //  現場の一言＋今のボード・入庫予定・予定表を渡し、「何をどう変えるか」をJSONで返させる。
 //  実際のシート更新はコード側が確定的に行う（AIには判断だけさせる＝安全）。
 // =============================================================
-import { CONFIG } from './config.mjs';
+import { CONFIG, BOARD } from './config.mjs';
 import { STAGES } from './board.mjs';
 import { SLOTS } from './layout.mjs';
 
@@ -14,6 +14,12 @@ const SYSTEM = `あなたは自動車の板金塗装工場の「ホワイトボ�
 ${STAGES.map((s, i) => `${i}:${s}`).join(' / ')}
 ※「入庫」＝ボードに載っただけで作業前、「納車済」＝引き渡し完了（ボードから外れる）。
 ※ボードでは、今いる工程のマスに担当者の名札（名前）が貼られている。
+
+【この工場の言葉】（社長に確認済み）
+- 「6R」「2R」など＝車検場のラウンド（車検に行く受検枠）。車検・代車の表に日付ごとに書く。
+- 「×」＝交換。例「バンパー×」＝バンパー交換作業、「タイヤ・ホイール×」＝タイヤ・ホイール交換。
+- 部品発注の日付＝入荷日（部品が届く日）。
+- 代車は全部で${BOARD.loanCars ?? 5}台。車検・代車の表で、車名（N-WGN・クリッパー等）が書いてある日はその代車が出ている。
 
 【返すJSON】これだけを返す（説明文・コードフェンスは付けない）。使わない項目は null。
 {
@@ -43,14 +49,14 @@ ${STAGES.map((s, i) => `${i}:${s}`).join(' / ')}
   入庫先（ディーラー名等）・保険会社・色番号が言われたら入れる。作業を始めた工程や担当が言われた時だけ toStage/staff。
 - これから来る車（「来週入庫予定」「予約入った」「仮予約」）→ reserve。content に修理内容・予定日・状態を短く。
 - スタッフの予定・休み（「井上 明日休み」「あやか 午後 キャンバス納車」）→ schedule。休みは text="休み"。予定表は1日分なので日付は気にしない。
-- 聞くだけ（「今どうなってる」「誰休み」「部品待ちは」「入庫予定は」「井上なにやってる」「空きある？」）→ status。
+- 聞くだけ（「今どうなってる」「誰休み」「部品いつ入る」「入庫予定は」「井上なにやってる」「空きある？」「今日の車検は」「代車空いてる？」）→ status。
   渡したデータだけを使い、reply をLINEで読みやすく簡潔に（1行1台程度、多すぎる時は要点）。空き＝ボードの空き番号数（16台中）も答えられる。
 - 名前・車種は一覧と照合して carId を特定（さん/様、ひらがな/カタカナ、車種の一部、登録番号の下4桁でもよい）。
 - スタッフ名は staffNames と照合する（呼び方ゆれも汲む）。
 - 特定できない・曖昧 → unknown。reply で短く聞き返す。
 - 1メッセージ＝1件。勝手に複数を動かさない。`;
 
-export async function interpret(text, { cars, reservations, schedule }) {
+export async function interpret(text, { cars, reservations, schedule, parts = [], loans = { days: [], list: [] } }) {
   const board = cars.map((c) => ({
     no: c.id, cust: c.cust, car: c.car, number: c.number, stage: c.stage, staff: c.staff,
     due: c.due, parts: c.parts, memo: c.memo, colorCode: c.colorCode, colorState: c.colorState,
@@ -62,6 +68,8 @@ export async function interpret(text, { cars, reservations, schedule }) {
     reservations: reservations.map((r) => ({ cust: r.cust, car: r.car, content: r.content })),
     schedule: { date: schedule.date, staff: schedule.staff.map((s) => ({ name: s.name, am: s.am, pm: s.pm })), notes: schedule.notes },
     staffNames: schedule.staff.map((s) => s.name),
+    partsOrders: parts.map((p) => ({ supplier: p.supplier, arrival: p.date, car: p.car, item: p.item })),
+    inspectionAndLoanCars: { days: loans.days, rows: loans.list.map((x) => ({ who: x.who, byDay: x.cells })), loanCarsTotal: BOARD.loanCars ?? 5 },
   };
   const userContent =
     `今のボード・入庫予定・予定表（JSON）：\n${JSON.stringify(data)}\n\n` +

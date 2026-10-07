@@ -210,7 +210,8 @@ assert.deepStrictEqual(rowVals(2, 'J', 'Q'), ['鈑金', '下地', 'マスキン�
 assert.strictEqual(at('ホワイトボード', 'A3'), '1'); assert.strictEqual(at('ホワイトボード', 'A18'), '16'); ok('1〜16番');
 assert.strictEqual(at('ホワイトボード', 'D3'), '青木 様'); assert.strictEqual(at('ホワイトボード', 'J3'), '松本'); ok('1番：青木様のシエンタ、鈑金に松本の名札（.envのSTAFFが反映）');
 assert.strictEqual(at('ホワイトボード', 'F6'), '070'); ok('色番号の先頭0が消えない');
-assert.strictEqual(at('ホワイトボード', 'V1'), '部　品　発　注'); assert.strictEqual(at('ホワイトボード', 'V8'), '入庫予定'); ok('右側：部品発注・入庫予定');
+assert.strictEqual(at('ホワイトボード', 'V1'), '部　品　発　注'); assert.strictEqual(at('ホワイトボード', 'W2'), '入荷日'); assert.strictEqual(at('ホワイトボード', 'V8'), '入庫予定'); ok('右側：部品発注（入荷日）・入庫予定');
+assert.strictEqual(at('ホワイトボード', 'V14'), '車検・代車　お客様／車種'); assert.strictEqual(at('ホワイトボード', 'X15'), '6R・N-WGN 9:00'); assert.strictEqual(at('ホワイトボード', 'V18'), '青木様／シエンタ'); ok('右下：車検・代車（6R＝車検ラウンド・5行）');
 assert.strictEqual(at('予定表', 'A8'), '社長'); assert.strictEqual(at('予定表', 'I1'), 'FALSE'); ok('予定表：スタッフ名・戸締りチェック');
 // 2回目の組み立て（作り直し）も通ること
 await build({ empty: false });
@@ -265,6 +266,12 @@ const digest = formatDigest(await buildAlerts(new Date()), new Date());
 assert.ok(digest.includes(`は納車予定が2台重なっています（石川様・片山様）`)); ok('📅 納車被り（石川様・片山様）');
 assert.ok(digest.includes('上田様のノート') && digest.includes('〈マスキング〉')); ok('⚠️ 遅れ（上田様・マスキング）');
 assert.ok(digest.includes('🔔 本日納車：大野様のハイエース')); ok('🔔 本日納車（大野様）');
+assert.ok(digest.includes('📦 本日入荷：ワゴンRのネームラベル（スズキ部品）') && digest.includes('📦 本日入荷：N-BOXのグロメット')); ok('📦 本日入荷の部品（2件）');
+assert.ok(digest.includes('🚗 本日車検：前田様／ファンクロス　6R')); ok('🚗 本日の車検（6R）');
+
+console.log('④ 部品・車検の質問がAIに届く');
+await say('今日の車検は？', { action: 'status', reply: '前田様ファンクロス 6R です' });
+assert.ok(lastUserContent.includes('"partsOrders"') && lastUserContent.includes('"inspectionAndLoanCars"') && lastUserContent.includes('6R・N-WGN 9:00')); ok('部品発注・車検代車の表もAIに渡している');
 if (SHOW) console.log('\n' + digest);
 
 assert.deepStrictEqual(warnings, []); ok('結合セルの中への書き込みなし');

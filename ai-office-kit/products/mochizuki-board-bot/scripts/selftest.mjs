@@ -5,8 +5,8 @@
 //  実運用前に `npm run check` で壊れていないか確認する用。
 // =============================================================
 import assert from 'node:assert';
-import { STAGES, nextStage, stageIndex, isValidStage, parseCars, parseSchedule, findStaff } from '../src/board.mjs';
-import { parseDue, formatDigest } from '../src/notify.mjs';
+import { STAGES, nextStage, stageIndex, isValidStage, parseCars, parseSchedule, findStaff, parseParts, parseLoans } from '../src/board.mjs';
+import { parseDue, formatDigest, partsAlerts, inspectionAlerts } from '../src/notify.mjs';
 import { I, L, R, colLetter, splitCarNum, stripSama, stageCells, rowToCar, BOARD_STAGES, FIRST_ROW } from '../src/layout.mjs';
 import { buildStatusSummary } from '../src/handler.mjs';
 
@@ -82,6 +82,22 @@ assert.strictEqual(parseDue('8/16', today).getDate(), 16); ok('parseDue M/D');
 assert.strictEqual(parseDue('8月16日', today).getDate(), 16); ok('parseDue 日本語');
 assert.strictEqual(parseDue('', today), null); ok('parseDue 空=null');
 assert.strictEqual(parseDue('10/14仮', today), null); ok('parseDue「仮」付きは読まない');
+
+// --- 部品の入荷・車検ラウンド（社長回答：日付＝入荷日、6R＝車検ラウンド） ---
+const parts = parseParts([['トヨタ部品', '8/13', 'シエンタ', 'バンパー×'], ['', '', '', ''], ['日産部品', '8/14', 'ノート', 'グロメット']]);
+assert.strictEqual(parts.length, 2); ok('部品発注の読み取り（空行は飛ばす）');
+const pa = partsAlerts(parts, today);
+assert.strictEqual(pa.length, 1); assert.ok(pa[0].text.includes('本日入荷：シエンタのバンパー×（トヨタ部品）')); ok('📦 本日入荷の部品');
+const loans = parseLoans([
+  ['車検・代車　お客様／車種', '', '8/13(木)', '8/14(金)', '8/15(土)', '8/16(日)', '8/17(月)'],
+  ['前田様／ファンクロス', '', '6R・N-WGN 9:00', 'N-WGN'],
+  ['宮田様／アトレー', '', 'クリッパー 17:00〜', '6R', '夜 納車'],
+  ['宮本様／キャンバス', '', '', '', '2R'],
+]);
+assert.strictEqual(loans.days[0], '8/13(木)'); assert.strictEqual(loans.list.length, 3); ok('車検・代車の表の読み取り');
+const ia = inspectionAlerts(loans, today);
+assert.strictEqual(ia.length, 1); assert.ok(ia[0].text.includes('前田様／ファンクロス　6R')); ok('🚗 本日の車検（クリッパー17:00は車検ではない）');
+assert.strictEqual(inspectionAlerts(loans, new Date(2026, 7, 15)).length, 1); ok('別の日（2R）も拾う');
 
 // --- 通知ダイジェスト ---
 assert.strictEqual(formatDigest([], today), null); ok('アラート0件=null');

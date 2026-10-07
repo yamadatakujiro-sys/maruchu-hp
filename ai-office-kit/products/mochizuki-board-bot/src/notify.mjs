@@ -1,9 +1,10 @@
 // =============================================================
-//  先回り通知のロジック（納期の重なり・遅れ・本日納車）
+//  先回り通知のロジック（納期の重なり・遅れ・本日納車・本日入荷の部品・本日の車検）
 //  シートを読んでアラート文を組み立てる。送信は bin/notify.mjs が行う。
 // =============================================================
 import { BOARD } from './config.mjs';
-import { listCars, activeCars, stageIndex } from './board.mjs';
+import { listCars, activeCars, stageIndex, loadRight } from './board.mjs';
+import { ROUND_RE } from './layout.mjs';
 
 // 納車予定の文字列を Date に。対応形式: "2026-08-16" / "8/16" / "8月16日"
 export function parseDue(s, today = new Date()) {
@@ -82,7 +83,37 @@ export async function buildAlerts(today = new Date()) {
     }
   }
 
+  // 4) 右側（部品の入荷・車検）。読めなくても他の通知は止めない
+  try {
+    const { parts, loans } = await loadRight();
+    alerts.push(...partsAlerts(parts, today), ...inspectionAlerts(loans, today));
+  } catch (e) {
+    console.warn('[notify] 部品・車検の欄を読めませんでした:', e.message);
+  }
+
   return alerts;
+}
+
+// 部品発注の「入荷日」が今日のもの
+export function partsAlerts(parts, today = new Date()) {
+  return parts
+    .filter((p) => { const d = parseDue(p.date, today); return d && daysBetween(d, today) === 0; })
+    .map((p) => ({ level: 'info', text: `📦 本日入荷：${p.car}の${p.item}${p.supplier ? `（${p.supplier}）` : ''}` }));
+}
+
+// 車検・代車の表で、今日の列に「6R」などラウンドが入っているもの
+export function inspectionAlerts(loans, today = new Date()) {
+  const k = loans.days.findIndex((h) => {
+    const d = parseDue((h || '').replace(/[（(].*$/, ''), today);
+    return d && daysBetween(d, today) === 0;
+  });
+  if (k < 0) return [];
+  const out = [];
+  for (const x of loans.list) {
+    const m = (x.cells[k] || '').match(ROUND_RE);
+    if (m) out.push({ level: 'info', text: `🚗 本日車検：${x.who || '（お客様未記入）'}　${m[1]}R` });
+  }
+  return out;
 }
 
 // アラート配列を1通のダイジェスト文へ

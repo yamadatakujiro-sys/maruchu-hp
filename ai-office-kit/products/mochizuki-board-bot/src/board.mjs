@@ -9,7 +9,7 @@ import {
 } from './sheets.mjs';
 import {
   TABS, BOARD_STAGES, I, L, R, SCHED, FIRST_ROW, LAST_ROW, SLOTS,
-  STAGE_FIRST, STAGE_LAST, rowToCar, stageCells, joinCarNum,
+  STAGE_FIRST, STAGE_LAST, CAR_DAY_COLS, rowToCar, stageCells, joinCarNum,
 } from './layout.mjs';
 
 export const STAGES = BOARD.stages;
@@ -32,6 +32,8 @@ const B = () => TABS.board;
 const BOARD_RANGE = () => `${B()}!A${FIRST_ROW}:${L.updated}${LAST_ROW}`;
 const RESERVE_RANGE = () => `${B()}!${R.c0}${R.reserveFirst}:${R.c3}${R.reserveLast}`;
 const SCHED_RANGE = () => `${TABS.schedule}!A1:F${SCHED.notesLast}`;
+const PARTS_RANGE = () => `${B()}!${R.c0}${R.partsFirst}:${R.c3}${R.partsLast}`;
+const LOANS_RANGE = () => `${B()}!${R.c0}${R.carHeadRow}:${CAR_DAY_COLS[CAR_DAY_COLS.length - 1]}${R.carLast}`;
 
 function nowStamp() {
   const d = new Date();
@@ -91,16 +93,49 @@ export function parseSchedule(rows) {
   return { date, staff, notes };
 }
 
-// LINE処理用：ボード・入庫予定・予定表を1回で読む
+// 部品発注（発注先・入荷日・車種・部品）
+export function parseParts(rows) {
+  const list = [];
+  rows.forEach((r, i) => {
+    const [supplier = '', date = '', car = '', item = ''] = r.map((x) => (x ?? '').toString().trim());
+    if (!supplier && !car && !item) return;
+    list.push({ row: R.partsFirst + i, supplier, date, car, item });
+  });
+  return list;
+}
+
+// 車検・代車（1行目＝日付の見出し、以降＝お客様／車種 × 日ごとの中身）
+export function parseLoans(rows) {
+  const head = (rows[0] || []).map((x) => (x ?? '').toString().trim());
+  const days = head.slice(2, 2 + CAR_DAY_COLS.length);
+  const list = [];
+  rows.slice(1).forEach((r, i) => {
+    const who = (r[0] ?? '').toString().trim();
+    const cells = Array.from({ length: CAR_DAY_COLS.length }, (_, k) => (r[2 + k] ?? '').toString().trim());
+    if (!who && !cells.some(Boolean)) return;
+    list.push({ row: R.carFirst + i, who, cells });
+  });
+  return { days, list };
+}
+
+// LINE処理用：ボード・入庫予定・予定表・部品・車検代車を1回で読む
 export async function loadAll() {
-  const [boardRows, resRows, schedRows] = await batchGetValues([
-    BOARD_RANGE(), RESERVE_RANGE(), SCHED_RANGE(),
+  const [boardRows, resRows, schedRows, partsRows, loanRows] = await batchGetValues([
+    BOARD_RANGE(), RESERVE_RANGE(), SCHED_RANGE(), PARTS_RANGE(), LOANS_RANGE(),
   ]);
   return {
     cars: parseCars(boardRows),
     reservations: parseReservations(resRows),
     schedule: parseSchedule(schedRows),
+    parts: parseParts(partsRows),
+    loans: parseLoans(loanRows),
   };
+}
+
+// 先回り通知用：右側（部品・車検代車）だけ読む
+export async function loadRight() {
+  const [partsRows, loanRows] = await batchGetValues([PARTS_RANGE(), LOANS_RANGE()]);
+  return { parts: parseParts(partsRows), loans: parseLoans(loanRows) };
 }
 
 // 先回り通知用：車だけ読む

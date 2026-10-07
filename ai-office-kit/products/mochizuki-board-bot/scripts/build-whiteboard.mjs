@@ -18,7 +18,7 @@ import { pathToFileURL } from 'node:url';
 import { BOARD } from '../src/config.mjs';
 import { getSpreadsheet, batchUpdate, batchUpdateValues } from '../src/sheets.mjs';
 import {
-  TABS, BOARD_STAGES, I, R, SCHED, FIRST_ROW, LAST_ROW, SLOTS, TOTAL_COLS, RIGHT_WIDTH,
+  TABS, BOARD_STAGES, I, R, SCHED, FIRST_ROW, LAST_ROW, BOARD_BOTTOM, SLOTS, TOTAL_COLS, RIGHT_WIDTH,
   CAR_DAY_COLS, colLetter,
 } from '../src/layout.mjs';
 import { seedAll, staffList, wd } from '../src/seed.mjs';
@@ -107,7 +107,7 @@ async function prepareTabs() {
   }
   reqs.push({ addSheet: { properties: {
     title: TABS.board, index: 0,
-    gridProperties: { rowCount: LAST_ROW + 6, columnCount: TOTAL_COLS, frozenRowCount: 2, hideGridlines: true },
+    gridProperties: { rowCount: BOARD_BOTTOM + 5, columnCount: TOTAL_COLS, frozenRowCount: 2, hideGridlines: true },
     tabColorStyle: { rgbColor: rgb('#1A73E8') },
   } } });
   reqs.push({ addSheet: { properties: {
@@ -155,10 +155,10 @@ function boardFormat(sid) {
   // 行の高さ
   q.push(height(sid, 0, 1, 28));
   q.push(height(sid, 1, 2, 32));
-  q.push(height(sid, d0, d1, 44));
+  q.push(height(sid, d0, BOARD_BOTTOM, 44));
 
   // 全体の基本（白地・中央・折り返し）
-  q.push(fmt(gr(sid, 0, d1, 0, TOTAL_COLS), style({ size: 10, color: INK, bg: '#FFFFFF', h: 'CENTER' })));
+  q.push(fmt(gr(sid, 0, BOARD_BOTTOM, 0, TOTAL_COLS), style({ size: 10, color: INK, bg: '#FFFFFF', h: 'CENTER' })));
 
   // --- 左：見出し（2段） ---
   q.push(fmt(gr(sid, 0, 2, 0, mainEnd), style({ size: 11, bold: true, bg: GRAY_BG, h: 'CENTER' })));
@@ -243,7 +243,11 @@ function boardFormat(sid) {
   q.push(fmt(gr(sid, R.carFirst - 1, R.carLast, c0 + 2, cE), style({ size: 10, bold: true, color: '#1A73E8', h: 'CENTER' })));
   q.push(borders(gr(sid, ch, R.carLast, c0, cE), 'SOLID_THICK', 'SOLID_MEDIUM'));
   // 代車の札（黄色の丸マグネット風）
-  q.push(cond([gr(sid, R.carFirst - 1, R.carLast, c0 + 2, cE)], notBlank, { backgroundColor: rgb('#FFE15A'), textFormat: { bold: true, foregroundColor: rgb('#1A73E8') } }));
+  q.push(cond([gr(sid, R.carFirst - 1, R.carLast, c0 + 2, cE)], notBlank, { backgroundColor: rgb('#FFE15A'), textFormat: { bold: true, foregroundColor: rgb(INK) } }));
+  // 車検のラウンド（6R・2R など）は青い丸札（代車より優先）
+  const dayTop = `${colLetter(c0 + 2)}${R.carFirst}`;
+  q.push(cond([gr(sid, R.carFirst - 1, R.carLast, c0 + 2, cE)], { type: 'CUSTOM_FORMULA', values: [{ userEnteredValue: `=REGEXMATCH(${dayTop},"[0-9]+ *[Rr]")` }] },
+    { backgroundColor: rgb('#E8F0FE'), textFormat: { bold: true, foregroundColor: rgb('#1A73E8') } }));
 
   return q;
 }
@@ -323,10 +327,10 @@ function headerValues() {
     { range: `${B}!${L(I.updated)}1`, values: [['更新']] },
     { range: `${B}!A${FIRST_ROW}:A${LAST_ROW}`, values: Array.from({ length: SLOTS }, (_, i) => [i + 1]) },
     { range: `${B}!${R.c0}${R.partsTitleRow}`, values: [['部　品　発　注']] },
-    { range: `${B}!${R.c0}${R.partsHeadRow}:${R.c3}${R.partsHeadRow}`, values: [['発注先', '日付', '車種', '部品・納期等']] },
+    { range: `${B}!${R.c0}${R.partsHeadRow}:${R.c3}${R.partsHeadRow}`, values: [['発注先', '入荷日', '車種', '部品・納期等（×＝交換）']] },
     { range: `${B}!${R.c0}${R.reserveHeadRow}`, values: [['入庫予定']] },
     { range: `${B}!${R.c2}${R.reserveHeadRow}:${R.c3}${R.reserveHeadRow}`, values: [['車種', '内容・予定']] },
-    { range: `${B}!${R.c0}${R.carHeadRow}`, values: [['代車　お客様／車種']] },
+    { range: `${B}!${R.c0}${R.carHeadRow}`, values: [['車検・代車　お客様／車種']] },
     { range: `${B}!${CAR_DAY_COLS[0]}${R.carHeadRow}:${CAR_DAY_COLS[CAR_DAY_COLS.length - 1]}${R.carHeadRow}`, values: [CAR_DAY_COLS.map((_, k) => wd(k))] },
     { range: `${T}!B${SCHED.headRow}`, values: [['午　　前']] },
     { range: `${T}!D${SCHED.headRow}`, values: [['午　　後']] },
