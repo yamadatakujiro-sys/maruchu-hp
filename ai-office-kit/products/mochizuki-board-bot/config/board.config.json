@@ -1,29 +1,22 @@
 {
-  "_comment": "工程ボードの設定。訪問で実際の工程名・呼び方が分かったら stages を差し替えるだけでOK。",
-  "stages": ["入庫", "分解", "板金", "塗装", "組付け", "検査", "納車待ち", "納車済"],
+  "_comment": "工程ボードの設定。実物のホワイトボード（2026-10-06 現地撮影）と同じ工程・並び。",
+  "stages": ["入庫", "鈑金", "下地", "マスキング", "裏吹き", "塗装", "磨き", "組付け", "納車準備", "納車済"],
+  "intakeStage": "入庫",
   "doneStage": "納車済",
-  "sheet": {
-    "tabName": "工程ボード",
-    "headerRow": 1,
-    "firstDataRow": 2,
-    "lastColumn": "I",
-    "columns": {
-      "id": "A",
-      "cust": "B",
-      "car": "C",
-      "number": "D",
-      "stage": "E",
-      "due": "F",
-      "staff": "G",
-      "updated": "H",
-      "memo": "I"
-    },
-    "header": ["ID", "お客様", "車種", "ナンバー", "工程", "納車予定", "担当", "更新日時", "メモ"]
+  "_boardStages": "ボードの「進捗状況」欄に列として並ぶ工程（入庫・納車済は列を持たない）",
+  "boardStages": ["鈑金", "下地", "マスキング", "裏吹き", "塗装", "磨き", "組付け", "納車準備"],
+  "tabs": {
+    "board": "ホワイトボード",
+    "schedule": "予定表",
+    "history": "納車済"
   },
+  "slots": 16,
+  "defaultStaff": ["社長", "松本", "井上", "林", "清水", "森", "ゆうこ", "あやか"],
+  "lockChecks": ["エアコン", "部品倉庫", "洗車場物置", "コンプレッサ", "トイレチェーン"],
   "notify": {
-    "_comment": "先回り通知のルール。日付は納車予定(F列)を YYYY-MM-DD か M/D 形式で読む。",
+    "_comment": "先回り通知のルール。納車予定（R列）を M/D か YYYY-MM-DD で読む。",
     "delayWithinDays": 1,
-    "warnBeforeStageIndex": 6,
+    "warnBeforeStage": "納車準備",
     "sameDayCollisionMin": 2
   }
 }

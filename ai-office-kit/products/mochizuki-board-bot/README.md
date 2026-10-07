@@ -1,8 +1,23 @@
-# 工程ボードBot（望月オート案件）
+# ホワイトボードBot（望月オート案件）
 
 **ホワイトボード → スマホ共有 → AI** を本番構成で動かす独立プロダクト。
-LINEに現場の一言を打つ／喋ると、Claudeが意味を判断してGoogleスプレッドシートの工程ボードを自動更新。
+スプレッドシートは**実物のホワイトボードと同じ見た目**（1〜16番 × 8工程の名札・部品発注・入庫予定・代車）＋紙と同じ**予定表**。
+LINEに現場の一言を打つ／喋ると、Claudeが意味を判断して**名札を動かす・入庫・予定を書く**。
 納期の重なり・遅れ・本日納車は「先回り通知」でLINEに届く。
+
+## LINEで送るセリフ集（デモ用・見本データの名前）
+| やりたいこと | LINEに送る | ボードの変化 |
+|---|---|---|
+| 工程を進める | `大野さんのハイエース 塗装終わった` | 4番の名札が 塗装→磨き |
+| 担当を替えて進める | `青木さんのシエンタ 鈑金終わった 下地は井上` | 1番の名札が下地へ・名前が井上に |
+| 担当だけ替える | `石川さんのワゴンR 担当はあやか` | 2番の名札の名前が変わる |
+| 納車日・部品・調色 | `上田さんのノート 納車10/20に変更`／`バンパー届いた`／`調色終わった` | R列・S列・調色の札 |
+| 新しく入庫 | `近藤様のハイエース入庫 ナンバー7777 納車10/25` | 空いている番号（9番〜）に載る／入庫予定から消える |
+| 入庫予定（予約） | `石田様 来週アクア入庫予定 リヤバンパー` | 右側「入庫予定」に追加 |
+| 休み・予定 | `ゆうこ 今日休み`／`あやか 午後 キャンバス納車` | 予定表に書く（休みは赤） |
+| 納車 | `栗原さんのアウトランダー 納車した` | 8番が空く・「納車済」タブに記録 |
+| 聞く | `今どうなってる？`／`今日誰休み？`／`部品待ちは？`／`空きある？` | 返事だけ（ボードは変えない） |
+※ 見本データは `node scripts/demo-seed.mjs` でいつでも元に戻せる。
 
 - 案件スレッド：`ai-office-kit/docs/CASE-mochizuki-whiteboard.md`
 - 体験デモ（設定不要）：`ai-office-kit/assets/whiteboard-demo/board-demo.html`
@@ -12,7 +27,7 @@ LINEに現場の一言を打つ／喋ると、Claudeが意味を判断してGoog
 
 ```
   社員のLINE（いつものLINE、新アプリ不要）
-        │  「田中さんのハイエース 塗装終わった」
+        │  「大野さんのハイエース 塗装終わった」
         ▼
   LINE Messaging API ──(Webhook)──▶ このBot（Node・Mac or クラウド）
                                         │ 1. 署名検証
@@ -20,7 +35,7 @@ LINEに現場の一言を打つ／喋ると、Claudeが意味を判断してGoog
                                         │    → どの車を・どの工程へ
                                         │ 3. Googleスプレッドシートを更新
                                         ▼
-                              Googleスプレッドシート（＝みんなの工程ボード）
+                              Googleスプレッドシート（＝実物と同じホワイトボード）
                                         │  全員のスマホで即共有
         ┌───────────────────────────────┘
         ▼
@@ -39,26 +54,32 @@ mochizuki-board-bot/
 ├─ SETUP.md              立ち上げ手順（Mac＋cloudflared・オーナー名義前提）★まずこれ
 ├─ README.md             このファイル
 ├─ .env.example          必要な鍵の一覧（.env にコピーして埋める）
-├─ config/board.config.json  工程名・シート列・通知ルール（訪問後はここを直すだけ）
+├─ config/board.config.json  工程名・タブ名・既定スタッフ・戸締り項目・通知ルール
 ├─ src/
 │  ├─ server.mjs         Webhookサーバー（本体）
 │  ├─ handler.mjs        受信→解釈→更新→返信の中核
 │  ├─ claude.mjs         Claudeで意味を解釈
 │  ├─ sheets.mjs         Google Sheets 読み書き（サービスアカウント）
-│  ├─ board.mjs          ボードのモデル（車の一覧・移動・追加）
+│  ├─ layout.mjs         ホワイトボードのセル配置（写真と同じ並び）
+│  ├─ board.mjs          ボードのモデル（名札の移動・入庫・更新・入庫予定・予定表）
+│  ├─ seed.mjs           見本データ（架空の名前・日付は実行日基準）
 │  ├─ line.mjs           LINE署名検証・返信・push
 │  ├─ notify.mjs         先回り通知のロジック
 │  └─ config.mjs         設定ロード
 ├─ bin/notify.mjs        先回り通知の実行（cron/launchdから）
 └─ scripts/
-   ├─ init-sheet.mjs     シートにヘッダ＋サンプルを投入
-   └─ selftest.mjs       クレデンシャル不要の自己テスト（npm run check）
+   ├─ build-whiteboard.mjs  ホワイトボード・予定表・納車済タブを組み立てる
+   ├─ demo-seed.mjs     盤面を見本データに戻す（デモ直前用）
+   ├─ selftest.mjs      クレデンシャル不要の自己テスト（npm run check）
+   └─ offline-e2e.mjs   偽のSheets＋偽のClaudeで通しテスト（鍵・ネット不要）
 ```
 
 ## よく使うコマンド
 ```bash
 node scripts/selftest.mjs         # ロジックの自己テスト（鍵不要）
-node scripts/init-sheet.mjs --sample   # シート初期化＋サンプル投入
+node scripts/offline-e2e.mjs      # 通しテスト（鍵・ネット不要）
+node scripts/build-whiteboard.mjs # ホワイトボードを組み立て＋見本データ（--empty で空）
+node scripts/demo-seed.mjs        # 盤面を見本データに戻す
 node src/server.mjs               # Botサーバー起動
 node bin/notify.mjs --dry         # 先回り通知の中身を送信せず確認
 node bin/notify.mjs               # 先回り通知を実送信（差分があれば）

@@ -109,3 +109,62 @@ export async function appendValues(range, values) {
   }
   return res.json();
 }
+
+// 複数範囲をまとめて読む（1リクエスト）。戻り値は範囲ごとの2次元配列。
+export async function batchGetValues(ranges) {
+  const token = await getAccessToken();
+  const q = ranges.map((r) => `ranges=${encRange(r)}`).join('&');
+  const res = await fetch(api(`/values:batchGet?${q}`), {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Sheets まとめ読み失敗: ${res.status} ${t}`);
+  }
+  const json = await res.json();
+  return (json.valueRanges || []).map((v) => v.values || []);
+}
+
+// 複数範囲をまとめて書く（1リクエスト）。data = [{ range, values }]
+export async function batchUpdateValues(data) {
+  if (!data.length) return null;
+  const token = await getAccessToken();
+  const res = await fetch(api('/values:batchUpdate'), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ valueInputOption: 'USER_ENTERED', data }),
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Sheets まとめ書き失敗: ${res.status} ${t}`);
+  }
+  return res.json();
+}
+
+// スプレッドシートの情報（タブ一覧など）
+export async function getSpreadsheet(fields = 'sheets.properties') {
+  const token = await getAccessToken();
+  const res = await fetch(api(`?fields=${encodeURIComponent(fields)}`), {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Sheets 情報取得失敗: ${res.status} ${t}`);
+  }
+  return res.json();
+}
+
+// 書式・結合・タブ追加などの構造変更（spreadsheets.batchUpdate）
+export async function batchUpdate(requests) {
+  const token = await getAccessToken();
+  const res = await fetch(api(':batchUpdate'), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ requests }),
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Sheets 書式設定失敗: ${res.status} ${t}`);
+  }
+  return res.json();
+}

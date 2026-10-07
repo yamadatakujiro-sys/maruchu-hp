@@ -43,6 +43,8 @@ function daysBetween(a, b) {
 export async function buildAlerts(today = new Date()) {
   const cars = activeCars(await listCars());
   const rule = BOARD.notify;
+  // 「この工程より手前なら遅れ」の基準（工程名で指定。旧設定の番号指定にも対応）
+  const warnIdx = rule.warnBeforeStage ? stageIndex(rule.warnBeforeStage) : (rule.warnBeforeStageIndex ?? 6);
   const alerts = [];
 
   // 1) 同日納車の重なり
@@ -66,7 +68,7 @@ export async function buildAlerts(today = new Date()) {
     if (!due) continue;
     const dt = daysBetween(due, today);
     const si = stageIndex(c.stage);
-    if (dt >= 0 && dt <= (rule.delayWithinDays ?? 1) && si >= 0 && si < (rule.warnBeforeStageIndex ?? 6)) {
+    if (dt >= 0 && dt <= (rule.delayWithinDays ?? 1) && si >= 0 && si < warnIdx) {
       alerts.push({ level: 'warn', text: `⚠️ ${c.cust}様の${c.car}：納車まであと${dt}日（${fmt(due)}）、まだ〈${c.stage}〉です` });
     }
   }

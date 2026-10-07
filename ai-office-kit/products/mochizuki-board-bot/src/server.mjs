@@ -4,7 +4,7 @@
 //  実処理は非同期で行う（返信は replyToken で行う）。
 // =============================================================
 import http from 'node:http';
-import { CONFIG } from './config.mjs';
+import { CONFIG, BOARD } from './config.mjs';
 import { verifySignature, reply, sourceTarget } from './line.mjs';
 import { handleText } from './handler.mjs';
 
@@ -71,7 +71,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(CONFIG.port, () => {
-  console.log(`工程ボードBot 起動: http://127.0.0.1:${CONFIG.port}`);
+  console.log(`ホワイトボードBot 起動: http://127.0.0.1:${CONFIG.port}`);
   console.log(`Webhook: POST /webhook  ヘルスチェック: GET /health`);
-  console.log(`モデル: ${CONFIG.anthropicModel} / タブ: ${CONFIG.sheetTab}`);
+  console.log(`モデル: ${CONFIG.anthropicModel} / タブ: ${BOARD.tabs.board}・${BOARD.tabs.schedule}`);
 });

@@ -1,9 +1,9 @@
 {
   "name": "mochizuki-board-bot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "ホワイトボード→スマホ共有→AI：LINEの一言でGoogleスプレッドシートの工程ボードを動かす独立Bot（望月オート案件）",
+  "description": "実物のホワイトボードと同じ見た目のGoogleスプレッドシートを、LINEの一言で動かす独立Bot（望月オート案件）",
   "engines": {
     "node": ">=18"
   },
@@ -11,8 +11,9 @@
     "start": "node src/server.mjs",
     "notify": "node bin/notify.mjs",
     "notify:dry": "node bin/notify.mjs --dry",
-    "init-sheet": "node scripts/init-sheet.mjs",
-    "init-sheet:sample": "node scripts/init-sheet.mjs --sample",
-    "check": "node scripts/selftest.mjs"
+    "check": "node scripts/selftest.mjs",
+    "build": "node scripts/build-whiteboard.mjs",
+    "build:empty": "node scripts/build-whiteboard.mjs --empty",
+    "demo": "node scripts/demo-seed.mjs"
   }
 }

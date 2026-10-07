@@ -96,6 +96,7 @@ export const CONFIG = {
   googleClientEmail: () => resolveGoogleCreds().client_email,
   googlePrivateKey: () => resolveGoogleCreds().private_key,
 
-  // シートのタブ名（環境変数で上書き可）
-  sheetTab: process.env.SHEET_TAB || boardConfig.sheet.tabName,
+  // スタッフ名（予定表の行・見本データの担当者）。本名は公開リポジトリに置かず .env の STAFF に書く。
+  // 例: STAFF=社長,松本,井上,林,清水,森,ゆうこ,あやか
+  staff: (process.env.STAFF || '').split(/[,、]/).map((s) => s.trim()).filter(Boolean),
 };
