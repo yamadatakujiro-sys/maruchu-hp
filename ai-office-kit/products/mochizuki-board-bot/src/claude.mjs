@@ -5,7 +5,7 @@
 // =============================================================
 import { CONFIG, BOARD } from './config.mjs';
 import { STAGES } from './board.mjs';
-import { SLOTS } from './layout.mjs';
+import { SLOTS, ROUND_RE } from './layout.mjs';
 
 const SYSTEM = `あなたは自動車の板金塗装工場の「ホワイトボード」係のアシスタントです。
 現場の社員がLINEに打つ短いメッセージを読み、ボードをどう変えるかをJSONで返します。
@@ -20,6 +20,7 @@ ${STAGES.map((s, i) => `${i}:${s}`).join(' / ')}
 - 「×」＝交換。例「バンパー×」＝バンパー交換作業、「タイヤ・ホイール×」＝タイヤ・ホイール交換。
 - 部品発注の日付＝入荷日（部品が届く日）。
 - 代車は全部で${BOARD.loanCars ?? 5}台。車検・代車の表で、車名（N-WGN・クリッパー等）が書いてある日はその代車が出ている。
+- 車検の質問は inspectionsByDate だけを見て答える（その日付に載っているものだけがその日の車検。別の日のラウンドや代車の時刻を混ぜない）。代車は loanCarsByDate を見る。「今日」は today の日付。
 
 【返すJSON】これだけを返す（説明文・コードフェンスは付けない）。使わない項目は null。
 {
@@ -63,13 +64,23 @@ export async function interpret(text, { cars, reservations, schedule, parts = []
     insurance: c.insurance, source: c.source, inDate: c.inDate,
   }));
   const data = {
+    today: todayLabel(),
     board,
     emptySlots: SLOTS - cars.length,
     reservations: reservations.map((r) => ({ cust: r.cust, car: r.car, content: r.content })),
     schedule: { date: schedule.date, staff: schedule.staff.map((s) => ({ name: s.name, am: s.am, pm: s.pm })), notes: schedule.notes },
     staffNames: schedule.staff.map((s) => s.name),
     partsOrders: parts.map((p) => ({ supplier: p.supplier, arrival: p.date, car: p.car, item: p.item })),
-    inspectionAndLoanCars: { days: loans.days, rows: loans.list.map((x) => ({ who: x.who, byDay: x.cells })), loanCarsTotal: BOARD.loanCars ?? 5 },
+    // 車検・代車の表は、日付ごとに「車検（ラウンド）」と「代車」に分けて渡す（列のずれで取り違えないように）
+    inspectionsByDate: byDate(loans, (cell) => {
+      const m = cell.match(ROUND_RE);
+      return m ? { round: `${m[1]}R` } : null;
+    }),
+    loanCarsByDate: byDate(loans, (cell) => {
+      const rest = cell.replace(ROUND_RE, '').replace(/^[・\s]+|[・\s]+$/g, '');
+      return rest ? { note: rest } : null;
+    }),
+    loanCarsTotal: BOARD.loanCars ?? 5,
   };
   const userContent =
     `今のボード・入庫予定・予定表（JSON）：\n${JSON.stringify(data)}\n\n` +
@@ -99,6 +110,28 @@ export async function interpret(text, { cars, reservations, schedule, parts = []
   const json = await res.json();
   const raw = (json.content || []).map((b) => b.text || '').join('').trim();
   return extractJson(raw);
+}
+
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+function todayLabel(d = new Date()) {
+  return `${d.getMonth() + 1}/${d.getDate()}(${WD[d.getDay()]})`;
+}
+
+// 車検・代車の表 → { "10/8(木)": [{ who, ...pick(cell) }], ... }（中身がある日だけ）
+export function byDate(loans, pick) {
+  const out = {};
+  loans.days.forEach((day, k) => {
+    if (!day) return;
+    const items = [];
+    for (const x of loans.list) {
+      const cell = (x.cells[k] || '').trim();
+      if (!cell) continue;
+      const v = pick(cell);
+      if (v) items.push({ who: x.who, ...v });
+    }
+    if (items.length) out[day] = items;
+  });
+  return out;
 }
 
 const FALLBACK = { action: 'unknown', reply: 'すみません、うまく読み取れませんでした🙏 もう一度お願いします。' };

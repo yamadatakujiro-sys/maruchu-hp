@@ -271,7 +271,12 @@ assert.ok(digest.includes('🚗 本日車検：前田様／ファンクロス　
 
 console.log('④ 部品・車検の質問がAIに届く');
 await say('今日の車検は？', { action: 'status', reply: '前田様ファンクロス 6R です' });
-assert.ok(lastUserContent.includes('"partsOrders"') && lastUserContent.includes('"inspectionAndLoanCars"') && lastUserContent.includes('6R・N-WGN 9:00')); ok('部品発注・車検代車の表もAIに渡している');
+assert.ok(lastUserContent.includes('"partsOrders"') && lastUserContent.includes('"inspectionsByDate"') && lastUserContent.includes('"loanCarsByDate"')); ok('部品発注・車検・代車もAIに渡している');
+const sent = JSON.parse(lastUserContent.slice(lastUserContent.indexOf('{'), lastUserContent.indexOf('\n\n現場からのメッセージ')));
+const todayKey = Object.keys(sent.inspectionsByDate)[0];
+assert.strictEqual(todayKey, sent.today); ok(`AIに今日の日付（${sent.today}）を渡している`);
+assert.deepStrictEqual(sent.inspectionsByDate[sent.today].map((x) => x.who), ['前田様／ファンクロス']); ok('今日の車検は前田様だけ（アトレーの6Rは翌日・17:00は代車）');
+assert.ok(sent.loanCarsByDate[sent.today].some((x) => x.note === 'クリッパー 17:00〜')); ok('代車（クリッパー17:00）は代車として渡している');
 if (SHOW) console.log('\n' + digest);
 
 assert.deepStrictEqual(warnings, []); ok('結合セルの中への書き込みなし');
