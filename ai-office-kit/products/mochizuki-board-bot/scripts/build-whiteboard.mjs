@@ -142,9 +142,9 @@ function boardFormat(sid) {
   const mainEnd = I.updated + 1;
 
   // 列幅
-  const W = { no: 36, inDate: 50, source: 74, cust: 82, carNum: 132, colorCode: 56, colorState: 54, insurance: 78, memo: 112, due: 58, parts: 132, updated: 120 };
+  const W = { no: 36, inDate: 50, source: 74, cust: 82, carNum: 132, colorCode: 64, colorState: 74, insurance: 98, memo: 112, due: 58, parts: 132, updated: 120 };
   for (const [k, px] of Object.entries(W)) q.push(width(sid, I[k], I[k] + 1, px));
-  q.push(width(sid, I.stageStart, I.stageStart + NS, 64));
+  q.push(width(sid, I.stageStart, I.stageStart + NS, 80)); // 「マスキング」「納車準備」が1行に収まる幅
   q.push(width(sid, I.gap, I.gap + 1, 14));
   q.push(width(sid, I.right, I.right + 1, 86));
   q.push(width(sid, I.right + 1, I.right + 2, 64));
