@@ -857,6 +857,7 @@
       <div class="btn-row" style="margin-bottom:16px">
         ${type === 'quote' ? '<button class="btn" data-convert="delivery">→ 納品書を作る</button><button class="btn" data-convert="invoice">→ 請求書を作る</button>' : ''}
         ${type === 'delivery' ? '<button class="btn" data-convert="invoice">→ 請求書を作る</button>' : ''}
+        ${type === 'invoice' ? '<button class="btn" data-convert="delivery">→ 納品書を作る</button>' : ''}
         <button class="btn" id="dup">⧉ 複製して新規</button>
         <button class="btn danger" id="del">削除</button>
       </div>
