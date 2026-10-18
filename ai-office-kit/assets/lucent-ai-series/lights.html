@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>Lucent ライト入荷（10/19）</title><style>
+  /* Lucent（@lucent_autoparts）ライト入荷の投稿サムネ 1080×1350（4:5）
+     ⚠️入荷投稿（arrival.html）・買取告知（buy2.html）とまったく同じ型＝シリーズに見せる
+       写真を主役に、左下に Anton の英字＋差し色オレンジは1語だけ（今回は LIGHTS.）
+     ⚠️黒い影を濃くしない・帯・飾り・絵文字は入れない（README「どこでも見る広告テンプレにしない」）
+     フォントは fonts/ に今回の文字だけ切り出して置いてある（bash fetch-fonts.sh lights.html） */
+  @font-face{font-family:'ZKG';font-weight:700;src:url('fonts/zkg-700-lights.ttf');}
+  @font-face{font-family:'Anton';src:url('fonts/anton-lights.ttf');}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  body{background:#111;}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;color:#fff;}
+  /* 写真は1108×1477（3:4）→ 横幅ぴったりで敷くと縦が約90px余るだけ（左右は切れない）。
+     y=100%で余りを全部上から切り、写真を持ち上げる → 見せ場の黒いプロジェクター（レンズ4連）が LOADED WITH の上に丸ごと出て、
+     下半分のメッキのライト群が英字の裏の質感になる。左端のテールランプの赤もそのまま残す。
+     元写真の解像度が低めなので、これ以上の拡大（background-size を大きくする）はしない */
+  .photo{position:absolute;inset:0;background:url('lights-photo.jpg') center 100%/cover no-repeat;}
+  /* 影は入荷投稿・買取告知と同じ薄さ（最大.72・濃くしない）。始まりは入荷投稿と同じ60% */
+  .shade{position:absolute;left:0;right:0;bottom:0;height:60%;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.5) 50%,rgba(0,0,0,.72) 100%);}
+  .txt{position:absolute;left:66px;right:66px;bottom:62px;}
+  /* 2段なので買取告知の180pxより大きく190px。LOADED WITH が11文字と長く、200px以上だと右端で切れる（210pxで14pxはみ出した）
+     → 190pxで右に約85pxの余白。white-space:nowrap で1行目が折り返さないようにする */
+  .en{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.9;font-size:190px;letter-spacing:.005em;white-space:nowrap;}
+  .en .c{color:#ff6a13;}
+  .jp{font-family:'ZKG',sans-serif;font-weight:700;font-size:32px;margin-top:30px;letter-spacing:.04em;}
+  .sign{display:flex;justify-content:space-between;margin-top:34px;padding-top:20px;font-family:'Anton',sans-serif;
+    border-top:2px solid rgba(255,255,255,.5);font-size:26px;letter-spacing:.18em;color:rgba(255,255,255,.85);}
+</style></head><body>
+
+<div class="slide"><div class="photo"></div><div class="shade"></div>
+  <div class="txt">
+    <div class="en"><span class="l1">Loaded with</span><br><span class="c">Lights.</span></div>
+    <div class="jp">ライト、たくさん入荷しています。</div>
+    <div class="sign"><span>LUCENT</span><span>SAITAMA, JAPAN</span></div>
+  </div>
+</div>
+
+</body></html>
