@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>一言で作った投稿</title><style>
+  /* @line_ai_office インスタ用カルーセル「店のインスタ投稿を、一言頼んで作りました。」1080×1350（4:5）×5枚
+     見た目は behind-buy.html と同じ「紙＋紺＋赤ペン」の体裁を流用（オーナー判定で見た目はOK）
+     ⚠️赤線の取り消し（.del）は使わない。赤ペン（Klee One）は差し色として少量だけ
+     ⚠️紺グラデ・絵文字・角丸カードだらけ・LINEグリーンは使わない
+     ⚠️本文の文言はオーナー確定版。一字も変えない（改行位置だけ調整）
+     フォントは fonts/*-ichigen.ttf（bash fetch-fonts.sh ichigen.html で作る。文言を変えたら再実行） */
+  @font-face{font-family:'ZKG';font-weight:700;src:url('fonts/zkg-700-ichigen.ttf');}
+  @font-face{font-family:'ZKG';font-weight:500;src:url('fonts/zkg-500-ichigen.ttf');}
+  @font-face{font-family:'Klee';font-weight:600;src:url('fonts/klee-600-ichigen.ttf');}
+  @font-face{font-family:'Anton';src:url('fonts/anton-ichigen.ttf');}
+  :root{--ink:#13233b;--paper:#f3efe6;--pen:#d23c26;--gray:#8a8f98;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  body{background:#222;}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;
+    color:var(--ink);font-family:'ZKG',sans-serif;font-weight:700;background:var(--paper);}
+  /* 紙のざらつき（ごく薄く） */
+  .slide::before{content:"";position:absolute;inset:0;opacity:.35;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .4 0 0 0 0 .3 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .in{position:absolute;inset:70px 74px 64px;display:flex;flex-direction:column;}
+
+  /* 上下の罫（書類の体裁） */
+  .head{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:16px;
+    border-bottom:3px solid var(--ink);font-family:'Anton',sans-serif;font-weight:400;font-size:28px;letter-spacing:.14em;}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;padding-top:18px;
+    border-top:1.5px solid rgba(19,35,59,.35);font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:.12em;color:rgba(19,35,59,.7);}
+
+  /* 赤ペン（丸囲み・下線だけ。取り消し線は使わない） */
+  .pen{font-family:'Klee',sans-serif;font-weight:600;color:var(--pen);}
+  .circ{position:relative;display:inline-block;padding:0 .12em;margin:0 .02em;}
+  .circ svg{position:absolute;left:-4%;top:-14%;width:108%;height:128%;overflow:visible;}
+  .uline{position:relative;display:inline-block;}
+  .uline svg{position:absolute;left:-2%;bottom:-.16em;width:104%;height:.3em;overflow:visible;}
+  .circ path,.uline path{fill:none;stroke:var(--pen);stroke-width:5;stroke-linecap:round;}
+
+  .mid{margin:auto 0;}
+  .mid + .foot{margin-top:0;}
+
+  /* 写真（白フチ＋影で、机に置いたプリント風） */
+  .shot img{display:block;width:100%;border:14px solid #fff;
+    box-shadow:0 18px 40px rgba(19,35,59,.28),0 2px 6px rgba(19,35,59,.2);}
+
+  /* 1枚目：表紙 */
+  .cover h1{font-size:118px;line-height:1.26;letter-spacing:.01em;}
+  .cover .row{display:flex;align-items:flex-end;justify-content:space-between;margin-top:64px;}
+  .cover .sub{font-size:34px;line-height:1.6;color:rgba(19,35,59,.75);letter-spacing:.04em;padding-bottom:18px;}
+  .cover .shot{width:268px;flex:none;transform:rotate(3deg);margin-right:14px;}
+  .cover .shot img{border-width:11px;}
+
+  /* 2枚目：送ったメッセージ（チャットの右側吹き出し。紺地に紙色の文字。緑は使わない） */
+  .chat{display:flex;flex-direction:column;align-items:flex-end;gap:26px;}
+  .pic{width:330px;aspect-ratio:1530/1466;overflow:hidden;border-radius:22px;
+    box-shadow:0 10px 26px rgba(19,35,59,.22);}
+  .pic img{width:100%;height:100%;object-fit:cover;transform:scale(1.03);}
+  .bubble{position:relative;background:var(--ink);color:var(--paper);
+    padding:46px 54px 50px;border-radius:40px 40px 10px 40px;
+    font-size:60px;line-height:1.5;letter-spacing:.02em;margin-right:20px;
+    box-shadow:0 12px 30px rgba(19,35,59,.22);}
+  /* しっぽ（右下） */
+  .bubble::after{content:"";position:absolute;right:-22px;bottom:0;width:44px;height:40px;
+    background:var(--ink);clip-path:polygon(0 0,100% 100%,0 100%);}
+  .say{margin-top:64px;font-size:44px;line-height:1.55;}
+  .say b{color:var(--pen);font-weight:700;}
+
+  /* 3枚目：AI社員の手分け（表組み。罫線だけで区切る） */
+  .team h2{font-size:104px;line-height:1.28;letter-spacing:.01em;}
+  .tbl{margin-top:84px;border-bottom:3px solid var(--ink);}
+  .tbl .r{display:grid;grid-template-columns:350px 1fr;align-items:center;column-gap:36px;
+    padding:36px 0;border-top:1.5px solid rgba(19,35,59,.35);}
+  .tbl .r:first-child{border-top:3px solid var(--ink);}
+  .tbl .k{font-size:46px;line-height:1.3;}
+  .tbl .v{font-size:42px;font-weight:500;line-height:1.4;}
+
+  /* 4枚目：完成品を大きく */
+  .done h2{font-size:84px;line-height:1.3;margin-top:44px;}
+  .done .sub{font-size:36px;line-height:1.6;margin-top:22px;font-weight:500;}
+  .done .shot{width:628px;margin:auto auto;transform:rotate(-2deg);position:relative;left:-40px;}
+
+  /* 5枚目：結論 */
+  .end h1{font-size:100px;line-height:1.3;}
+  .end .p{font-size:42px;line-height:1.7;margin-top:72px;font-weight:500;}
+  .end .p .n{font-family:'Anton',sans-serif;font-weight:400;font-size:1.25em;color:var(--pen);margin-right:.04em;}
+  .end .cta{display:flex;align-items:center;gap:18px;font-size:46px;margin-top:40px;transform:rotate(-2deg);transform-origin:left;}
+  .end .cta svg{width:74px;height:34px;flex:none;overflow:visible;}
+</style></head><body>
+
+<!-- 1: 表紙（見出し＋完成画像を小さく） -->
+<div class="slide cover"><div class="in">
+  <div class="head"><span>MADE WITH ONE LINE</span><span>01 / 05</span></div>
+  <div class="mid"><h1>店のインスタ<br>投稿を、<br><span class="circ">一言<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M8 58 C4 20 60 6 88 22 C104 34 98 78 60 90 C30 98 6 84 4 60 C3 46 16 30 32 24"/></svg></span>頼んで<br>作りました。</h1>
+  <div class="row"><div class="sub">本業（車の中古部品屋）の<br>アカウントの投稿です</div>
+    <div class="shot"><img src="../lucent-ai-series/arrival-1.png" alt=""></div></div></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>SWIPE</span></div>
+</div></div>
+
+<!-- 2: 送ったメッセージ（写真1枚＋一文） -->
+<div class="slide"><div class="in">
+  <div class="head"><span>MADE WITH ONE LINE</span><span>02 / 05</span></div>
+  <div class="mid">
+    <div class="chat">
+      <div class="pic"><img src="../lucent-ai-series/arrival-photo.webp" alt=""></div>
+      <div class="bubble">シルバーウイークも終わり<br>順調に部品の入荷も増えて<br>登録作業しております！<br>買取依頼もいつでもOKです<br>みたいな投稿作って！</div>
+    </div>
+    <div class="say">頼んだのは、<b>この一文</b>。<br>あとは写真1枚だけ。</div>
+  </div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>1 MESSAGE + 1 PHOTO</span></div>
+</div></div>
+
+<!-- 3: AI社員の手分け -->
+<div class="slide team"><div class="in">
+  <div class="head"><span>MADE WITH ONE LINE</span><span>03 / 05</span></div>
+  <div class="mid"><h2>あとはAI社員が<br><span class="uline">手分け<svg viewBox="0 0 300 20" preserveAspectRatio="none"><path d="M4 12 C70 6 150 16 220 9 S290 11 296 7"/></svg></span></h2>
+  <div class="tbl">
+    <div class="r"><div class="k">ライター</div><div class="v">文章を書く</div></div>
+    <div class="r"><div class="k">SNS担当・<br>アナリスト</div><div class="v">一回読んで分かるか確認</div></div>
+    <div class="r"><div class="k">デザイナー</div><div class="v">写真に文字を入れて画像に</div></div>
+  </div></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>AI STAFF</span></div>
+</div></div>
+
+<!-- 4: 完成品（大きく） -->
+<div class="slide done"><div class="in">
+  <div class="head"><span>MADE WITH ONE LINE</span><span>04 / 05</span></div>
+  <h2>できたのが、これ。</h2>
+  <div class="sub">「もう少し長くしてほしい」と一言送ったら、<br>長くした版が届きました。</div>
+  <div class="shot"><img src="../lucent-ai-series/arrival-1.png" alt=""></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>LUCENT / SAITAMA</span></div>
+</div></div>
+
+<!-- 5: 結論 -->
+<div class="slide end"><div class="in">
+  <div class="head"><span>MADE WITH ONE LINE</span><span>05 / 05</span></div>
+  <div class="mid"><h1>スマホで頼むだけの<br>AIチーム、<br>事業主向けに<br>作っています</h1>
+  <div class="p"><span class="n">9</span>つの職種がそろったチーム。</div>
+  <div class="cta pen"><svg viewBox="0 0 74 34"><path d="M4 18 C24 14 44 20 64 16 M50 4 L66 16 L52 29" fill="none" stroke="#d23c26" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>詳しくはプロフィールのリンクから</div></div>
+  <div class="foot"><span>@LINE_AI_OFFICE</span><span>AI OFFICE</span></div>
+</div></div>
+
+</body></html>

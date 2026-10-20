@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><title>Lucent 入荷の現場投稿</title><style>
+  /* Lucent（@lucent_autoparts）入荷の現場投稿サムネ 1080×1350（4:5）
+     ⚠️9/23の買取告知（buy-parts.html の A1-orange）と同じ型＝シリーズに見せる
+       写真を主役に、左下に Anton の英字＋差し色オレンジは1語だけ
+     ⚠️補修・再販・儲けの話は書かない（README参照）
+     フォントは fonts/ に今回の文字だけ切り出して置いてある（bash fetch-fonts.sh arrival.html） */
+  @font-face{font-family:'ZKG';font-weight:700;src:url('fonts/zkg-700-arrival.ttf');}
+  @font-face{font-family:'Anton';src:url('fonts/anton-arrival.ttf');}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+  body{background:#111;}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;margin:0 auto 26px;color:#fff;}
+  /* 写真は1530×1466のほぼ正方形 → 4:5に敷くと横が約330px余る。x=80%で手前ライトのレンズ〜ベゼルを右端で切らずに収め、
+     奥のもう1灯のレンズも左上に残す（どちらのレンズも英字より上＝文字で隠れない） */
+  .photo{position:absolute;inset:0;background:url('arrival-photo.webp') 80% center/cover no-repeat;}
+  /* 影は買取告知と同じ薄さ（最大.72）。明るい棚板がJUSTの裏を横切るので、始まりだけ52%→60%に上げてJUSTの上半分にも少し効かせる */
+  .shade{position:absolute;left:0;right:0;bottom:0;height:60%;
+    background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.5) 50%,rgba(0,0,0,.72) 100%);}
+  .txt{position:absolute;left:66px;right:66px;bottom:62px;}
+  .en{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.9;font-size:230px;letter-spacing:.005em;}
+  .en .c{color:#ff6a13;}
+  .jp{font-family:'ZKG',sans-serif;font-weight:700;font-size:32px;margin-top:30px;letter-spacing:.04em;}
+  .sign{display:flex;justify-content:space-between;margin-top:34px;padding-top:20px;font-family:'Anton',sans-serif;
+    border-top:2px solid rgba(255,255,255,.5);font-size:26px;letter-spacing:.18em;color:rgba(255,255,255,.85);}
+</style></head><body>
+
+<div class="slide"><div class="photo"></div><div class="shade"></div>
+  <div class="txt">
+    <div class="en">Just<br><span class="c">In.</span></div>
+    <div class="jp">連休明け、入荷が増えています。</div>
+    <div class="sign"><span>LUCENT</span><span>SAITAMA, JAPAN</span></div>
+  </div>
+</div>
+
+</body></html>

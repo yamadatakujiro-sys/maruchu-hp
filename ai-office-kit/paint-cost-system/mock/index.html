@@ -1,0 +1,556 @@
+<title>塗装原価メーター</title>
+<meta name="description" content="板金塗装の塗料原価・見積もりを見える化する訪問デモ用モック（ダミーデータ）">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=BIZ+UDPGothic:wght@400;700&family=Roboto+Mono:wght@500;700&display=swap">
+<style>
+  :root{
+    /* 現場（鉄鋼）系ニュートラル + ペトロールティールのアクセント */
+    --ground:#eef1f3;
+    --surface:#ffffff;
+    --surface-2:#f5f7f8;
+    --line:#dbe1e5;
+    --line-strong:#c3ccd2;
+    --ink:#182126;
+    --ink-2:#48575f;
+    --ink-3:#7c8a92;
+    --accent:#0d6e6b;
+    --accent-ink:#0a5250;
+    --accent-soft:#e2f0ef;
+    --profit:#16a34a;
+    --profit-soft:#e4f4ea;
+    --loss:#dc2626;
+    --loss-soft:#fbe6e6;
+    --warn:#b45309;
+    --warn-soft:#f6ecdc;
+    --shadow:0 1px 2px rgba(24,33,38,.06),0 6px 20px rgba(24,33,38,.06);
+    --shadow-lift:0 2px 6px rgba(24,33,38,.10),0 16px 40px rgba(24,33,38,.14);
+    --r:14px;
+    --r-sm:9px;
+    --maxw:460px;
+    --mono:"Roboto Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:"Zen Kaku Gothic New","BIZ UDPGothic",system-ui,sans-serif;
+    --body:"BIZ UDPGothic","Zen Kaku Gothic New",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d1316;
+      --surface:#151d21;
+      --surface-2:#1b2429;
+      --line:#26333a;
+      --line-strong:#33444c;
+      --ink:#eaf1f4;
+      --ink-2:#a9b8bf;
+      --ink-3:#7d8f97;
+      --accent:#2ec6bf;
+      --accent-ink:#7fe0da;
+      --accent-soft:#123230;
+      --profit:#3ecf7a;
+      --profit-soft:#12321f;
+      --loss:#ff6b6b;
+      --loss-soft:#39191a;
+      --warn:#e0a45a;
+      --warn-soft:#33260f;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.4);
+      --shadow-lift:0 2px 6px rgba(0,0,0,.5),0 16px 40px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1316;
+    --surface:#151d21;
+    --surface-2:#1b2429;
+    --line:#26333a;
+    --line-strong:#33444c;
+    --ink:#eaf1f4;
+    --ink-2:#a9b8bf;
+    --ink-3:#7d8f97;
+    --accent:#2ec6bf;
+    --accent-ink:#7fe0da;
+    --accent-soft:#123230;
+    --profit:#3ecf7a;
+    --profit-soft:#12321f;
+    --loss:#ff6b6b;
+    --loss-soft:#39191a;
+    --warn:#e0a45a;
+    --warn-soft:#33260f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.4);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.5),0 16px 40px rgba(0,0,0,.55);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    padding:0;
+  }
+  .wrap{width:100%;max-width:var(--maxw);min-height:100vh;background:var(--surface);
+    box-shadow:var(--shadow-lift);display:flex;flex-direction:column;position:relative}
+  @media(min-width:600px){
+    body{padding:24px 16px}
+    .wrap{border-radius:20px;overflow:hidden;min-height:auto}
+  }
+
+  /* ===== ヘッダー ===== */
+  .appbar{position:sticky;top:0;z-index:20;background:var(--surface);
+    border-bottom:1px solid var(--line);padding:12px 16px 10px}
+  .appbar-top{display:flex;align-items:center;gap:10px}
+  .logo{width:34px;height:34px;border-radius:9px;flex:none;
+    background:linear-gradient(150deg,var(--accent),var(--accent-ink));
+    display:grid;place-items:center;color:#fff;box-shadow:var(--shadow)}
+  .logo svg{width:20px;height:20px}
+  .brand{display:flex;flex-direction:column;line-height:1.15}
+  .brand b{font-family:var(--disp);font-weight:900;font-size:16px;letter-spacing:.02em}
+  .brand span{font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+  .demo-badge{margin-left:auto;font-family:var(--disp);font-weight:700;font-size:10px;
+    letter-spacing:.08em;color:var(--warn);background:var(--warn-soft);
+    border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);
+    padding:3px 8px;border-radius:999px;white-space:nowrap}
+
+  /* ===== ステップナビ ===== */
+  .steps{display:flex;gap:4px;margin-top:12px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  .steps::-webkit-scrollbar{display:none}
+  .step{flex:1 1 0;min-width:74px;border:none;background:var(--surface-2);
+    color:var(--ink-2);font-family:var(--body);cursor:pointer;
+    border-radius:var(--r-sm);padding:8px 6px 7px;text-align:center;transition:.16s;
+    border:1px solid transparent}
+  .step:hover{background:var(--accent-soft)}
+  .step .n{display:block;font-family:var(--mono);font-weight:700;font-size:11px;color:var(--ink-3)}
+  .step .t{display:block;font-size:11px;font-weight:700;margin-top:1px;line-height:1.25}
+  .step[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:var(--shadow)}
+  .step[aria-selected="true"] .n{color:rgba(255,255,255,.75)}
+  .step:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ===== 画面共通 ===== */
+  main{flex:1;overflow-y:auto;padding:16px 16px 96px}
+  .screen{display:none;animation:fade .28s ease both}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){.screen{animation:none}}
+  .lead{margin:2px 0 14px}
+  .lead h2{font-family:var(--disp);font-weight:900;font-size:19px;margin:0;letter-spacing:.01em;text-wrap:balance}
+  .lead p{margin:4px 0 0;font-size:12.5px;color:var(--ink-2)}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);overflow:hidden}
+  .card + .card{margin-top:12px}
+  .card-h{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .card-h h3{margin:0;font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.02em}
+  .card-h .hint{margin-left:auto;font-size:10.5px;color:var(--ink-3)}
+  .eyebrow{font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--accent);margin:18px 0 7px}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700}
+  .yen::before{content:"¥";font-family:var(--mono);font-weight:500;opacity:.6;margin-right:1px}
+
+  /* ===== ① 原価マスタ テーブル ===== */
+  .tbl-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:340px}
+  thead th{font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.04em;
+    color:var(--ink-3);text-align:right;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  thead th:first-child{text-align:left}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  tbody td:first-child{text-align:left}
+  tbody tr:last-child td{border-bottom:none}
+  .swatch{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;
+    vertical-align:-1px;border:1px solid rgba(0,0,0,.15)}
+  .kind{font-size:10px;color:var(--ink-3);display:block;margin-top:1px}
+  .unit-cell{color:var(--accent-ink);font-weight:700}
+  .unit-cell small{font-weight:500;color:var(--ink-3);font-family:var(--body)}
+  .autocalc{display:flex;align-items:center;gap:7px;padding:10px 14px;background:var(--accent-soft);
+    font-size:11.5px;color:var(--accent-ink);font-weight:700}
+  .autocalc svg{width:15px;height:15px;flex:none}
+
+  /* ===== ② 使用量入力 ===== */
+  .job{display:flex;flex-wrap:wrap;gap:6px 14px;padding:12px 14px;font-size:12px}
+  .job div{display:flex;flex-direction:column}
+  .job dt{font-size:10px;color:var(--ink-3);letter-spacing:.03em}
+  .job dd{margin:0;font-weight:700}
+  .uselist{padding:6px 6px 4px}
+  .userow{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:var(--r-sm)}
+  .userow + .userow{border-top:1px solid var(--line)}
+  .userow .nm{flex:1;min-width:0;font-size:12.5px;font-weight:700;line-height:1.25}
+  .userow .nm small{display:block;font-weight:400;color:var(--ink-3);font-size:10px}
+  .stepper{display:flex;align-items:center;gap:0;flex:none;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
+  .stepper button{width:30px;height:32px;border:none;background:var(--surface-2);color:var(--ink);
+    font-size:17px;cursor:pointer;font-family:var(--mono);line-height:1;display:grid;place-items:center}
+  .stepper button:hover{background:var(--accent-soft);color:var(--accent-ink)}
+  .stepper button:active{background:var(--accent);color:#fff}
+  .stepper input{width:52px;height:32px;border:none;border-left:1px solid var(--line);border-right:1px solid var(--line);
+    text-align:center;font-family:var(--mono);font-weight:700;font-size:14px;background:var(--surface);color:var(--ink);
+    -moz-appearance:textfield}
+  .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .stepper .g{font-size:10px;color:var(--ink-3);padding:0 8px 0 6px}
+  .rowcost{flex:none;width:64px;text-align:right;font-family:var(--mono);font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+  .mat-total{display:flex;align-items:baseline;justify-content:space-between;padding:13px 16px;
+    background:var(--accent-soft);border-top:1px solid var(--line)}
+  .mat-total .lbl{font-family:var(--disp);font-weight:700;font-size:13px;color:var(--accent-ink)}
+  .mat-total .val{font-family:var(--mono);font-weight:700;font-size:22px;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+
+  /* ===== ③ 見積もり ===== */
+  .rows{padding:4px 0}
+  .qrow{display:flex;align-items:baseline;gap:10px;padding:10px 16px;font-size:13px}
+  .qrow + .qrow{border-top:1px solid var(--line)}
+  .qrow .rk{color:var(--ink-2)}
+  .qrow .rk small{display:block;color:var(--ink-3);font-size:10px}
+  .qrow .rv{margin-left:auto;font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+  .qrow.sum{background:var(--surface-2)}
+  .qrow.sum .rk{font-family:var(--disp);font-weight:700;color:var(--ink)}
+  .qrow.sum .rv{font-size:17px}
+  .field{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .field input{width:64px;height:30px;border:1px solid var(--line-strong);border-radius:7px;text-align:right;
+    padding:0 8px;font-family:var(--mono);font-weight:700;background:var(--surface);color:var(--ink);-moz-appearance:textfield}
+  .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .field span{font-size:11px;color:var(--ink-3)}
+
+  .quote-hero{padding:16px;background:linear-gradient(160deg,var(--accent),var(--accent-ink));color:#fff}
+  .quote-hero .k{font-size:11px;letter-spacing:.06em;opacity:.85;font-weight:700}
+  .quote-hero .big{font-family:var(--mono);font-weight:700;font-size:34px;line-height:1.1;margin-top:2px;font-variant-numeric:tabular-nums}
+  .quote-hero .sub{display:flex;gap:14px;margin-top:8px;font-size:12px;opacity:.95;flex-wrap:wrap}
+  .quote-hero .sub b{font-family:var(--mono)}
+
+  /* 赤字ライン ゲージ */
+  .gauge{padding:14px 16px 16px}
+  .gauge .cap{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-3);margin-bottom:6px}
+  .bar{position:relative;height:26px;border-radius:8px;overflow:hidden;
+    background:linear-gradient(90deg,var(--loss-soft),var(--profit-soft))}
+  .bar .cost{position:absolute;top:0;bottom:0;left:0;background:var(--loss-soft);border-right:2px dashed var(--loss)}
+  .bar .mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+  .bar .mark.deal{background:var(--warn)}
+  .bar .mark.offer{background:var(--profit)}
+  .gauge .legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;font-size:11px}
+  .gauge .legend div{display:flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:2px;flex:none}
+  .note-line{margin-top:12px;font-size:11.5px;color:var(--ink-2);background:var(--loss-soft);
+    border-left:3px solid var(--loss);padding:8px 11px;border-radius:0 8px 8px 0}
+  .note-line b{color:var(--loss)}
+
+  /* ===== ④ 実績・予測 ===== */
+  .predict{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--profit-soft)}
+  .predict .ic{width:38px;height:38px;border-radius:10px;background:var(--profit);display:grid;place-items:center;flex:none}
+  .predict .ic svg{width:20px;height:20px}
+  .predict .tx{font-size:12px}
+  .predict .tx b{font-family:var(--mono);font-size:16px;color:var(--profit)}
+  .hist{padding:6px 14px 12px}
+  .hbar{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:11.5px}
+  .hbar .hn{flex:none;width:58px;color:var(--ink-2);font-family:var(--mono);font-size:10.5px}
+  .hbar .track{flex:1;height:9px;border-radius:5px;background:var(--surface-2);overflow:hidden}
+  .hbar .fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),var(--accent-ink))}
+  .hbar .hv{flex:none;width:52px;text-align:right;font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+  .soon{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.06em;color:var(--accent-ink);
+    background:var(--accent-soft);padding:2px 7px;border-radius:999px;margin-left:8px}
+
+  /* ===== 正直な前提 ===== */
+  .honest{margin-top:20px;border:1px dashed var(--line-strong);border-radius:var(--r);padding:14px 15px;background:var(--surface-2)}
+  .honest h4{margin:0 0 8px;font-family:var(--disp);font-weight:700;font-size:12.5px;display:flex;align-items:center;gap:7px}
+  .honest h4 svg{width:15px;height:15px;color:var(--warn)}
+  .honest ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:6px}
+  .honest li{font-size:11.5px;color:var(--ink-2);line-height:1.55}
+  .honest li b{color:var(--ink)}
+
+  .footer{padding:14px 16px 22px;font-size:10.5px;color:var(--ink-3);text-align:center;line-height:1.6}
+  .footer b{color:var(--ink-2)}
+</style>
+
+<div class="wrap">
+  <!-- ヘッダー -->
+  <header class="appbar">
+    <div class="appbar-top">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 3H6a1 1 0 0 0-1 1v3h14V4a1 1 0 0 0-1-1Z"/><path d="M5 7v3a2 2 0 0 0 2 2h5"/><path d="M12 12v4"/><rect x="9" y="16" width="6" height="5" rx="1"/>
+        </svg>
+      </div>
+      <div class="brand">
+        <b>塗装原価メーター</b>
+        <span>板金塗装の材料費・見積もりを見える化</span>
+      </div>
+      <span class="demo-badge">デモ（仮）</span>
+    </div>
+    <div class="steps" role="tablist" aria-label="画面切替">
+      <button class="step" role="tab" aria-selected="true" data-t="s1"><span class="n">01</span><span class="t">原価マスタ</span></button>
+      <button class="step" role="tab" aria-selected="false" data-t="s2"><span class="n">02</span><span class="t">使用量入力</span></button>
+      <button class="step" role="tab" aria-selected="false" data-t="s3"><span class="n">03</span><span class="t">見積もり</span></button>
+      <button class="step" role="tab" aria-selected="false" data-t="s4"><span class="n">04</span><span class="t">実績・予測</span></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ① 原価マスタ -->
+    <section class="screen active" id="s1">
+      <div class="lead">
+        <h2>原価マスタ</h2>
+        <p>塗料・クリヤー・硬化剤などを「内容量 × 缶の値段」で1回だけ登録。<strong>1gあたり単価</strong>を自動計算します。</p>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>登録済みマテリアル</h3><span class="hint">全6品目</span></div>
+        <div class="tbl-scroll">
+          <table>
+            <thead>
+              <tr><th>品名</th><th>内容量</th><th>缶単価</th><th>1gあたり</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="swatch" style="background:#f2f3f5"></span>ソリッドホワイト<span class="kind">カラーベース・QM1</span></td><td class="num">1,000 g</td><td class="num yen">9,800</td><td class="unit-cell num yen">9.80<small>/g</small></td></tr>
+              <tr><td><span class="swatch" style="background:#eef1ee"></span>パールホワイト<span class="kind">カラーベース・QAB</span></td><td class="num">500 g</td><td class="num yen">12,600</td><td class="unit-cell num yen">25.20<small>/g</small></td></tr>
+              <tr><td><span class="swatch" style="background:#c9ccd1"></span>メタリックシルバー<span class="kind">カラーベース・KY0</span></td><td class="num">1,000 g</td><td class="num yen">11,000</td><td class="unit-cell num yen">11.00<small>/g</small></td></tr>
+              <tr><td><span class="swatch" style="background:#dfe6ea"></span>クリヤー<span class="kind">上塗り（2:1）</span></td><td class="num">1,000 g</td><td class="num yen">6,400</td><td class="unit-cell num yen">6.40<small>/g</small></td></tr>
+              <tr><td><span class="swatch" style="background:#e7dcc6"></span>硬化剤（ハードナー）<span class="kind">クリヤー用</span></td><td class="num">500 g</td><td class="num yen">4,200</td><td class="unit-cell num yen">8.40<small>/g</small></td></tr>
+              <tr><td><span class="swatch" style="background:#eaeef0"></span>シンナー（薄め液）<span class="kind">標準</span></td><td class="num">4,000 g</td><td class="num yen">5,600</td><td class="unit-cell num yen">1.40<small>/g</small></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="autocalc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
+          缶単価 ÷ 内容量 ＝ 1gあたり単価を自動計算。登録は最初の1回だけ。
+        </div>
+      </div>
+      <p class="eyebrow">ポイント</p>
+      <div class="card"><div class="job" style="display:block;padding:13px 15px;font-size:12px;color:var(--ink-2)">
+        缶によって内容量（200g・500g・1L…）がバラバラでも、<b style="color:var(--ink)">同じ「1gあたり」の土俵に揃える</b>のでブレません。仕入れ値を更新したら単価も自動で追従します。
+      </div></div>
+    </section>
+
+    <!-- ② 使用量入力 -->
+    <section class="screen" id="s2">
+      <div class="lead">
+        <h2>使用量入力</h2>
+        <p>1台ごとに使った量（g）を入れるだけ。<strong>材料費が自動で出ます</strong>。＋−で試しに動かせます。</p>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>作業カード</h3><span class="hint">#A-2048</span></div>
+        <dl class="job">
+          <div><dt>車両</dt><dd>日産 セレナ（C28）</dd></div>
+          <div><dt>作業</dt><dd>リアバンパー 単品塗装</dd></div>
+          <div><dt>色</dt><dd>ソリッドホワイト QM1</dd></div>
+          <div><dt>担当</dt><dd>—</dd></div>
+        </dl>
+        <div class="uselist" id="uselist">
+          <!-- JSで生成 -->
+        </div>
+        <div class="mat-total">
+          <span class="lbl">材料費 合計</span>
+          <span class="val"><span style="font-size:14px">¥</span><span id="matTotal">0</span></span>
+        </div>
+      </div>
+      <p class="eyebrow">現場の手間を減らす（開発中）</p>
+      <div class="card"><div class="job" style="display:block;padding:13px 15px;font-size:12px;color:var(--ink-2)">
+        入力の手間が製品の肝。<b style="color:var(--ink)">はかり連携・音声入力・調色機のデータ取込</b>などで「入れる手間」を極小化していきます（現場ヒアリングで優先順位を決めます）。
+      </div></div>
+    </section>
+
+    <!-- ③ 見積もり -->
+    <section class="screen" id="s3">
+      <div class="lead">
+        <h2>見積もり</h2>
+        <p>材料費に工賃・諸経費を乗せて<strong>原価と見積もり</strong>を確定。「どこから赤字か」も見えます。</p>
+      </div>
+
+      <div class="card">
+        <div class="rows">
+          <div class="qrow"><span class="rk">材料費<small>②の使用量から自動</small></span><span class="rv"><span id="q_mat">1,227</span></span></div>
+          <div class="qrow">
+            <span class="rk">工賃<small>作業時間 × レバレート</small></span>
+            <span class="field">
+              <input id="q_hours" type="number" value="2.5" step="0.5" min="0" inputmode="decimal" aria-label="作業時間">
+              <span>h ×</span>
+              <input id="q_rate" type="number" value="6000" step="500" min="0" inputmode="numeric" aria-label="レバレート">
+              <span>円/h</span>
+            </span>
+          </div>
+          <div class="qrow"><span class="rk">工賃 小計</span><span class="rv"><span id="q_labor">15,000</span></span></div>
+          <div class="qrow">
+            <span class="rk">消耗品・諸経費<small>マスキング・ペーパー等</small></span>
+            <span class="field"><span>¥</span><input id="q_misc" type="number" value="1500" step="100" min="0" inputmode="numeric" aria-label="諸経費"></span>
+          </div>
+          <div class="qrow sum"><span class="rk">原価 合計</span><span class="rv" style="color:var(--loss)"><span id="q_cost">17,727</span></span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="quote-hero">
+          <div class="k">提示見積もり（税抜）</div>
+          <div class="big">¥<span id="q_offer">26,000</span></div>
+          <div class="sub">
+            <span>粗利 <b id="q_profit">¥8,273</b></span>
+            <span>粗利率 <b id="q_margin">31.8%</b></span>
+          </div>
+        </div>
+        <div class="gauge">
+          <div class="cap"><span>赤字ライン（原価）</span><span>提示額</span></div>
+          <div class="bar" id="bar" aria-hidden="true">
+            <div class="cost" id="barCost"></div>
+            <div class="mark deal" id="barDeal"></div>
+            <div class="mark offer" id="barOffer"></div>
+          </div>
+          <div class="legend">
+            <div><span class="dot" style="background:var(--loss)"></span>原価 <span class="num" id="lg_cost" style="margin-left:2px">¥17,727</span></div>
+            <div><span class="dot" style="background:var(--warn)"></span>協定後(-8%) <span class="num" id="lg_deal" style="margin-left:2px">¥23,920</span></div>
+            <div><span class="dot" style="background:var(--profit)"></span>提示 <span class="num" id="lg_offer" style="margin-left:2px">¥26,000</span></div>
+          </div>
+          <div class="note-line">保険協定で <b>8%</b> 値引かれても粗利 <span class="num" id="dealProfit">¥6,193</span>（<span id="dealMargin">25.9%</span>）。<b>原価¥<span id="note_cost">17,727</span> より下は赤字</b>＝ここが交渉のライン。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ 実績・予測 -->
+    <section class="screen" id="s4">
+      <div class="lead">
+        <h2>実績・予測</h2>
+        <p>台数を重ねるほど精度が上がります。<strong>「この作業なら材料費いくら」</strong>を見積もり前に予測。</p>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>リアバンパー 単品塗装（ホワイト系）</h3><span class="hint">実績 12件</span></div>
+        <div class="predict">
+          <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg></div>
+          <div class="tx">予測材料費 <b>¥1,190</b> ／ 平均使用量 ソリッド系 <b style="font-size:13px">43g</b><br><span style="color:var(--ink-3)">見積もり画面に「約¥1,200」と先出しできます</span></div>
+        </div>
+        <div class="hist">
+          <div class="hbar"><span class="hn">#A-2048</span><span class="track"><span class="fill" style="width:78%"></span></span><span class="hv yen">1,227</span></div>
+          <div class="hbar"><span class="hn">#A-1994</span><span class="track"><span class="fill" style="width:70%"></span></span><span class="hv yen">1,105</span></div>
+          <div class="hbar"><span class="hn">#A-1953</span><span class="track"><span class="fill" style="width:82%"></span></span><span class="hv yen">1,288</span></div>
+          <div class="hbar"><span class="hn">#A-1902</span><span class="track"><span class="fill" style="width:66%"></span></span><span class="hv yen">1,040</span></div>
+          <div class="hbar"><span class="hn">#A-1877</span><span class="track"><span class="fill" style="width:74%"></span></span><span class="hv yen">1,166</span></div>
+        </div>
+      </div>
+      <p class="eyebrow">これから増やす<span class="soon">構想</span></p>
+      <div class="card"><div class="job" style="display:block;padding:13px 15px;font-size:12px;color:var(--ink-2)">
+        車種・パネル・色系統ごとの平均使用量が貯まると、<b style="color:var(--ink)">写真や作業名からザックリ見積もり</b>が出せるように。ふわっと → しっかり、を実績で裏づけます。
+      </div></div>
+
+      <!-- 正直な前提 -->
+      <div class="honest">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>正直な前提（できること・できないこと）</h4>
+        <ul>
+          <li><b>1g未満の超微量</b>は測れないと原価も出ません。「はかりで計量」か「作業ごとの標準使用量（実績平均）」で扱います。魔法ではありません。</li>
+          <li><b>精度は入力データしだい</b>。最初は記録の手間が要ります。その手間を最小化するのが本製品の役目です。</li>
+          <li>既存見積ソフト（コグニ／アウダ／ブロードリーフ等）との<b>自動連携は現時点で約束しません</b>（CSV取込・手入力の橋渡しから）。</li>
+          <li>レバレートや保険協定の値引きを<b>止める機能ではありません</b>。「どこから赤字か」を見える化し、交渉の根拠を作ります。</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="footer">
+      これは<b>訪問デモ用のモック（仮）</b>です。品名・数値・画面はすべて<b>ダミー</b>で、実際の製品仕様ではありません。<br>現場ヒアリング後に仕様を確定します。 ／ 案件：塗料原価の見える化システム
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var yen = function(n){ return Math.round(n).toLocaleString("ja-JP"); };
+
+  /* ---- 画面切替 ---- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".step"));
+  var screens = {};
+  Array.prototype.forEach.call(document.querySelectorAll(".screen"), function(s){ screens[s.id]=s; });
+  tabs.forEach(function(tab){
+    tab.addEventListener("click", function(){
+      tabs.forEach(function(t){ t.setAttribute("aria-selected", t===tab ? "true":"false"); });
+      Object.keys(screens).forEach(function(id){ screens[id].classList.remove("active"); });
+      screens[tab.getAttribute("data-t")].classList.add("active");
+      document.querySelector("main").scrollTop = 0;
+    });
+  });
+
+  /* ---- ② 使用量：単価はマスタ由来（¥/g）---- */
+  var items = [
+    {name:"ソリッドホワイト", sub:"カラーベース", g:45,  u:9.80},
+    {name:"硬化剤（ベース用）", sub:"ハードナー", g:12, u:8.40},
+    {name:"シンナー（ベース用）", sub:"薄め液", g:20,   u:1.40},
+    {name:"クリヤー", sub:"上塗り", g:60,               u:6.40},
+    {name:"硬化剤（クリヤー用）", sub:"ハードナー", g:30, u:8.40},
+    {name:"シンナー（クリヤー用）", sub:"薄め液", g:15,   u:1.40}
+  ];
+
+  var listEl = document.getElementById("uselist");
+  function render(){
+    listEl.innerHTML = "";
+    items.forEach(function(it, i){
+      var row = document.createElement("div");
+      row.className = "userow";
+      row.innerHTML =
+        '<div class="nm">'+it.name+'<small>'+it.sub+'　@¥'+it.u.toFixed(2)+'/g</small></div>'+
+        '<div class="stepper">'+
+          '<button type="button" data-d="-1" data-i="'+i+'" aria-label="'+it.name+'を減らす">−</button>'+
+          '<input type="number" min="0" step="1" value="'+it.g+'" data-i="'+i+'" inputmode="numeric" aria-label="'+it.name+'の使用量(g)">'+
+          '<button type="button" data-d="1" data-i="'+i+'" aria-label="'+it.name+'を増やす">＋</button>'+
+          '<span class="g">g</span>'+
+        '</div>'+
+        '<div class="rowcost">¥'+yen(it.g*it.u)+'</div>';
+      listEl.appendChild(row);
+    });
+    recalc();
+  }
+  function recalc(){
+    var mat = items.reduce(function(s,it){ return s + it.g*it.u; }, 0);
+    document.getElementById("matTotal").textContent = yen(mat);
+    // 各行コスト更新
+    Array.prototype.forEach.call(listEl.querySelectorAll(".rowcost"), function(el,i){
+      el.textContent = "¥"+yen(items[i].g*items[i].u);
+    });
+    updateQuote(mat);
+  }
+  listEl.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-d]"); if(!b) return;
+    var i = +b.getAttribute("data-i"), d = +b.getAttribute("data-d");
+    items[i].g = Math.max(0, items[i].g + d);
+    var inp = listEl.querySelector('input[data-i="'+i+'"]'); if(inp) inp.value = items[i].g;
+    recalc();
+  });
+  listEl.addEventListener("input", function(e){
+    var inp = e.target.closest('input[data-i]'); if(!inp) return;
+    var i = +inp.getAttribute("data-i");
+    items[i].g = Math.max(0, parseFloat(inp.value)||0);
+    recalc();
+  });
+
+  /* ---- ③ 見積もり ---- */
+  var DEAL = 0.08;      // 保険協定 想定値引き
+  function updateQuote(mat){
+    var hours = parseFloat(document.getElementById("q_hours").value)||0;
+    var rate  = parseFloat(document.getElementById("q_rate").value)||0;
+    var misc  = parseFloat(document.getElementById("q_misc").value)||0;
+    var labor = hours*rate;
+    var cost  = mat + labor + misc;
+
+    // 提示額：原価に対して一定の粗利を狙う（デモは原価+約47%を目安、100円丸め）
+    var offer = Math.round((cost * 1.4667)/100)*100;
+    var profit = offer - cost;
+    var margin = offer>0 ? (profit/offer*100) : 0;
+    var deal = Math.round(offer*(1-DEAL));
+    var dealProfit = deal - cost;
+    var dealMargin = deal>0 ? (dealProfit/deal*100) : 0;
+
+    document.getElementById("q_mat").textContent = yen(mat);
+    document.getElementById("q_labor").textContent = yen(labor);
+    document.getElementById("q_cost").textContent = yen(cost);
+    document.getElementById("q_offer").textContent = yen(offer);
+    document.getElementById("q_profit").textContent = "¥"+yen(profit);
+    document.getElementById("q_margin").textContent = margin.toFixed(1)+"%";
+    document.getElementById("lg_cost").textContent = "¥"+yen(cost);
+    document.getElementById("lg_deal").textContent = "¥"+yen(deal);
+    document.getElementById("lg_offer").textContent = "¥"+yen(offer);
+    document.getElementById("note_cost").textContent = yen(cost);
+    document.getElementById("dealProfit").textContent = "¥"+yen(dealProfit);
+    document.getElementById("dealMargin").textContent = dealMargin.toFixed(1)+"%";
+
+    // ゲージ（0 〜 提示額×1.05 のスケール）
+    var scale = offer*1.05 || 1;
+    document.getElementById("barCost").style.width  = Math.min(100, cost/scale*100)+"%";
+    document.getElementById("barDeal").style.left   = Math.min(100, deal/scale*100)+"%";
+    document.getElementById("barOffer").style.left  = Math.min(100, offer/scale*100)+"%";
+  }
+  ["q_hours","q_rate","q_misc"].forEach(function(id){
+    document.getElementById(id).addEventListener("input", function(){
+      var mat = items.reduce(function(s,it){ return s+it.g*it.u; },0);
+      updateQuote(mat);
+    });
+  });
+
+  render();
+})();
+</script>
