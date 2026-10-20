@@ -79,7 +79,8 @@
   .phone{width:100%;max-width:430px;background:var(--surface);
     display:flex;flex-direction:column;min-height:100vh;position:relative;overflow:hidden}
   @media(min-width:520px){
-    .phone{min-height:auto;height:min(880px,94vh);border-radius:30px;
+    /* 高さは中身に合わせる（固定すると画面の低いPCでボードが潰れる） */
+    .phone{min-height:auto;height:auto;border-radius:30px;
       box-shadow:var(--shadow-lift);border:1px solid var(--line)}
   }
 
@@ -127,7 +128,8 @@
   .note p .sub{display:block;color:var(--ink-soft);font-size:11px;margin-top:1px}
 
   /* カンバン */
-  .board{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;gap:0;
+  /* ボードはカードの高さより縮めない（余白があれば広がる） */
+  .board{flex:1 0 auto;overflow-x:auto;overflow-y:hidden;display:flex;gap:0;
     padding:12px 4px 14px;background:var(--stage);
     scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
   .col{flex:none;width:158px;padding:0 8px;display:flex;flex-direction:column;gap:8px;
