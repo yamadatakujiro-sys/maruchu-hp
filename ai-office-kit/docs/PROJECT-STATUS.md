@@ -23,7 +23,7 @@
 > 🗓**インスタは毎週月曜に投稿**（オーナーの決まり。投稿日を別の曜日で提案しない）。**ルーセント 19:30頃 → @line_ai_office 20:30頃**（紹介する側を後に）。
 > 🗓**今週（10/26〜）のインスタ**（2026-10-20）
 > - ✅**@lucent_autoparts：工程ボードの体験版リール WHITEBOARD ON EVERY PHONE.**（`assets/lucent-ai-series/koutei-reel.mp4`＋カバー`koutei-cover.png`＋README「今週の1本」）。素材＝オーナーが撮った「みんなの工程ボード」体験版の画面録画。出口＝DMで「ボード」→ 体験版リンク（`assets/koutei-board-demo/`）。本業7：AI3の枠内。
-> - ⏳オーナー：体験版の共有を「リンクを知っている全員」にして、ログインなしで開けるか確認／（推奨）相談元の社長に一言伝える。
+> - ⏳オーナー：体験版の公開URL（GitHub Pages・ログイン不要）https://yamadatakujiro-sys.github.io/maruchu-hp/ai-office-kit/assets/koutei-board-demo/ をマージ後にスマホで開いて確認／（推奨）相談元の社長に一言伝える。claude.ai のアーティファクトのリンクは送る先に使わない（開かなかった）。
 > - 🚫**@line_ai_office にはこの動画を出さない**（プロフィール「LINEは使いません」と食い違う・工程ボードは値段未定・求人原稿配布の「ほしい」件数を計測中）。10/26の @line_ai_office 枠は求人の反応を見て別に決める。
 > - 見る数字＝「ボード」DM数／リーチ（うちフォロワー）／平均再生時間／シェア／ストーリーズ閲覧。配達のついでに取引先3軒へ直接見せ、言葉を記録。
 > - 前週（10/19）：ルーセント ライト入荷 LOADED WITH LIGHTS.／@line_ai_office 求人原稿の無料配布（試乗）カルーセル6枚（「ほしい」には `free-giveaway/kyujin-prompt.txt`＋`kyujin-dm-2/1.png`）。
