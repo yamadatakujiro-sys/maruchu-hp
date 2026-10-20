@@ -57,7 +57,7 @@
 大手はもう"AI画像見積"をやっている（Tractable／コグニビジョン Espart Pro／ブロードリーフ Repair.c／JARWA／Seibii）。ただし大手は「正式見積・損保連携」＝大工場向けで重い/高い。**ルーセントの狙いは真逆＝小さい工場が今すぐ安く現場をラクに＝隙間**。競合増＝AIが業界の常識化＝追い風。
 
 ## 体験版の公開とルーセントでの投稿（2026-10-20）
-- 体験版「みんなの工程ボード」＝**公開URL https://yamadatakujiro-sys.github.io/maruchu-hp/koutei/ （⏳未公開：Pagesは nail-sample だけを公開するワークフローなので、体験版を /koutei/ に足す変更がオーナー判断待ち）**（GitHub Pages・ログイン不要。本体＝`ai-office-kit/assets/koutei-board-demo/index.html`）。作業用の元はオーナーのアーティファクト（非公開）。
+- 体験版「みんなの工程ボード」＝**公開URL https://yamadatakujiro-sys.github.io/maruchu-hp/koutei/ （PR #23 のマージで公開。2026-10-20 オーナー許可で Pages のワークフローに /koutei/ を追加）**（GitHub Pages・ログイン不要。本体＝`ai-office-kit/assets/koutei-board-demo/index.html`）。作業用の元はオーナーのアーティファクト（非公開）。
   - 下の注意書きに「体験版は決まった言い方で動きます。中の名前・車は架空です。」を追加（体験版はAIを呼ばず決まりで動くため）。
   - 2026-10-20：アーティファクトのリンクがオーナーのアプリで「ページが見つかりません」→ claude.ai に頼らず GitHub Pages で公開する形に変更。⏳マージ後、オーナーがスマホで開けるか確認。
 - オーナーが画面録画（17秒）を撮った → **@lucent_autoparts で 10/26(月) にリール投稿**（`assets/lucent-ai-series/koutei-reel.mp4`）。出口＝DMで「ボード」→ 体験版リンク。

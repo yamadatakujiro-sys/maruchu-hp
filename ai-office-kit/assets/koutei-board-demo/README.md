@@ -1,8 +1,8 @@
 # みんなの工程ボード（体験版）
 
 - **公開URL（DMで送るのはこれ）**：
-  https://yamadatakujiro-sys.github.io/maruchu-hp/koutei/ （⏳未公開：Pagesは nail-sample だけを公開するワークフローなので、体験版を /koutei/ に足す変更がオーナー判断待ち）
-  - GitHub Pages から配信する予定（**ログイン不要・誰でも開ける**）。今の Pages は `.github/workflows/deploy-pages.yml` で `nail-sample/`（Lino）だけを公開しているので、体験版の index.html を `/koutei/` に足す変更が要る。
+  https://yamadatakujiro-sys.github.io/maruchu-hp/koutei/ （PR #23 のマージで公開。2026-10-20 オーナー許可で Pages のワークフローに /koutei/ を追加）
+  - GitHub Pages から配信（**ログイン不要・誰でも開ける**）。`.github/workflows/deploy-pages.yml` が、`nail-sample/`（Lino）を直下に、この `index.html` を `/koutei/` にまとめて公開する。main でこの index.html を直すと自動で出し直される。
   - 公開元は Settings → Pages の「GitHub Actions」（main への push で自動デプロイ）。
 - 作業用の元：オーナーのアーティファクト https://claude.ai/artifact/EnuYdQzqL7xJqhjK2UpQWs （非公開。2026-10-20、オーナーのアプリで「ページが見つかりません」になったため、送る先には使わない）
 - このフォルダの `index.html` が公開版の本体。head に title・lang="ja"・OGP（LINE等で貼ったときの表示）を入れてある。

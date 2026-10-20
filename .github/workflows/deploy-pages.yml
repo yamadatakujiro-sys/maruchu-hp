@@ -1,13 +1,15 @@
 # ネイルサロン「Lino」デモサイトを GitHub Pages に公開するワークフロー
-# 公開対象は nail-sample/ のみ（公開URL直下 = Lino のTOPページ）
-name: Deploy nail-sample to GitHub Pages
+# 公開対象は nail-sample/（公開URL直下 = Lino のTOPページ）
+# ＋ 工程ボードの体験版（公開URL/koutei/ = ai-office-kit/assets/koutei-board-demo/index.html）
+name: Deploy nail-sample (+ koutei demo) to GitHub Pages
 
 on:
-  # mainブランチの nail-sample 配下が更新されたら自動デプロイ
+  # mainブランチの nail-sample 配下・工程ボード体験版が更新されたら自動デプロイ
   push:
     branches: [main]
     paths:
       - 'nail-sample/**'
+      - 'ai-office-kit/assets/koutei-board-demo/index.html'
       - '.github/workflows/deploy-pages.yml'
   # 手動実行も可能
   workflow_dispatch:
@@ -38,10 +40,17 @@ jobs:
         with:
           enablement: true
 
-      - name: nail-sample をアーティファクトとしてアップロード
+      - name: 公開するファイルをまとめる（Lino ＋ 工程ボード体験版）
+        run: |
+          mkdir -p _site
+          cp -R nail-sample/. _site/
+          mkdir -p _site/koutei
+          cp ai-office-kit/assets/koutei-board-demo/index.html _site/koutei/index.html
+
+      - name: まとめたファイルをアーティファクトとしてアップロード
         uses: actions/upload-pages-artifact@v3
         with:
-          path: nail-sample
+          path: _site
 
       - name: GitHub Pages へデプロイ
         id: deployment
