@@ -138,9 +138,9 @@ DMありがとうございます。
 
 ### 投稿前にオーナーが確認すること（10/25(日)まで）
 1. 体験版の公開URL（DMの［リンク］に貼るのはこれ）を、**スマホで開いて例文をタップし、車が動くか**確かめる。
-   https://yamadatakujiro-sys.github.io/maruchu-hp/ai-office-kit/assets/koutei-board-demo/
+   https://yamadatakujiro-sys.github.io/maruchu-hp/koutei/ （⏳未公開：Pagesは nail-sample だけを公開するワークフローなので、体験版を /koutei/ に足す変更がオーナー判断待ち）
    - claude.ai のアーティファクトのリンクは使わない（非公開で、オーナーのアプリでも「ページが見つかりません」になった）。
-   - 開かなければ GitHub の Settings → Pages の公開元（main／(root)）を確認。
+   - 公開されるまでは、DMには予備の返信を使う。
 2. （推奨）相談をくれた社長に「ご相談をきっかけに体験版を作った。社名・地域は出さずに投稿する」と一言伝える。返事待ちの相手が先にSNSで見つけると気まずいため。
 
 ### 投稿の流れ

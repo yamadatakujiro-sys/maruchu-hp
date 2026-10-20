@@ -1,9 +1,9 @@
 # みんなの工程ボード（体験版）
 
 - **公開URL（DMで送るのはこれ）**：
-  https://yamadatakujiro-sys.github.io/maruchu-hp/ai-office-kit/assets/koutei-board-demo/
-  - GitHub Pages（このリポジトリの main）から配信。**ログイン不要・誰でも開ける**。main にマージされて1〜2分で反映。
-  - 開かないときは GitHub の Settings → Pages で、公開元が「main／(root)」になっているか確認。
+  https://yamadatakujiro-sys.github.io/maruchu-hp/koutei/ （⏳未公開：Pagesは nail-sample だけを公開するワークフローなので、体験版を /koutei/ に足す変更がオーナー判断待ち）
+  - GitHub Pages から配信する予定（**ログイン不要・誰でも開ける**）。今の Pages は `.github/workflows/deploy-pages.yml` で `nail-sample/`（Lino）だけを公開しているので、体験版の index.html を `/koutei/` に足す変更が要る。
+  - 公開元は Settings → Pages の「GitHub Actions」（main への push で自動デプロイ）。
 - 作業用の元：オーナーのアーティファクト https://claude.ai/artifact/EnuYdQzqL7xJqhjK2UpQWs （非公開。2026-10-20、オーナーのアプリで「ページが見つかりません」になったため、送る先には使わない）
 - このフォルダの `index.html` が公開版の本体。head に title・lang="ja"・OGP（LINE等で貼ったときの表示）を入れてある。
 - 本番の想定：社員がいつものLINEで「◯◯さんの△△、□□終わった」と打つ（喋る）→ Claude が読んで判断 → Googleスプレッドシートの車を次の工程へ動かす → 全員のスマホに反映。納期の重なり・遅れは LINE で先回り通知。
