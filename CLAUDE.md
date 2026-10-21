@@ -26,3 +26,8 @@ Claude × LINE のAI社員チームを顧客ごとに代行構築・運用代行
 **この事業の作業を再開・継続するときは、まず必ず `ai-office-kit/docs/PROJECT-STATUS.md` を最初に読むこと。**
 そこに全体像・確定した決定事項（販売モデル・価格・差別化方針・X/LINE集客など）と現況がまとまっている（＝記憶の本体）。
 新しい決定をしたら PROJECT-STATUS.md に追記する。詳細は `ai-office-kit/docs/` 配下の各ドキュメント参照。
+
+## 別リポジトリ：自動車板金・整備業界の作業効率化（auto-repair-dx）
+板金・整備工場向けの案件（望月オートの工程ボード／塗料原価の見える化／本橋さんの事務自動化）は、
+2026-10-21 に **`yamadatakujiro-sys/auto-repair-dx`** へ移行した。これらの作業はそちらで行い、まず `docs/STATUS.md` を読むこと。
+※工程ボード体験版の公開URL（`/koutei/`）はこのリポジトリの Pages から配信しているため、`ai-office-kit/assets/koutei-board-demo/` は控えとして残している。

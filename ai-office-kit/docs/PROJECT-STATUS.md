@@ -8,12 +8,13 @@
 ## 🧵 案件別スレッド一覧（情報が混ざらないよう案件ごとに別スレッドで進める）
 > 各案件は**専用ブリーフ1枚を読めば全contextが分かる**ようにしてある。新しいスレッドを開いたら、まず該当ファイルを読む。
 > 新しい決定は**そのCASEファイル**に追記する（このハブには一覧だけ置く）。
+> 🚚**2026-10-21：自動車板金・整備の効率化案件（下の3件・事務ヒアリング文面・塗料原価モック・望月オート提案資料）は、新リポジトリ `yamadatakujiro-sys/auto-repair-dx` に移行した。** 案件の作業はそちらで行い、まず `docs/STATUS.md` を読む。工程ボード体験版は公開URLを守るため `assets/koutei-board-demo/` にも残している（auto-repair-dx の `apps/koutei-board/` と同じ内容に保つ）。
 
 | 案件 | 専用ブリーフ（最初に読む） | ひとこと |
 |---|---|---|
-| 望月オート（ホワイトボード→スマホ共有→AI） | `ai-office-kit/docs/CASE-mochizuki-whiteboard.md` | 提案PDF完成済み。社長の反応待ち。 |
-| 塗料原価の見える化システム（LINEなし・独立製品） | `ai-office-kit/docs/CASE-paint-cost-system.md` | 日産系板金屋が第1号候補。現地ヒアリングで仕様固めから。 |
-| 本橋さん（板金屋）事務効率化（納品書・請求書自動化／迷惑メール） | `ai-office-kit/docs/CASE-motohashi-jimu.md` | LINEでヒアリング回答→「できますよ」で希望を持たせた段階。反応待ち。 |
+| 望月オート（ホワイトボード→スマホ共有→AI） | auto-repair-dx リポジトリの `docs/cases/CASE-mochizuki-whiteboard.md` | 提案PDF完成済み。社長の反応待ち。 |
+| 塗料原価の見える化システム（LINEなし・独立製品） | auto-repair-dx リポジトリの `docs/cases/CASE-paint-cost-system.md` | 日産系板金屋が第1号候補。現地ヒアリングで仕様固めから。 |
+| 本橋さん（板金屋）事務効率化（納品書・請求書自動化／迷惑メール） | auto-repair-dx リポジトリの `docs/cases/CASE-motohashi-jimu.md` | LINEでヒアリング回答→「できますよ」で希望を持たせた段階。反応待ち。 |
 
 ---
 

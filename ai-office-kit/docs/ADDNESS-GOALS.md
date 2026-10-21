@@ -24,7 +24,7 @@
 
 ## 3. 業界の声を集める（Threadsの会話を続ける）
 親：`1. AI社員キットの最初の1件を売る（実績0→1）`
-[説明]（現在）Threadsで triple_trucks・sedeino16 の2人と会話が成立（n=2）。見積はソフトで解決済み、痛みは人手不足、というのが分かってきた。事務作業ヒアリングのLINE文面（`docs/JIMU-HEARING.md`）も用意済み。**今は"声を集めるだけ"のフェーズ**（1人の要望で商品を作らない）。
+[説明]（現在）Threadsで triple_trucks・sedeino16 の2人と会話が成立（n=2）。見積はソフトで解決済み、痛みは人手不足、というのが分かってきた。事務作業ヒアリングのLINE文面（auto-repair-dx の `docs/JIMU-HEARING.md`）も用意済み。**今は"声を集めるだけ"のフェーズ**（1人の要望で商品を作らない）。
 [完了基準]（理想）板金屋・整備屋の社長から**事務作業の困りごとの声がさらに複数集まり**、**同じ作業が2人以上から出た「本命の入口」が1つ特定できている**。声はすべて `docs/LUCENT-X-PLAN.md` に原文ママで記録。
 
 ## 4. カレンダーの被り検知をテストする
@@ -58,7 +58,7 @@
 1. 上の8ゴールを作成（親①の下に2〜5、親②の下に6〜8）。
 2. 各ゴールに `write_goal_detail` で要点を入れる（判断を間違えないための要点のみ／リポジトリの丸写しはしない）。
    - ⚠️**SNSアカウントが2つある**ことを本文に明記：Addnessの「3本/日」は **`@line_ai_office` 用**。**`@hellolucent`（本業）は 本業9:AI1**。
-   - 参照の在処＝`docs/DIRECT-OFFER.md` `docs/LUCENT-X-PLAN.md` `docs/JIMU-HEARING.md` `assets/free-giveaway/` と本ファイル。
+   - 参照の在処＝`docs/DIRECT-OFFER.md` `docs/LUCENT-X-PLAN.md` auto-repair-dx の `docs/JIMU-HEARING.md` `assets/free-giveaway/` と本ファイル。
 3. `bind_context` で workspace と紐付ける（次回から自動で解決される）。
 4. 作成できたゴールIDを `PROJECT-STATUS.md` に1行ずつ追記する。
 5. 以後、**タスクの追加・完了はAddness側**で行い、節目ごとに `append_goal_memory` で決定事項の差分だけを記録する。
