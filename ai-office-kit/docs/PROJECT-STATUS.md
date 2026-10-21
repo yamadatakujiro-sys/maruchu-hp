@@ -24,7 +24,8 @@
 > 🗓**今週のインスタ**（2026-10-21更新）：ルーセントの工程ボードリールは**10/21(水)19:30に前倒し**（オーナー判断・Business Suiteで予約）
 > - ✅**@lucent_autoparts：工程ボードの体験版リール WHITEBOARD ON EVERY PHONE.**（`assets/lucent-ai-series/koutei-reel.mp4`＋カバー`koutei-cover.png`＋README「今週の1本」）。素材＝オーナーが撮った「みんなの工程ボード」体験版の画面録画。出口＝DMで「ボード」→ 体験版リンク（`assets/koutei-board-demo/`）。本業7：AI3の枠内。
 > - ⏳オーナー：体験版の公開URL（GitHub Pages・ログイン不要）https://yamadatakujiro-sys.github.io/maruchu-hp/koutei/ （PR #23 のマージで公開。2026-10-20 オーナー許可で Pages のワークフローに /koutei/ を追加） をマージ後にスマホで開いて確認／（推奨）相談元の社長に一言伝える。claude.ai のアーティファクトのリンクは送る先に使わない（開かなかった）。
-> - 🚫**@line_ai_office にはこの動画を出さない**（プロフィール「LINEは使いません」と食い違う・工程ボードは体験版の段階（値段＝作る費用5万円〜はDMだけで伝える）・求人原稿配布の「ほしい」件数を計測中）。次の @line_ai_office 投稿は求人の反応を見て別に決める。
+> - ✅**X・Threads にも出す**（オーナー依頼）：10/22(木) 20:00 X @hellolucent／20:05 Threads @lucent_autoparts、10/23(金) 20:30 X @line_ai_office／20:35 Threads @line_ai_office。本文＝`assets/lucent-ai-series/README.md`・`assets/line-ai-office-ig/README.md`。@line_ai_office 版は「スタートキットとは別に、LINEを使って1社ずつ作るもの」と明記。
+> - 🚫**@line_ai_office （インスタ）にはこの動画を出さない**（プロフィール「LINEは使いません」と食い違う・工程ボードは体験版の段階（値段＝作る費用5万円〜はDMだけで伝える）・求人原稿配布の「ほしい」件数を計測中）。次の @line_ai_office 投稿は求人の反応を見て別に決める。
 > - 見る数字＝「ボード」DM数／リーチ（うちフォロワー）／平均再生時間／シェア／ストーリーズ閲覧。配達のついでに取引先3軒へ直接見せ、言葉を記録。
 > - 前週（10/19）：ルーセント ライト入荷 LOADED WITH LIGHTS.／@line_ai_office 求人原稿の無料配布（試乗）カルーセル6枚（「ほしい」には `free-giveaway/kyujin-prompt.txt`＋`kyujin-dm-2/1.png`）。
 > - 10/5 以前は**反応ほぼなし**。アナリスト見立て＝文より**届いていない**（リーチ13.5%・フォロワー外3.8%）→ ストーリーズ共有＋取引先に直接。
