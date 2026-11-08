@@ -256,7 +256,7 @@
 const STAGES = [
   {key:"入庫",   phase:"recv"},
   {key:"分解",   phase:"recv"},
-  {key:"板金",   phase:"work"},
+  {key:"鈑金",   phase:"work"},
   {key:"塗装",   phase:"work"},
   {key:"組付け", phase:"fin"},
   {key:"検査",   phase:"fin"},
@@ -406,7 +406,7 @@ function parseAndMove(text){
     {re:/検査/, idx:5},
     {re:/組(み)?付|くみつけ/, idx:4},
     {re:/塗装|塗り|ぬり/, idx:3},
-    {re:/板金|ばんきん/, idx:2},
+    {re:/鈑金|板金|ばんきん/, idx:2},
     {re:/(ばらし|分解)/, idx:1},
     {re:/(入庫|預か|あずか|入った)/, idx:0},
   ];
@@ -453,7 +453,7 @@ input.addEventListener("keydown", e=>{ if(e.key==="Enter") submit(); });
 
 /* クイック例文 */
 const CHIPS = [
-  "佐藤さんのフィット 板金終わった",
+  "佐藤さんのフィット 鈑金終わった",
   "田中さんのハイエース 塗装上がった",
   "山本さんのアルファード 組付け完了",
   "中村さんのタント 検査OK",
